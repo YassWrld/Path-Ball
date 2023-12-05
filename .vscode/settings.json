@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "sdl.h": "c",
+    "sdl_ttf.h": "c",
+    "sdl2_gfxprimitives.h": "c",
+    "math.h": "c"
+  }
+}
