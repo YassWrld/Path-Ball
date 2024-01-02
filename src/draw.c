@@ -44,12 +44,12 @@ void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radi
     }
 }
 
-void drawDiagonal(SDL_Renderer *renderer, int cellSize, int direction, int centerX, int centerY)
+void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY)
 {
     // Set the length of the diagonal line
 
     // Calculate the end points of the diagonal based on the direction
-
+    int cellSize = GRID_SIZE / n;
     int of = cellSize / 4;    // OFFSET
     int bold = cellSize / 10; // boldness
 
@@ -72,8 +72,10 @@ void drawDiagonal(SDL_Renderer *renderer, int cellSize, int direction, int cente
     }
 }
 
-void drawGrid(SDL_Renderer *renderer, int n, int cellSize, int matrix[n][n], int hoverI, int hoverJ)
+void drawGrid(SDL_Renderer *renderer, game Game, int hoverI, int hoverJ)
 {
+    int n = Game.level + 5;
+    int cellSize = GRID_SIZE / n;
 
     SDL_SetRenderDrawColor(renderer, BORDER_COLOR);
 
@@ -111,35 +113,38 @@ void drawGrid(SDL_Renderer *renderer, int n, int cellSize, int matrix[n][n], int
             int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
             if (j > 0 && j < n - 1)
             {
-                int current = matrix[i][j];
-                if (current != 0)
+                int current = Game.matrix[i][j];
+
+                if (current != 0 && Game.state)
                 {
 
-                    drawDiagonal(renderer, cellSize, current, x, y);
+                    drawDiagonal(renderer, n, current, x, y);
                 }
 
                 continue;
             }
 
-            SDL_SetRenderDrawColor(renderer, BIG_CIRCLE_COLOR);
+            SDL_SetRenderDrawColor(renderer, BORDER_COLOR); // Color of the big circle
+
             drawFilledCircle(renderer, x, y, cellSize / 3); // Draw the big circle vertically
+
             drawFilledCircle(renderer, y, x, cellSize / 3); // Draw the big circle horizontally
+            int startI, startJ;
+            findStart(n, Game.matrix, Game.solution->start, &startI, &startJ);
 
-          //  SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
-
-            hoverI == i &&hoverJ == j ? SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR) : SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
+            startI == i &&startI == j && Game.state == 1 ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR) : SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
             drawFilledCircle(renderer, x, y, cellSize / 4); // Draw the small circle vertically
 
-
-            hoverI == j &&hoverJ== i ? SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR) : SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
+            startI == j &&startJ == i&& Game.state==1 ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR) : SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
 
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
 }
 
-void drawPath(SDL_Renderer *renderer, int cellSize, path *sPath)
+void drawPath(SDL_Renderer *renderer, int n, path *sPath)
 {
+    int cellSize = GRID_SIZE / n;
     SDL_SetRenderDrawColor(renderer, PATH_COLOR);
     while (sPath->next != NULL && sPath != NULL)
     {

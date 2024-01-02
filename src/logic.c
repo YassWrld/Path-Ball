@@ -1,4 +1,7 @@
 #include <logic.h>
+/*
+matrix logic part
+*/
 
 void initializeMatrix(int n, int matrix[n][n])
 {
@@ -37,25 +40,6 @@ void initializeMatrix(int n, int matrix[n][n])
             matrix[i][j] = 0;
         }
     }
-}
-
-int updateLevel(int level, int *winStreak, int *loseStreak)
-{
-    if (winStreak == 3)
-    {
-        level++;
-        *winStreak = 0;
-        *loseStreak = 0;
-    }
-    if (winStreak == 3)
-    {
-        level--;
-        *winStreak = 0;
-        *loseStreak = 0;
-    }
-    
-    
-    return level;
 }
 
 int setObstacles(int n, int matrix[n][n])
@@ -226,15 +210,17 @@ solution *setupMatrix(int n, int matrix[n][n])
 {
     initializeMatrix(n, matrix);
     int obs = setObstacles(n, matrix);
-    //int start = randomInt(11, 4 * (n - 2));
+    // int start = randomInt(11, 4 * (n - 2));
     solution *s = solveMatrix(11, obs, n, matrix);
-    for (int i = 12; i <= 4 * (n - 2);i++){
+    for (int i = 12; i <= 4 * (n - 2); i++)
+    {
         solution *tmp = solveMatrix(i, obs, n, matrix);
-        if(tmp->hit > s->hit){
+        if (tmp->hit > s->hit)
+        {
             s = tmp;
         }
     }
-        
+
     return s;
 }
 
@@ -315,5 +301,23 @@ void getTopPlayers(player players[])
             players[4] = current;
             sortTopPlayers(players);
         }
+    }
+}
+
+/*
+game part
+*/
+
+void updateLevel(game *game)
+{
+    if (game->winStreak % 3 == 0)
+    {
+        game->level++;
+        game->loseStreak = 0;
+    }
+    if (game->loseStreak == 3)
+    {
+        game->level--;
+        game->winStreak = 0;
     }
 }

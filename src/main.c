@@ -13,87 +13,49 @@
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
-
 void initialize();
 void Quit();
-int matrix[20][20];
-int winStreak = 0;
-int loseStreak = 0;
-int level = 1;
-int hoverI = 0;
-int hoverJ = 0;
+
+game Game;
 
 int main(int argc, char *argv[])
 {
-
     initialize();
-
-    int n = 6;
-
-    solution *s = setupMatrix(n, matrix);
-
-    printMatrix(n, matrix);
-
-    printf("start: %d, end: %d, hit: %d, noHit: %d\n", s->start, s->end,s->hit,s->noHit);
-
-    int cellSize = GRID_SIZE / n;
-
+    bool quit = false;
     SDL_Event e;
-    int quit = 0;
+    Game.level = 1;
+    Game.solution = setupMatrix(Game.level + 5, Game.matrix);
+    Game.state = Memorizing;
+
+    printMatrix(Game.level + 5, Game.matrix);
     while (!quit)
     {
 
-        SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-        SDL_RenderClear(renderer);
-        drawGrid(renderer, n, cellSize, matrix, hoverI, hoverJ);
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
             {
-                quit = 1;
+                quit = true;
             }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                int key = e.key.keysym.sym;
-                // key x
-                if (key == 120)
-                {
-                    printf("x pressed\n");
-                    quit = 1;
-                }
-            }
-            else if (e.type == SDL_MOUSEBUTTONDOWN)
-            {
-                drawPath(renderer, cellSize, s->path);
-                SDL_PollEvent(&(SDL_Event){0});
-                SDL_Delay(2000);
-                level++;
-                if (level % 3 == 0)
-                {
-                    n++;
-                    cellSize = GRID_SIZE / n;
-                }
+        }
+        SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
+        SDL_RenderClear(renderer);
 
-                s = setupMatrix(n, matrix);
-                printMatrix(n, matrix);
-                printf("start: %d, end: %d, hit: %d, noHit: %d\n", s->start, s->end, s->hit, s->noHit);
-
-                // SDL_Delay(20000);
-            }
-            else if (e.type == SDL_MOUSEMOTION)
-            {
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-                getMatrixClick(renderer, x, y, n, &hoverI, &hoverJ);
-            }
-        };
+        switch (Game.state)
+        {
+        case Memorizing:
+            drawGrid(renderer, Game, 0, 0);
+            Game.state = Selecting;
+            break;
+        case Selecting:
+            drawGrid(renderer, Game, 0, 0);
+            break;
+        }
 
         SDL_RenderPresent(renderer);
+        SDL_Delay(Game.state==0?10*1000:10);
     }
-
-    // Clean up and exit
     Quit();
-    return 0;
 }
 
 void initialize()

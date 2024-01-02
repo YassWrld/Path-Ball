@@ -1,5 +1,3 @@
-
-
 #ifndef LOGIC_H
 #define LOGIC_H
 
@@ -7,6 +5,21 @@
 #include <stdio.h>
 #include <string.h>
 #include "util.h"
+
+typedef enum Directions
+{
+    Up,
+    Right,
+    Down,
+    Left
+} direction;
+
+typedef struct ball
+{
+    direction dir;
+    int x;
+    int y;
+} ball;
 
 typedef struct path
 {
@@ -24,22 +37,6 @@ typedef struct solution
     path *path;
 
 } solution;
-
-typedef enum Directions
-{
-    Up,
-    Right,
-    Down,
-    Left
-} direction;
-
-typedef struct ball
-{
-    direction dir;
-    int x;
-    int y;
-} ball;
-
 typedef struct player
 {
     char name[20];
@@ -47,8 +44,28 @@ typedef struct player
     date_t date;
 
 } player;
+
+typedef enum game_state
+{
+    Memorizing,
+    Selecting,
+    Result,
+} game_state;
+
+typedef struct game
+{
+    game_state state;
+    player player;
+    int matrix[20][20];
+    int level;
+    int maxLevel;
+    int winStreak;
+    int loseStreak;
+    solution *solution;
+} game;
+
 solution *setupMatrix(int n, int matrix[n][n]);
-int updateLevel(int level, int *winStreak, int *loseStreak);
+void updateLevel(game *game);
 void initializeMatrix(int n, int matrix[n][n]);
 void findStart(int n, int matrix[n][n], int start, int *x, int *y);
 int setObstacles(int n, int matrix[n][n]);
