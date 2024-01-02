@@ -3,6 +3,23 @@
     "sdl.h": "c",
     "sdl_ttf.h": "c",
     "sdl2_gfxprimitives.h": "c",
-    "math.h": "c"
+    "math.h": "c",
+    "charconv": "c",
+    "chrono": "c",
+    "optional": "c",
+    "format": "c",
+    "ratio": "c",
+    "system_error": "c",
+    "array": "c",
+    "functional": "c",
+    "tuple": "c",
+    "type_traits": "c",
+    "utility": "c",
+    "utils.h": "c",
+    "util.h": "c",
+    "numbers": "c",
+    "any": "c",
+    "memory": "c",
+    "sstream": "c"
   }
 }
