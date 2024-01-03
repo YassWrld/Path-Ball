@@ -250,19 +250,29 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
 
 void drawSideBar(SDL_Renderer *renderer, game *Game)
 {
-    
+    // side bar
     int outline = 10;
-    SDL_Rect outerSideBar = {GRID_SIZE + OFFSET * 2, 0, WIDTH, HEIGHT};
-    SDL_Rect innerSideBar = {outerSideBar.x + outline, outerSideBar.y + outline, outerSideBar.w - 2 * outline, outerSideBar.h - 2 * outline};
+    int sideBarWidth = WIDTH - GRID_SIZE - OFFSET * 2;
+    
+    SDL_Rect outerSideBar = {GRID_SIZE + OFFSET * 2, 0, sideBarWidth, HEIGHT};
+    SDL_Rect innerSideBar = {GRID_SIZE + OFFSET * 2+ outline, outline,sideBarWidth - 2 * outline, HEIGHT - 2 * outline};
+
     SDL_SetRenderDrawColor(renderer, SIDE_BAR_OUTLINE_COLOR);
     SDL_RenderFillRect(renderer, &outerSideBar);
 
     SDL_SetRenderDrawColor(renderer, SIDE_BAR_COLOR);
     SDL_RenderFillRect(renderer, &innerSideBar);
+
+    // 3 displays
+        // Name
+        // Level
+        // Score
+
     
-    // rectangle
-    // 2 displays
     // 2 buttons
+        // Pause
+        // Save & Quit
+    
 }
 
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
@@ -314,4 +324,27 @@ playMusic(char *path)
     Mix_PlayMusic(music, -1);
 
     return music;
+}
+
+
+void writeText(SDL_Renderer *renderer,char *fontPath, char *text,int x,int y, int size, int r, int g, int b, int a)
+
+{
+    TTF_Font *font = TTF_OpenFont(fontPath, size);
+    if (!font)
+    {
+        printf("TTF_OpenFont Error: %s\n", TTF_GetError());
+        return;
+    }
+
+    SDL_Color color = {r, g, b, a};
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect = {x, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+    TTF_CloseFont(font);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }

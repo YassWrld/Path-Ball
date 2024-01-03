@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 
     Game.solution = setupMatrix(Game.level + 5, Game.matrix);
     Game.state = Memorizing;
+    
     printf("start: %d,i=%d,j=%d\n", Game.solution->start, Game.solution->startI, Game.solution->startJ);
     printMatrix(Game.level + 5, Game.matrix);
     while (!quit)
