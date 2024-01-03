@@ -42,6 +42,11 @@ void initializeMatrix(int n, int matrix[n][n])
     }
 }
 
+
+
+
+
+
 int setObstacles(int n, int matrix[n][n])
 {
     // Calculate the maximum number of obstacles in the interior
@@ -54,7 +59,7 @@ int setObstacles(int n, int matrix[n][n])
     int numObstacles = randomInt(minObstacles, maxObstacles);
     int k = numObstacles;
     // Print the total number of obstacles
-    printf("Obstacles: %d\n", numObstacles);
+    // printf("Obstacles: %d\n", numObstacles);
 
     // Place random obstacles (either 1 or -1) at random positions in the interior
 
@@ -71,7 +76,7 @@ int setObstacles(int n, int matrix[n][n])
             matrix[x][y] = obstacle;
 
             // Print the coordinates of the generated obstacle
-            printf("Obstacle at (x, y) = (%d, %d)\n", x, y);
+            // printf("Obstacle at (x, y) = (%d, %d)\n", x, y);
 
             k--;
         }
@@ -143,6 +148,8 @@ solution *solveMatrix(int start, int obs, int n, int matrix[n][n])
     direction d;
     int i = 0, j = 0;
     findStart(n, matrix, start, &i, &j);
+    s->startI = i;
+    s->startJ = j;
     start = start - 10;
     int m = n - 2;
 
@@ -203,6 +210,9 @@ solution *solveMatrix(int start, int obs, int n, int matrix[n][n])
 
     s->end = matrix[b.x][b.y];
     s->noHit = obs - s->hit;
+    s->endI = b.x;
+    s->endJ = b.y;
+
     return s;
 }
 
@@ -211,6 +221,7 @@ solution *setupMatrix(int n, int matrix[n][n])
     initializeMatrix(n, matrix);
     int obs = setObstacles(n, matrix);
     // int start = randomInt(11, 4 * (n - 2));
+
     solution *s = solveMatrix(11, obs, n, matrix);
     for (int i = 12; i <= 4 * (n - 2); i++)
     {
@@ -310,14 +321,16 @@ game part
 
 void updateLevel(game *game)
 {
-    if (game->winStreak % 3 == 0)
+    if (game->winStreak == 3)
     {
         game->level++;
         game->loseStreak = 0;
+        game->winStreak = 0;
     }
     if (game->loseStreak == 3)
     {
         game->level--;
         game->winStreak = 0;
+        game->loseStreak = 0;
     }
 }

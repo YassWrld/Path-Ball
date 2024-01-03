@@ -8,8 +8,29 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
         *j = -1;
         return;
     }
+
     *j = (clickX - OFFSET) * n / GRID_SIZE;
     *i = (clickY - OFFSET) * n / GRID_SIZE;
+
+    // check if the click in the circle
+
+    bool isOuterMatrix = *i == 0 || *i == n - 1 || *j == 0 || *j == n - 1;
+    if (!isOuterMatrix)
+    {
+        return;
+    }
+
+    int cellSize = GRID_SIZE / n;
+    int x = OFFSET + *j * cellSize + cellSize / 2 + THICKNESS / 2;
+    int y = OFFSET + *i * cellSize + cellSize / 2 + THICKNESS / 2;
+    int radius = cellSize / 3; // radius of the small circle
+
+    if (clickX < x - radius || clickX > x + radius || clickY < y - radius || clickY > y + radius)
+    {
+        *i = -1;
+        *j = -1;
+        return;
+    }
 }
 
 // void getClickCenter()
@@ -63,7 +84,7 @@ void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int
     SDL_SetRenderDrawColor(renderer, DIAGONAL_COLOR); // Set the color of the diagonal
     if (direction < 0)
     {
-        SDL_SetRenderDrawColor(renderer, 240, 236, 231, 254);
+        SDL_SetRenderDrawColor(renderer, DIAGONAL_COLOR);
     }
     for (int s = 0; s < bold; ++s)
     {
@@ -72,10 +93,16 @@ void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int
     }
 }
 
-void drawGrid(SDL_Renderer *renderer, game Game, int hoverI, int hoverJ)
+void drawGrid(SDL_Renderer *renderer, game *Game)
 {
-    int n = Game.level + 5;
+    int n = Game->level + 5;
     int cellSize = GRID_SIZE / n;
+
+    int matrix[n][n];
+
+    // cast the matrix using mmset
+    memcpy(matrix, Game->matrix, sizeof(matrix));
+    // copy the matrix
 
     SDL_SetRenderDrawColor(renderer, BORDER_COLOR);
 
@@ -113,12 +140,11 @@ void drawGrid(SDL_Renderer *renderer, game Game, int hoverI, int hoverJ)
             int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
             if (j > 0 && j < n - 1)
             {
-                int current = Game.matrix[i][j];
-
-                if (current != 0 && Game.state)
+                int current = matrix[i][j];
+                if (current != 0 && Game->state != 1)
                 {
-
                     drawDiagonal(renderer, n, current, x, y);
+                    // drawDiagonal(renderer, n, current, x, y);
                 }
 
                 continue;
@@ -129,14 +155,49 @@ void drawGrid(SDL_Renderer *renderer, game Game, int hoverI, int hoverJ)
             drawFilledCircle(renderer, x, y, cellSize / 3); // Draw the big circle vertically
 
             drawFilledCircle(renderer, y, x, cellSize / 3); // Draw the big circle horizontally
-            int startI, startJ;
-            findStart(n, Game.matrix, Game.solution->start, &startI, &startJ);
+            int startI = Game->solution->startI, startJ = Game->solution->startJ;
 
-            startI == i &&startI == j && Game.state == 1 ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR) : SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
+            int hoverX, hoverY;
+            SDL_GetMouseState(&hoverX, &hoverY);
+
+            int hoverI, hoverJ;
+            getMatrixClick(renderer, hoverX, hoverY, n, &hoverI, &hoverJ);
+
+            SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
+
+            if (Game->state == 1)
+            {
+                if (startI == i && startJ == j)
+                {
+                    SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
+                }
+                else if (hoverI == i && hoverJ == j)
+                {
+                    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
+                }
+            }
+
             drawFilledCircle(renderer, x, y, cellSize / 4); // Draw the small circle vertically
 
-            startI == j &&startJ == i&& Game.state==1 ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR) : SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
-
+            if (Game->state == 1)
+            {
+                if (startI == j && startJ == i)
+                {
+                    SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
+                }
+                else if (hoverI == j && hoverJ == i)
+                {
+                    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
+                }
+            }
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
@@ -187,6 +248,23 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
     }
 }
 
+void drawSideBar(SDL_Renderer *renderer, game *Game)
+{
+    
+    int outline = 10;
+    SDL_Rect outerSideBar = {GRID_SIZE + OFFSET * 2, 0, WIDTH, HEIGHT};
+    SDL_Rect innerSideBar = {outerSideBar.x + outline, outerSideBar.y + outline, outerSideBar.w - 2 * outline, outerSideBar.h - 2 * outline};
+    SDL_SetRenderDrawColor(renderer, SIDE_BAR_OUTLINE_COLOR);
+    SDL_RenderFillRect(renderer, &outerSideBar);
+
+    SDL_SetRenderDrawColor(renderer, SIDE_BAR_COLOR);
+    SDL_RenderFillRect(renderer, &innerSideBar);
+    
+    // rectangle
+    // 2 displays
+    // 2 buttons
+}
+
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
 {
     SDL_Surface *getPixel_Surface = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -222,7 +300,10 @@ SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
     return pixelColor;
 }
 
-Mix_Music *playMusic(char *path)
+
+
+Mix_Music *
+playMusic(char *path)
 {
     Mix_Music *music = Mix_LoadMUS(path);
     if (!music)

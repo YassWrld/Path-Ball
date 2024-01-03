@@ -31,7 +31,11 @@ typedef struct path
 typedef struct solution
 {
     int start;
+    int startI;
+    int startJ;
     int end;
+    int endI;
+    int endJ;
     int noHit;
     int hit;
     path *path;

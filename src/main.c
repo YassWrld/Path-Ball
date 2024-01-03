@@ -14,48 +14,110 @@
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 void initialize();
-void Quit();
+int Quit();
 
 game Game;
 
 int main(int argc, char *argv[])
 {
+
     initialize();
-    bool quit = false;
+    int quit = 0;
     SDL_Event e;
+
     Game.level = 1;
+
     Game.solution = setupMatrix(Game.level + 5, Game.matrix);
     Game.state = Memorizing;
-
+    printf("start: %d,i=%d,j=%d\n", Game.solution->start, Game.solution->startI, Game.solution->startJ);
     printMatrix(Game.level + 5, Game.matrix);
     while (!quit)
     {
-
+        int won = 0;
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
             {
-                quit = true;
+                quit = 1;
+            }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                printf("Mouse click detected\n");
+                if (e.button.button != SDL_BUTTON_LEFT)
+                    continue;
+
+                int x, y;
+
+                SDL_GetMouseState(&x, &y);
+                int i, j;
+                getMatrixClick(renderer, x, y, Game.level + 5, &i, &j);
+                printf("i=%d,j=%d\n", i, j);
+
+                if (Game.state == Selecting)
+                {
+                    if (Game.solution->endI == i && Game.solution->endJ == j)
+                    {
+                        Game.state = Result;
+                        printf("You won\n");
+                        won = 1;
+                    }
+                    else
+                    {
+                        printf("You lost\n");
+                        Game.state = Result;
+                        won = -1;
+                    }
+                }
             }
         }
+
         SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
         SDL_RenderClear(renderer);
 
-        switch (Game.state)
+        if (Game.level == 0)
         {
-        case Memorizing:
-            drawGrid(renderer, Game, 0, 0);
-            Game.state = Selecting;
-            break;
-        case Selecting:
-            drawGrid(renderer, Game, 0, 0);
-            break;
+            SDL_SetRenderDrawColor(renderer, PATH_COLOR);
+            drawFilledCircle(renderer, WIDTH / 2, HEIGHT / 2, 100);
         }
-
+        else
+        {
+            switch (Game.state)
+            {
+            case Memorizing:
+            case Selecting:
+                drawGrid(renderer, &Game);
+                drawSideBar(renderer, &Game);
+                break;
+            case Result:
+                drawGrid(renderer, &Game);
+                drawSideBar(renderer, &Game);
+                drawPath(renderer, Game.level + 5, Game.solution->path);
+                if (won == 1)
+                {
+                    Game.winStreak++;
+                }
+                else
+                {
+                    Game.loseStreak++;
+                }
+                updateLevel(&Game);
+                if (Game.level != 0)
+                    Game.solution = setupMatrix(Game.level + 5, Game.matrix);
+                break;
+            }
+        }
         SDL_RenderPresent(renderer);
-        SDL_Delay(Game.state==0?10*1000:10);
+        SDL_Delay(Game.state == 0 ? 3 * 1000 : 10);
+        if (Game.state == 0)
+        {
+            Game.state = Selecting;
+        }
+        else if (Game.state == 2)
+        {
+            Game.state = Memorizing;
+        }
     }
-    Quit();
+    return Quit();
 }
 
 void initialize()
@@ -84,10 +146,11 @@ void initialize()
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
-void Quit()
+int Quit()
 {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();
     SDL_Quit();
+    return 0;
 }
