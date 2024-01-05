@@ -1,5 +1,6 @@
 {
   "files.associations": {
+    "*.ejs": "html",
     "sdl.h": "c",
     "sdl_ttf.h": "c",
     "sdl2_gfxprimitives.h": "c",
@@ -20,6 +21,8 @@
     "numbers": "c",
     "any": "c",
     "memory": "c",
-    "sstream": "c"
-  }
+    "sstream": "c",
+    "logic.h": "c"
+  },
+  "editor.formatOnSave": true
 }

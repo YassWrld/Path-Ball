@@ -25,49 +25,78 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
 
+    // str concatenation
+
     Game.level = 1;
+    Game.maxLevel = 1;
 
     Game.solution = setupMatrix(Game.level + 5, Game.matrix);
-    Game.state = Memorizing;
-    
+    Game.state = TextInput;
+
     printf("start: %d,i=%d,j=%d\n", Game.solution->start, Game.solution->startI, Game.solution->startJ);
     printMatrix(Game.level + 5, Game.matrix);
+    // playMusic("assets/sounds/undertale.mp3");
+
     while (!quit)
     {
-        int won = 0;
+        int win = 0;
+        Uint32 delay = 10;
         while (SDL_PollEvent(&e) != 0)
         {
-            if (e.type == SDL_QUIT)
-            {
+
+            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
                 quit = 1;
-            }
-            else if (e.type == SDL_MOUSEBUTTONDOWN)
+
+            if (e.type == SDL_MOUSEBUTTONDOWN && Game.state == Selecting)
             {
-                printf("Mouse click detected\n");
                 if (e.button.button != SDL_BUTTON_LEFT)
                     continue;
-
+                // continue;
                 int x, y;
 
                 SDL_GetMouseState(&x, &y);
                 int i, j;
                 getMatrixClick(renderer, x, y, Game.level + 5, &i, &j);
-                printf("i=%d,j=%d\n", i, j);
 
-                if (Game.state == Selecting)
+                if (i == -1 && j == -1)
                 {
-                    if (Game.solution->endI == i && Game.solution->endJ == j)
-                    {
-                        Game.state = Result;
-                        printf("You won\n");
-                        won = 1;
-                    }
-                    else
-                    {
-                        printf("You lost\n");
-                        Game.state = Result;
-                        won = -1;
-                    }
+                    continue;
+                }
+
+                if (Game.solution->endI == i && Game.solution->endJ == j)
+                {
+                    Game.state = Result;
+                    win = 1;
+                }
+                else if (Game.solution->startI != i || Game.solution->startJ != j)
+                {
+                    Game.state = Result;
+                    win = -1;
+                }
+            }
+
+            if (e.type == SDL_TEXTINPUT && Game.state == TextInput)
+            {
+                // check if the name is too long
+                if (strlen(Game.player.name) >= 20)
+                    continue;
+
+                strcat(Game.player.name, e.text.text);
+            }
+
+            if (e.type == SDL_KEYDOWN && Game.state == TextInput)
+            {
+                if (e.key.keysym.sym == SDLK_BACKSPACE && strlen(Game.player.name) > 0)
+                {
+                    Game.player.name[strlen(Game.player.name) - 1] = '\0';
+                }
+                if (e.key.keysym.sym == SDLK_RETURN)
+                {
+                    if (strlen(Game.player.name) == 0)
+                        continue;
+
+                    SDL_StopTextInput();
+                    Game.state = Memorizing;
                 }
             }
         }
@@ -75,48 +104,39 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
         SDL_RenderClear(renderer);
 
-        if (Game.level == 0)
+        switch (Game.state)
         {
-            SDL_SetRenderDrawColor(renderer, PATH_COLOR);
-            drawFilledCircle(renderer, WIDTH / 2, HEIGHT / 2, 100);
-        }
-        else
-        {
-            switch (Game.state)
-            {
-            case Memorizing:
-            case Selecting:
-                drawGrid(renderer, &Game);
-                drawSideBar(renderer, &Game);
-                break;
-            case Result:
-                drawGrid(renderer, &Game);
-                drawSideBar(renderer, &Game);
-                drawPath(renderer, Game.level + 5, Game.solution->path);
-                if (won == 1)
-                {
-                    Game.winStreak++;
-                }
-                else
-                {
-                    Game.loseStreak++;
-                }
-                updateLevel(&Game);
-                if (Game.level != 0)
-                    Game.solution = setupMatrix(Game.level + 5, Game.matrix);
-                break;
-            }
-        }
-        SDL_RenderPresent(renderer);
-        SDL_Delay(Game.state == 0 ? 3 * 1000 : 10);
-        if (Game.state == 0)
-        {
+        case TextInput:
+
+            drawTextInput(renderer, &Game);
+
+            break;
+        case Memorizing:
+        case Selecting:
+            drawGrid(renderer, &Game);
+            drawSideBar(renderer, &Game);
+            if (Game.state == Memorizing)
+                delay = 3 * 1000;
             Game.state = Selecting;
+            break;
+
+        case Result:
+            drawGrid(renderer, &Game);
+            drawSideBar(renderer, &Game);
+            drawPath(renderer, Game.level + 5, Game.solution->path);
+
+            updateLevel(&Game, win);
+
+            Game.state = Game.level == 0 ? GameOver : Memorizing;
+            break;
+        case GameOver:
+            break;
         }
-        else if (Game.state == 2)
-        {
-            Game.state = Memorizing;
-        }
+
+        SDL_RenderPresent(renderer);
+
+        if (graycefulDelay(delay))
+            quit = 1;
     }
     return Quit();
 }
@@ -138,12 +158,14 @@ void initialize()
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
     {
+        Mix_AllocateChannels(16);
         fprintf(stderr, "SDL_mixer could not be initialized! SDL_mixer Error: %s\n", Mix_GetError());
         // Handle the SDL_mixer error and exit or return an error code.
     }
 
-    window = SDL_CreateWindow("Snake Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+    window = SDL_CreateWindow("Pineball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 

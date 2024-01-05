@@ -42,11 +42,6 @@ void initializeMatrix(int n, int matrix[n][n])
     }
 }
 
-
-
-
-
-
 int setObstacles(int n, int matrix[n][n])
 {
     // Calculate the maximum number of obstacles in the interior
@@ -319,18 +314,37 @@ void getTopPlayers(player players[])
 game part
 */
 
-void updateLevel(game *game)
+void updateLevel(game *Game, int win)
 {
-    if (game->winStreak == 3)
+    if (win == 0)
+        return;
+
+    if (win == 1)
     {
-        game->level++;
-        game->loseStreak = 0;
-        game->winStreak = 0;
+        if (Game->level == Game->maxLevel)
+            Game->player.score += Game->solution->noHit * 5 + Game->solution->hit * 10 + 100 * Game->level;
+        Game->winStreak++;
     }
-    if (game->loseStreak == 3)
+    else if (win == -1)
     {
-        game->level--;
-        game->winStreak = 0;
-        game->loseStreak = 0;
+        Game->loseStreak++;
     }
+    if (Game->winStreak == 3)
+    {
+        Game->level++;
+        Game->loseStreak = 0;
+        Game->winStreak = 0;
+        if (Game->level > Game->maxLevel)
+            Game->maxLevel = Game->level;
+    }
+
+    if (Game->loseStreak == 3)
+    {
+        Game->level--;
+        Game->winStreak = 0;
+        Game->loseStreak = 0;
+    }
+
+    if (Game->level != 0)
+        Game->solution = setupMatrix(Game->level + 5, Game->matrix);
 }

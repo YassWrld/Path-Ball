@@ -17,6 +17,8 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
     bool isOuterMatrix = *i == 0 || *i == n - 1 || *j == 0 || *j == n - 1;
     if (!isOuterMatrix)
     {
+        *i = -1;
+        *j = -1;
         return;
     }
 
@@ -141,7 +143,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             if (j > 0 && j < n - 1)
             {
                 int current = matrix[i][j];
-                if (current != 0 && Game->state != 1)
+                if (current != 0 && Game->state != Selecting)
                 {
                     drawDiagonal(renderer, n, current, x, y);
                     // drawDiagonal(renderer, n, current, x, y);
@@ -163,9 +165,8 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             int hoverI, hoverJ;
             getMatrixClick(renderer, hoverX, hoverY, n, &hoverI, &hoverJ);
 
-            SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
-
-            if (Game->state == 1)
+            SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR); // Color of the small circle
+            if (Game->state == Selecting)
             {
                 if (startI == i && startJ == j)
                 {
@@ -183,7 +184,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
 
             drawFilledCircle(renderer, x, y, cellSize / 4); // Draw the small circle vertically
 
-            if (Game->state == 1)
+            if (Game->state == Selecting)
             {
                 if (startI == j && startJ == i)
                 {
@@ -198,9 +199,15 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                     SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
                 }
             }
+
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
+
+    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+    int endx = Game->solution->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+    int endy = Game->solution->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+    SDL_RenderDrawLine(renderer, endx, endy, endx + 15, endy + 15);
 }
 
 void drawPath(SDL_Renderer *renderer, int n, path *sPath)
@@ -211,6 +218,7 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
     {
         path *start = sPath;
         path *end = sPath->next;
+
         int startX = OFFSET + start->y * cellSize + cellSize / 2 + THICKNESS / 2;
         int startY = OFFSET + start->x * cellSize + cellSize / 2 + THICKNESS / 2;
         int endX = OFFSET + end->y * cellSize + cellSize / 2 + THICKNESS / 2;
@@ -218,7 +226,7 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
 
         int circlesNumber = 2;
         int circleRadius = cellSize / 8;
-        for (int i = 0; i <= circlesNumber; i++)
+        for (int i = 0; i < circlesNumber; i++)
         {
             if (i != circlesNumber && i != 0)
             {
@@ -231,21 +239,33 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
 
             if (end->next == NULL && i == circlesNumber)
             {
+                SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
                 circleRadius = cellSize / 4;
             }
+
             int c1 = startX + (endX - startX) * i / circlesNumber;
             int c2 = startY + (endY - startY) * i / circlesNumber;
 
-            SDL_PollEvent(&(SDL_Event){0});
-
             drawFilledCircle(renderer, c1, c2, circleRadius);
             SDL_RenderPresent(renderer);
-            SDL_Delay(100);
+            playSoundEffect("assets/sounds/step.wav");
+            graycefulDelay(250);
         }
 
         // SDL_Delay(100);
         sPath = sPath->next;
     }
+    if (sPath->next == NULL)
+    {
+        SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
+        int endx = sPath->y * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+        int endy = sPath->x * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+        drawFilledCircle(renderer, endx, endy, cellSize / 4);
+        // playSoundEffect("assets/sounds/step.wav");
+        SDL_RenderPresent(renderer);
+    }
+
+    graycefulDelay(1000);
 }
 
 void drawSideBar(SDL_Renderer *renderer, game *Game)
@@ -253,9 +273,9 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     // side bar
     int outline = 10;
     int sideBarWidth = WIDTH - GRID_SIZE - OFFSET * 2;
-    
+
     SDL_Rect outerSideBar = {GRID_SIZE + OFFSET * 2, 0, sideBarWidth, HEIGHT};
-    SDL_Rect innerSideBar = {GRID_SIZE + OFFSET * 2+ outline, outline,sideBarWidth - 2 * outline, HEIGHT - 2 * outline};
+    SDL_Rect innerSideBar = {GRID_SIZE + OFFSET * 2 + outline, outline, sideBarWidth - 2 * outline, HEIGHT - 2 * outline};
 
     SDL_SetRenderDrawColor(renderer, SIDE_BAR_OUTLINE_COLOR);
     SDL_RenderFillRect(renderer, &outerSideBar);
@@ -263,16 +283,54 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     SDL_SetRenderDrawColor(renderer, SIDE_BAR_COLOR);
     SDL_RenderFillRect(renderer, &innerSideBar);
 
-    // 3 displays
-        // Name
-        // Level
-        // Score
+    int centerX = outline + GRID_SIZE + OFFSET * 2 + sideBarWidth / 2;
 
-    
+    int centerY = outline + HEIGHT / 2;
+    char text[100];
+    sprintf(text, "Score:%d", Game->player.score);
+    int w = mesureTextWidth(MONOCRAFT_FONT, text, 24);
+    writeText(renderer, MONOCRAFT_FONT, text, centerX - w / 2, centerY - 100, 24, FONT_COLOR);
+
+    // write player name at the top of the side bar
+    sprintf(text, "Name:%s", Game->player.name);
+    int fontSize = 24;
+    do
+    {
+
+        w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
+        fontSize--;
+    } while (w >= sideBarWidth - 2 * outline - w / 2);
+    writeText(renderer, MONOCRAFT_FONT, text, centerX - w / 2, centerY - 150, fontSize, FONT_COLOR);
+
+    // 3 displays
+    // Name
+    // Level
+    // Score
+
     // 2 buttons
-        // Pause
-        // Save & Quit
-    
+    // Pause
+    // Save & Quit
+}
+
+void drawTextInput(SDL_Renderer *renderer, game *Game)
+{
+
+    SDL_SetRenderDrawColor(renderer, FONT_COLOR);
+
+    char text[100];
+    int fontSize = 24;
+    sprintf(text, "Enter Your Name:");
+    int w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
+
+    writeText(renderer, MONOCRAFT_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
+
+    sprintf(text, "%s", Game->player.name);
+    w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
+    writeText(renderer, MONOCRAFT_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, FONT_COLOR);
+
+    sprintf(text, "Press Enter to Start");
+    w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
+    writeText(renderer, MONOCRAFT_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
 }
 
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
@@ -310,8 +368,6 @@ SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
     return pixelColor;
 }
 
-
-
 Mix_Music *
 playMusic(char *path)
 {
@@ -321,15 +377,28 @@ playMusic(char *path)
         printf("Mix_LoadMUS Error: %s\n", Mix_GetError());
         return NULL;
     }
-    Mix_PlayMusic(music, -1);
+    Mix_PlayMusic(music, 0);
 
     return music;
 }
 
-
-void writeText(SDL_Renderer *renderer,char *fontPath, char *text,int x,int y, int size, int r, int g, int b, int a)
-
+void playSoundEffect(char *path)
 {
+    Mix_Chunk *soundEffect = Mix_LoadWAV(path);
+    if (!soundEffect)
+    {
+        printf("Mix_LoadWAV Error: %s\n", Mix_GetError());
+        return;
+    }
+    Mix_PlayChannel(-1, soundEffect, 0);
+}
+
+void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a)
+{
+    if (!text || text[0] == '\0')
+    {
+        return; // Don't render anything if the text is empty
+    }
     TTF_Font *font = TTF_OpenFont(fontPath, size);
     if (!font)
     {
@@ -337,7 +406,10 @@ void writeText(SDL_Renderer *renderer,char *fontPath, char *text,int x,int y, in
         return;
     }
 
+    // TTF_SetFontWrappedAlign(font, TTF_WRAPPED_ALIGN_CENTER);
+
     SDL_Color color = {r, g, b, a};
+    //TTF_SetFontStyle(font, TTF_STYLE_BOLD);
     SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
 
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -347,4 +419,20 @@ void writeText(SDL_Renderer *renderer,char *fontPath, char *text,int x,int y, in
     TTF_CloseFont(font);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
+}
+
+int mesureTextWidth(char *fontPath, char *text, int size)
+{
+    TTF_Font *font = TTF_OpenFont(fontPath, size);
+    if (!font)
+    {
+        printf("TTF_OpenFont Error: %s\n", TTF_GetError());
+        return 0;
+    }
+
+    int w, h;
+    TTF_SizeText(font, text, &w, &h);
+
+    TTF_CloseFont(font);
+    return w;
 }

@@ -12,7 +12,6 @@ int randomInt(int min, int max)
     return rand() % (max - min + 1) + min;
 }
 
-
 void printMatrix(int n, int matrix[n][n])
 {
     printf("+---");
@@ -58,8 +57,32 @@ date_t getCurrentDate()
     return currentDate;
 }
 
-void gracefulSDLDelay(int fps)
+int graycefulDelay(Uint32 ms)
 {
-    clock_t start = clock();
-    while (clock() < start + (CLOCKS_PER_SEC / fps));
+
+    if (ms < 500)
+    {
+        SDL_Delay(ms);
+        return 0;
+    }
+
+    int start = SDL_GetTicks();
+    SDL_Event e;
+
+    while (SDL_GetTicks() - start < ms)
+    {
+        int exist = SDL_PollEvent(&e);
+        if (!exist)
+            continue;
+
+        if (e.type == SDL_QUIT)
+        {
+         
+            return 1;
+        }
+
+        SDL_PushEvent(&e);
+    }
+
+    return 0;
 }

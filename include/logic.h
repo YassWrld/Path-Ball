@@ -6,6 +6,9 @@
 #include <string.h>
 #include "util.h"
 
+#define MAX_NAME_LENGTH 20
+#define MAX_MATRIX_SIZE 20
+
 typedef enum Directions
 {
     Up,
@@ -26,6 +29,7 @@ typedef struct path
     int x;
     int y;
     struct path *next;
+
 } path;
 
 typedef struct solution
@@ -33,17 +37,20 @@ typedef struct solution
     int start;
     int startI;
     int startJ;
+
     int end;
     int endI;
     int endJ;
+
     int noHit;
     int hit;
+
     path *path;
 
 } solution;
 typedef struct player
 {
-    char name[20];
+    char name[MAX_NAME_LENGTH];
     int score;
     date_t date;
 
@@ -51,16 +58,18 @@ typedef struct player
 
 typedef enum game_state
 {
+    TextInput,
     Memorizing,
     Selecting,
     Result,
+    GameOver,
 } game_state;
 
 typedef struct game
 {
     game_state state;
     player player;
-    int matrix[20][20];
+    int matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE];
     int level;
     int maxLevel;
     int winStreak;
@@ -69,7 +78,7 @@ typedef struct game
 } game;
 
 solution *setupMatrix(int n, int matrix[n][n]);
-void updateLevel(game *game);
+void updateLevel(game *Game, int win);
 void initializeMatrix(int n, int matrix[n][n]);
 void findStart(int n, int matrix[n][n], int start, int *x, int *y);
 int setObstacles(int n, int matrix[n][n]);

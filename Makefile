@@ -1,34 +1,47 @@
-# Compiler
-CC = gcc
+all: build run
 
-# Directories
-SRC_DIR = src
-INCLUDE_DIR = include
-BIN_DIR = bin
+current_date := $(shell powershell Get-Date -Format "-dd-MM-HH-mm-ss")
 
-# Source files
-SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
-OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC_FILES))
+ 
+sdlPath = C:\SDL2
+src = src/*.c
+linkers= -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer #-mwindows 
+includes= -I include -I $(sdlPath)\include -I $(sdlPath)\include\SDL2
+libs= -L $(sdlPath)\lib
+flags=-Wall  -std=c17 -Wpedantic -Werror -g  
 
-# Compiler flags
-CFLAGS = -I$(INCLUDE_DIR) -g -Wall `sdl2-config --cflags` -lSDL2_mixer -lSDL2_ttf -lSDL2_image  -lSDL2_gfx
-LDFLAGS = `sdl2-config --libs`
 
-# Target binary
-TARGET = $(BIN_DIR)/game
+build:
+	gcc $(src) $(includes) $(libs) $(linkers) $(flags) -o "bin/game.exe"
+run :
+	@echo Run started...
+	./bin/game.exe
+testBuild: 
+	gcc $(src) $(includes) $(libs) $(linkers) $(flags) -o "bin/game${current_date}.exe"
 
-all: $(TARGET)
 
-$(TARGET): $(OBJ_FILES)
-	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
+testRun:
+	@echo Run started...
+	./bin/game${current_date}.exe
 
-$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+test : testBuild testRun
+exes= $(wildcard bin/*.exe)
 
-run: $(TARGET)
-	./$(TARGET)
+runAll:
+	@echo Run started...
+	cmd /c "for %x in ($(exes)) do start %x"
+
+
+	
+	
+
+
 
 clean:
-	rm -rf $(BIN_DIR)/*.o $(TARGET)
+	@echo Clean started...
+		del bin\*.exe
 
-.PHONY: all run clean
+commands:
+	@echo "make build - compiles the game"
+	@echo "make run - runs the game"
+	@echo "make clean - removes the executable"
