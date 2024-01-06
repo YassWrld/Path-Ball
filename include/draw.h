@@ -11,6 +11,7 @@
 
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include "logic.h"
 
 #define HEIGHT 700    // window height
@@ -38,7 +39,7 @@
 #define FONT_SIZE 30
 // monocraft
 // #define MONOCRAFT_FONT "assets/fonts/monocraft.ttf"// black
-#define MONOCRAFT_FONT "assets/fonts/gamepaused-final.otf" // black
+#define GAMEPAUSED_FONT "assets/fonts/gamepaused.otf" // black
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
 
@@ -50,14 +51,27 @@ void drawGrid(SDL_Renderer *renderer, game *Game);
 void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
 void drawPath(SDL_Renderer *renderer, int n, path *sPath);
 
+SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
+void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j);
+
 // Side bar
 void drawSideBar(SDL_Renderer *renderer, game *Game);
 
-SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
-void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j);
+void drawGameOver(SDL_Renderer *renderer, game *Game);
+
+void drawPause(SDL_Renderer *renderer, game *Game);
+
 void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
 int mesureTextWidth(char *fontPath, char *text, int size);
 
+void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
+
 Mix_Music *playMusic(char *path);
 void playSoundEffect(char *path);
+
+SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
+bool compareColor(SDL_Color color, int r, int g, int b, int a);
+
+void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n]);
+void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n]);
 #endif // DRAW_H

@@ -314,7 +314,7 @@ void getTopPlayers(player players[])
 game part
 */
 
-void updateLevel(game *Game, int win)
+void updateLevelAndScore(game *Game, int win)
 {
     if (win == 0)
         return;
@@ -323,12 +323,16 @@ void updateLevel(game *Game, int win)
     {
         if (Game->level == Game->maxLevel)
             Game->player.score += Game->solution->noHit * 5 + Game->solution->hit * 10 + 100 * Game->level;
+
         Game->winStreak++;
+        Game->loseStreak = 0;
     }
     else if (win == -1)
     {
         Game->loseStreak++;
+        Game->winStreak = 0;
     }
+
     if (Game->winStreak == 3)
     {
         Game->level++;
@@ -345,6 +349,31 @@ void updateLevel(game *Game, int win)
         Game->loseStreak = 0;
     }
 
-    if (Game->level != 0)
+    if (Game->level != 0 && Game->level != MAX_LEVEL)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
 }
+
+void initGame(game *Game, bool machineMode)
+{
+    Game->level = 1;
+    Game->maxLevel = Game->level;
+
+    Game->winStreak = 0;
+    Game->loseStreak = 0;
+    Game->player.score = 0;
+
+    // random name
+    sprintf(Game->player.name, "Player%d", randomInt(1, 1000));
+
+    Game->player.date = getCurrentDate();
+
+    Game->state = machineMode ? Memorizing : TextInput;
+
+    Game->machineMode = machineMode;
+
+    Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+}
+
+/*
+machine mode
+*/

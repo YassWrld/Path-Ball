@@ -288,8 +288,8 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     int centerY = outline + HEIGHT / 2;
     char text[100];
     sprintf(text, "Score:%d", Game->player.score);
-    int w = mesureTextWidth(MONOCRAFT_FONT, text, 24);
-    writeText(renderer, MONOCRAFT_FONT, text, centerX - w / 2, centerY - 100, 24, FONT_COLOR);
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, 24);
+    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 100, 24, FONT_COLOR);
 
     // write player name at the top of the side bar
     sprintf(text, "Name:%s", Game->player.name);
@@ -297,10 +297,10 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     do
     {
 
-        w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
+        w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
         fontSize--;
     } while (w >= sideBarWidth - 2 * outline - w / 2);
-    writeText(renderer, MONOCRAFT_FONT, text, centerX - w / 2, centerY - 150, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 150, fontSize, FONT_COLOR);
 
     // 3 displays
     // Name
@@ -315,57 +315,60 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
 void drawTextInput(SDL_Renderer *renderer, game *Game)
 {
 
-    SDL_SetRenderDrawColor(renderer, FONT_COLOR);
-
     char text[100];
     int fontSize = 24;
     sprintf(text, "Enter Your Name:");
-    int w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    writeText(renderer, MONOCRAFT_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
 
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     sprintf(text, "%s", Game->player.name);
-    w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
-    writeText(renderer, MONOCRAFT_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, FONT_COLOR);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, 255, 0, 0, 255);
+
+    // draw wrting line
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    if (strlen(text))
+        SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 2 - 50 + fontSize, WIDTH / 2 + w / 2, HEIGHT / 2 - 50 + fontSize);
 
     sprintf(text, "Press Enter to Start");
-    w = mesureTextWidth(MONOCRAFT_FONT, text, fontSize);
-    writeText(renderer, MONOCRAFT_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
+
+    drawSVG(renderer, "assets/images/enter.png", WIDTH / 2 - 50, HEIGHT / 2 + 100, 100, 100);
 }
 
-SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
+void drawGameOver(SDL_Renderer *renderer, game *Game)
 {
-    SDL_Surface *getPixel_Surface = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, getPixel_Surface->pixels, getPixel_Surface->pitch);
-    const Uint8 getPixel_bpp = getPixel_Surface->format->BytesPerPixel;
+    char text[100];
+    int fontSize = 24;
+    sprintf(text, "Game Over");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    SDL_Color pixelColor;
-    Uint8 *pPixel = (Uint8 *)getPixel_Surface->pixels + pixel_Y * getPixel_Surface->pitch + pixel_X * getPixel_bpp;
+    // you won if game->level = maxLevel or you lost if game->level = 0
+    sprintf(text, "You %s", Game->level == 0 ? "Lost" : "Won");
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    SDL_Color color = Game->level == 0 ? (SDL_Color){255, 0, 0, 255} : (SDL_Color){0, 255, 0, 255};
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, color.r, color.g, color.b, color.a);
 
-    Uint32 pixelData;
+    sprintf(text, "Your Score:%d", Game->player.score);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, FONT_COLOR);
+}
 
-    switch (getPixel_bpp)
-    {
-    case 1:
-        pixelData = *pPixel;
-        break;
-    case 2:
-        pixelData = *(Uint16 *)pPixel;
-        break;
-    case 3:
-        if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            pixelData = pPixel[0] << 16 | pPixel[1] << 8 | pPixel[2];
-        else
-            pixelData = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16;
-        break;
-    case 4:
-        pixelData = *(Uint32 *)pPixel;
-        break;
-    }
+void drawPause(SDL_Renderer *renderer, game *Game)
+{
+    char text[100];
+    int fontSize = 24;
+    sprintf(text, "Game Paused");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    SDL_GetRGBA(pixelData, getPixel_Surface->format, &pixelColor.r, &pixelColor.g, &pixelColor.b, &pixelColor.a);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
 
-    return pixelColor;
+    sprintf(text, "Press Ctrl + P to Resume");
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
 }
 
 Mix_Music *
@@ -409,7 +412,7 @@ void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y,
     // TTF_SetFontWrappedAlign(font, TTF_WRAPPED_ALIGN_CENTER);
 
     SDL_Color color = {r, g, b, a};
-    //TTF_SetFontStyle(font, TTF_STYLE_BOLD);
+    // TTF_SetFontStyle(font, TTF_STYLE_BOLD);
     SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
 
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -435,4 +438,154 @@ int mesureTextWidth(char *fontPath, char *text, int size)
 
     TTF_CloseFont(font);
     return w;
+}
+
+void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
+{
+    SDL_Surface *surface = IMG_Load(path);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect = {x, y, w, h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
+SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
+{
+    SDL_Surface *getPixel_Surface = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, getPixel_Surface->pixels, getPixel_Surface->pitch);
+    const Uint8 getPixel_bpp = getPixel_Surface->format->BytesPerPixel;
+
+    SDL_Color pixelColor;
+    Uint8 *pPixel = (Uint8 *)getPixel_Surface->pixels + pixel_Y * getPixel_Surface->pitch + pixel_X * getPixel_bpp;
+
+    Uint32 pixelData;
+
+    switch (getPixel_bpp)
+    {
+    case 1:
+        pixelData = *pPixel;
+        break;
+    case 2:
+        pixelData = *(Uint16 *)pPixel;
+        break;
+    case 3:
+        if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            pixelData = pPixel[0] << 16 | pPixel[1] << 8 | pPixel[2];
+        else
+            pixelData = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16;
+        break;
+    case 4:
+        pixelData = *(Uint32 *)pPixel;
+        break;
+    }
+
+    SDL_GetRGBA(pixelData, getPixel_Surface->format, &pixelColor.r, &pixelColor.g, &pixelColor.b, &pixelColor.a);
+
+    return pixelColor;
+}
+
+bool compareColor(SDL_Color color, int r, int g, int b, int a)
+{
+    return (r == color.r) && (g == color.g) && (b == color.b) && (a = color.a);
+}
+
+void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
+{
+    int cellSize = GRID_SIZE / n;
+    printf("cellSize: %d\n", cellSize);
+    initializeMatrix(n, matrix);
+
+    for (int i = 1; i < n - 1; i++)
+    {
+        for (int j = 1; j < n - 1; j++)
+        {
+            int x = OFFSET + j * cellSize + cellSize / 2 + THICKNESS / 2;
+            int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
+
+            if (j <= 0 || j >= n - 1)
+            {
+                continue;
+            }
+
+            SDL_Color color = getPixelColor(renderer, x, y);
+            bool isDiagonal = compareColor(color, DIAGONAL_COLOR);
+            if (!isDiagonal)
+            {
+                matrix[i][j] = 0;
+                continue;
+            }
+            // check if the diagonal is up or down
+            int of = cellSize / 4;
+            color = getPixelColor(renderer, x - of, y + of);
+            bool isUp = compareColor(color, DIAGONAL_COLOR);
+            if (isUp)
+            {
+                matrix[i][j] = 1;
+            }
+            else
+            {
+                matrix[i][j] = -1;
+            }
+        }
+    }
+}
+
+void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n])
+{
+    int cellSize = GRID_SIZE / n;
+    int startI = 0, startJ = 0;
+    for (int i = 1; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - 1; j++)
+        {
+            int x = OFFSET + j * cellSize + cellSize / 2 + THICKNESS / 2;
+            int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
+            if (j <= 0 || j >= n - 1)
+            {
+
+                SDL_Color color1 = getPixelColor(renderer, x, y);
+                SDL_Color color2 = getPixelColor(renderer, y, x);
+                bool isStart1 = compareColor(color1, START_CIRCLE_COLOR);
+                bool isStart2 = compareColor(color2, START_CIRCLE_COLOR);
+                if (isStart1)
+                {
+                    startI = i;
+                    startJ = j;
+                }
+
+                if (isStart2)
+                {
+                    startI = j;
+                    startJ = i;
+                }
+
+                continue;
+            }
+        }
+    }
+
+    solution *s = solveMatrix(matrix[startI][startJ], 0, n, matrix); // obs = 0
+
+    int endX = s->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+    int endY = s->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+    // SDL_WarpMouseInWindow(NULL, endX, endY);
+    graycefulDelay(1000);
+    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+    drawFilledCircle(renderer, endX, endY, cellSize / 4);
+    SDL_RenderPresent(renderer);
+    graycefulDelay(1000);
+
+    // custom event
+    SDL_Event e;
+    e.type = SDL_USEREVENT;
+    e.user.code = 139;
+    // set x and y coordinates
+    e.user.data1 = NULL;
+    e.user.data2 = NULL;
+
+    e.button.x = endX;
+    e.button.y = endY;
+
+    SDL_PushEvent(&e);
 }

@@ -8,6 +8,8 @@
 
 #define MAX_NAME_LENGTH 20
 #define MAX_MATRIX_SIZE 20
+#define MAX_LEVEL 11
+#define MEMORIZING_TIME 3 * 1000
 
 typedef enum Directions
 {
@@ -15,6 +17,7 @@ typedef enum Directions
     Right,
     Down,
     Left
+
 } direction;
 
 typedef struct ball
@@ -62,6 +65,7 @@ typedef enum game_state
     Memorizing,
     Selecting,
     Result,
+    Pause,
     GameOver,
 } game_state;
 
@@ -74,17 +78,20 @@ typedef struct game
     int maxLevel;
     int winStreak;
     int loseStreak;
+
+    bool machineMode;
     solution *solution;
 } game;
 
 solution *setupMatrix(int n, int matrix[n][n]);
-void updateLevel(game *Game, int win);
+void updateLevelAndScore(game *Game, int win);
 void initializeMatrix(int n, int matrix[n][n]);
 void findStart(int n, int matrix[n][n], int start, int *x, int *y);
 int setObstacles(int n, int matrix[n][n]);
 direction getNextDirection(direction d, int current);
 solution *solveMatrix(int start, int obs, int n, int matrix[n][n]);
 void printPath(path *p);
+void initGame(game *Game, bool machineMode);
 
 void insertScore(player current);
 void sortTopPlayers(player arr[]);

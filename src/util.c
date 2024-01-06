@@ -60,7 +60,7 @@ date_t getCurrentDate()
 int graycefulDelay(Uint32 ms)
 {
 
-    if (ms < 500)
+    if (ms < 100)
     {
         SDL_Delay(ms);
         return 0;
@@ -77,7 +77,7 @@ int graycefulDelay(Uint32 ms)
 
         if (e.type == SDL_QUIT)
         {
-         
+            exit(0);
             return 1;
         }
 

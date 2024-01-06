@@ -22,7 +22,8 @@
     "any": "c",
     "memory": "c",
     "sstream": "c",
-    "logic.h": "c"
+    "logic.h": "c",
+    "draw.h": "c"
   },
   "editor.formatOnSave": true
 }
