@@ -28,14 +28,11 @@ int main(int argc, char *argv[])
     initGame(&Game, false);
     // take the start time
 
-    Uint32 startTime = 0;
-    Uint32 pauseTime = 0;
-    game_state oldState = Game.state;
+    printMatrix(Game.level + 5, Game.matrix);
 
     while (!quit)
     {
-        int win = 0;
-
+        Game.helpers.win = 0;
         while (SDL_PollEvent(&e) != 0)
         {
 
@@ -48,15 +45,67 @@ int main(int argc, char *argv[])
 
                 if (Game.state != Pause)
                 {
-                    oldState = Game.state;
-                    pauseTime = SDL_GetTicks();
+                    Game.helpers.prevState = Game.state;
+                    Game.helpers.pauseTime = SDL_GetTicks();
                 }
                 else
-                    startTime += SDL_GetTicks() - pauseTime;
+                    Game.helpers.startTime += SDL_GetTicks() - Game.helpers.pauseTime;
 
-                Game.state = Game.state == Pause ? oldState : Pause;
+                Game.state = Game.state == Pause ? Game.helpers.prevState : Pause;
 
                 // change the state to pause
+            }
+            else if (e.type == SDL_KEYDOWN && Game.state == Selecting && !Game.machineMode)
+            {
+                int key = e.key.keysym.sym;
+                if (key != SDLK_RIGHT && key != SDLK_LEFT && key != SDLK_UP && key != SDLK_DOWN && key != SDLK_RETURN)
+                    continue;
+
+                int n = Game.level + 5;
+
+                if (Game.helpers.selectedI == -1 && Game.helpers.selectedJ == -1)
+                {
+                    Game.helpers.selected = Game.solution->start + 1;
+
+                    if (Game.helpers.selected > 10 + 4 * (n - 2))
+                        Game.helpers.selected = 11;
+                    findStart(n, Game.matrix, Game.helpers.selected, &Game.helpers.selectedI, &Game.helpers.selectedJ);
+
+                    continue;
+                }
+                if (key == SDLK_RETURN)
+                {
+                    if (Game.solution->endI == Game.helpers.selectedI && Game.solution->endJ == Game.helpers.selectedJ)
+                        Game.helpers.win = 1;
+                    else
+                        Game.helpers.win = -1;
+
+                    Game.state = Result;
+                    continue;
+                }
+
+                if (e.key.keysym.sym == SDLK_RIGHT || e.key.keysym.sym == SDLK_DOWN)
+                {
+                    Game.helpers.selected++;
+                    if (Game.helpers.selected == Game.solution->start)
+                        Game.helpers.selected++;
+                }
+                else if (e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_UP)
+                {
+                    Game.helpers.selected--;
+                    if (Game.helpers.selected == Game.solution->start)
+                        Game.helpers.selected--;
+                }
+
+                if (Game.helpers.selected < 11)
+                    Game.helpers.selected = 10 + 4 * (n - 2);
+                else if (Game.helpers.selected > 10 + 4 * (n - 2))
+                    Game.helpers.selected = 11;
+
+                if (Game.helpers.selected == Game.solution->start)
+                    key == SDLK_RIGHT ? Game.helpers.selected++ : Game.helpers.selected--;
+
+                findStart(n, Game.matrix, Game.helpers.selected, &Game.helpers.selectedI, &Game.helpers.selectedJ);
             }
 
             else if (e.type == SDL_TEXTINPUT && Game.state == TextInput)
@@ -98,11 +147,11 @@ int main(int argc, char *argv[])
                 if (Game.solution->endI == i && Game.solution->endJ == j)
                 {
 
-                    win = 1;
+                    Game.helpers.win = 1;
                 }
                 else
                 {
-                    win = -1;
+                    Game.helpers.win = -1;
                 }
                 Game.state = Result;
             }
@@ -120,11 +169,11 @@ int main(int argc, char *argv[])
                 if (Game.solution->endI == i && Game.solution->endJ == j)
                 {
 
-                    win = 1;
+                    Game.helpers.win = 1;
                 }
                 else if (Game.solution->startI != i || Game.solution->startJ != j)
                 {
-                    win = -1;
+                    Game.helpers.win = -1;
                 }
                 Game.state = Result;
             }
@@ -149,13 +198,13 @@ int main(int argc, char *argv[])
             if (Game.machineMode)
                 machineModeMemorize(renderer, Game.level + 5, mat);
             // delay = 3 * 1000;
-            if (startTime == 0)
-                startTime = SDL_GetTicks();
+            if (Game.helpers.startTime == 0)
+                Game.helpers.startTime = SDL_GetTicks();
             // Game.state = Selecting;
-            if (SDL_GetTicks() - startTime > MEMORIZING_TIME)
+            if (SDL_GetTicks() - Game.helpers.startTime > MEMORIZING_TIME)
             {
                 Game.state = Selecting;
-                startTime = 0;
+                Game.helpers.startTime = 0;
             }
             break;
         case Selecting:
@@ -169,7 +218,7 @@ int main(int argc, char *argv[])
             drawGrid(renderer, &Game);
             drawSideBar(renderer, &Game);
             drawPath(renderer, Game.level + 5, Game.solution->path);
-            updateLevelAndScore(&Game, win);
+            updateLevelAndScore(&Game);
 
             Game.state = Game.level == 0 || Game.level == MAX_LEVEL ? GameOver : Memorizing;
 
@@ -213,8 +262,20 @@ void initialize()
         // Handle the SDL_mixer error and exit or return an error code.
     }
 
-    window = SDL_CreateWindow("Pineball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+    if (IMG_Init(IMG_INIT_PNG) < 0)
+    {
+        fprintf(stderr, "SDL_image could not be initialized! SDL_image Error: %s\n", IMG_GetError());
+        // Handle the SDL_image error and exit or return an error code.
+    }
+
+    window = SDL_CreateWindow("Pinball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    SDL_Surface *icon = IMG_Load("assets/images/icon.png");
+
+    icon = SDL_ConvertSurfaceFormat(icon, SDL_PIXELFORMAT_RGBA8888, 0);
+    SDL_SetWindowIcon(window, icon);
+    SDL_FreeSurface(icon);
 
     // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_RegisterEvents(1);

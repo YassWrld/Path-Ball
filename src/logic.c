@@ -84,6 +84,12 @@ void findStart(int n, int matrix[n][n], int start, int *x, int *y)
 {
     int i = 0;
     int j = 0;
+    if (start < 11 || start > 10 + 4 * (n - 2))
+    {
+        *x = -1;
+        *y = -1;
+        return;
+    }
 
     while (matrix[i][j] != start)
     {
@@ -314,12 +320,12 @@ void getTopPlayers(player players[])
 game part
 */
 
-void updateLevelAndScore(game *Game, int win)
+void updateLevelAndScore(game *Game)
 {
-    if (win == 0)
+    if (Game->helpers.win == 0)
         return;
 
-    if (win == 1)
+    if (Game->helpers.win == 1)
     {
         if (Game->level == Game->maxLevel)
             Game->player.score += Game->solution->noHit * 5 + Game->solution->hit * 10 + 100 * Game->level;
@@ -327,7 +333,7 @@ void updateLevelAndScore(game *Game, int win)
         Game->winStreak++;
         Game->loseStreak = 0;
     }
-    else if (win == -1)
+    else if (Game->helpers.win == -1)
     {
         Game->loseStreak++;
         Game->winStreak = 0;
@@ -370,6 +376,12 @@ void initGame(game *Game, bool machineMode)
     Game->state = machineMode ? Memorizing : TextInput;
 
     Game->machineMode = machineMode;
+    Game->helpers.startTime = 0;
+    Game->helpers.pauseTime = 0;
+    Game->helpers.selectedI = -1;
+    Game->helpers.selectedJ = -1;
+    Game->helpers.selected = -1;
+    Game->helpers.prevState = Game->state;
 
     Game->solution = setupMatrix(Game->level + 5, Game->matrix);
 }

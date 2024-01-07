@@ -115,21 +115,16 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
     for (int i = 0; i < n - 1; i++)
     {
 
-        int startX = cellSize + OFFSET + i * cellSize;
+        int startX = (i + 1) * cellSize + OFFSET;
         int startY = cellSize + OFFSET;
-        int endX = cellSize + OFFSET + i * cellSize;
-        int endY = OFFSET + GRID_SIZE - cellSize;
+        int endX = (i + 1) * cellSize + OFFSET;
+        int endY = GRID_SIZE + OFFSET - cellSize;
 
         for (int s = 0; s < THICKNESS + x; s++)
         {
 
             SDL_RenderDrawLine(renderer, startX + s, startY, endX + s, endY);
             SDL_RenderDrawLine(renderer, startY, startX + s, endY, endX + s);
-
-            if (i == n - 2)
-            {
-                // SDL_RenderDrawLine(renderer, endY, endX + s, endY , endX + s);
-            }
         }
     }
 
@@ -172,7 +167,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                 {
                     SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
                 }
-                else if (hoverI == i && hoverJ == j)
+                else if ((hoverI == i && hoverJ == j) || (Game->helpers.selectedI == i && Game->helpers.selectedJ == j))
                 {
                     SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
                 }
@@ -190,7 +185,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                 {
                     SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
                 }
-                else if (hoverI == j && hoverJ == i)
+                else if ((hoverI == j && hoverJ == i) || (Game->helpers.selectedI == j && Game->helpers.selectedJ == i))
                 {
                     SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
                 }
@@ -203,7 +198,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
-
+    
     SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
     int endx = Game->solution->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     int endy = Game->solution->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;

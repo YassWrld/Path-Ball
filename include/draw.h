@@ -51,7 +51,6 @@ void drawGrid(SDL_Renderer *renderer, game *Game);
 void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
 void drawPath(SDL_Renderer *renderer, int n, path *sPath);
 
-SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
 void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j);
 
 // Side bar

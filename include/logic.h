@@ -69,6 +69,18 @@ typedef enum game_state
     GameOver,
 } game_state;
 
+typedef struct helpers
+{
+    int selected;
+    int selectedI;
+    int selectedJ;
+    int startTime;
+    int pauseTime;
+    int win;
+    game_state prevState;
+
+} helpers_t;
+
 typedef struct game
 {
     game_state state;
@@ -78,13 +90,13 @@ typedef struct game
     int maxLevel;
     int winStreak;
     int loseStreak;
-
+    helpers_t helpers;
     bool machineMode;
     solution *solution;
 } game;
 
 solution *setupMatrix(int n, int matrix[n][n]);
-void updateLevelAndScore(game *Game, int win);
+void updateLevelAndScore(game *Game);
 void initializeMatrix(int n, int matrix[n][n]);
 void findStart(int n, int matrix[n][n], int start, int *x, int *y);
 int setObstacles(int n, int matrix[n][n]);
