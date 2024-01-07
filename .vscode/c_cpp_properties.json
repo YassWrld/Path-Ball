@@ -1,13 +1,13 @@
 {
   "configurations": [
     {
-      "name": "Linux",
+      "name": "Win32",
       "includePath": ["${workspaceFolder}/include", "C:/SDL2/include"],
       "defines": [],
-      "compilerPath": "/usr/bin/gcc",
+      "compilerPath": "C:/MinGW/bin/gcc.exe",
       "cStandard": "c17",
-      "cppStandard": "gnu++17",
-      "intelliSenseMode": "linux-gcc-x64"
+      "cppStandard": "c++17",
+      "intelliSenseMode": "gcc-x64"
     }
   ],
   "version": 4

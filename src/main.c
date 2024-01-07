@@ -11,236 +11,47 @@
 #include "draw.h"
 #include "util.h"
 
+#include "renderers.h"
+#include "handlers.h"
+
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
-void initialize();
+void initializeSDL();
 int Quit();
 
-game Game;
-int mat[20][20];
 int main(int argc, char *argv[])
 {
 
-    initialize();
+    initializeSDL();
     int quit = 0;
     SDL_Event e;
-
+    game Game;
+    
     initGame(&Game, false);
-    // take the start time
-
     printMatrix(Game.level + 5, Game.matrix);
 
     while (!quit)
     {
-        Game.helpers.win = 0;
+
         while (SDL_PollEvent(&e) != 0)
         {
-
-            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) // quit
-                quit = 1;
-            else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p && SDL_GetModState() & KMOD_CTRL) // pause
-            {
-                if (Game.state == TextInput || Game.state == Result || Game.state == GameOver)
-                    continue;
-
-                if (Game.state != Pause)
-                {
-                    Game.helpers.prevState = Game.state;
-                    Game.helpers.pauseTime = SDL_GetTicks();
-                }
-                else
-                    Game.helpers.startTime += SDL_GetTicks() - Game.helpers.pauseTime;
-
-                Game.state = Game.state == Pause ? Game.helpers.prevState : Pause;
-
-                // change the state to pause
-            }
-            else if (e.type == SDL_KEYDOWN && Game.state == Selecting && !Game.machineMode)
-            {
-                int key = e.key.keysym.sym;
-                if (key != SDLK_RIGHT && key != SDLK_LEFT && key != SDLK_UP && key != SDLK_DOWN && key != SDLK_RETURN)
-                    continue;
-
-                int n = Game.level + 5;
-
-                if (Game.helpers.selectedI == -1 && Game.helpers.selectedJ == -1)
-                {
-                    Game.helpers.selected = Game.solution->start + 1;
-
-                    if (Game.helpers.selected > 10 + 4 * (n - 2))
-                        Game.helpers.selected = 11;
-                    findStart(n, Game.matrix, Game.helpers.selected, &Game.helpers.selectedI, &Game.helpers.selectedJ);
-
-                    continue;
-                }
-                if (key == SDLK_RETURN)
-                {
-                    if (Game.solution->endI == Game.helpers.selectedI && Game.solution->endJ == Game.helpers.selectedJ)
-                        Game.helpers.win = 1;
-                    else
-                        Game.helpers.win = -1;
-
-                    Game.state = Result;
-                    continue;
-                }
-
-                if (e.key.keysym.sym == SDLK_RIGHT || e.key.keysym.sym == SDLK_DOWN)
-                {
-                    Game.helpers.selected++;
-                    if (Game.helpers.selected == Game.solution->start)
-                        Game.helpers.selected++;
-                }
-                else if (e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_UP)
-                {
-                    Game.helpers.selected--;
-                    if (Game.helpers.selected == Game.solution->start)
-                        Game.helpers.selected--;
-                }
-
-                if (Game.helpers.selected < 11)
-                    Game.helpers.selected = 10 + 4 * (n - 2);
-                else if (Game.helpers.selected > 10 + 4 * (n - 2))
-                    Game.helpers.selected = 11;
-
-                if (Game.helpers.selected == Game.solution->start)
-                    key == SDLK_RIGHT ? Game.helpers.selected++ : Game.helpers.selected--;
-
-                findStart(n, Game.matrix, Game.helpers.selected, &Game.helpers.selectedI, &Game.helpers.selectedJ);
-            }
-
-            else if (e.type == SDL_TEXTINPUT && Game.state == TextInput)
-            {
-                // check if the name is too long
-                if (strlen(Game.player.name) >= 20)
-                    continue;
-
-                strcat(Game.player.name, e.text.text); // add the character to the name
-            }
-            else if (e.type == SDL_KEYDOWN && Game.state == TextInput) // text input
-            {
-                if (strlen(Game.player.name) == 0) // if the name is empty
-                    continue;
-                if (e.key.keysym.sym == SDLK_BACKSPACE)
-                {
-                    Game.player.name[strlen(Game.player.name) - 1] = '\0'; // remove the last character
-                }
-
-                if (e.key.keysym.sym == SDLK_RETURN)
-                {
-                    SDL_StopTextInput();     // stop text input mode
-                    Game.state = Memorizing; // change the state to memorizing
-                }
-            }
-            else if (e.type == SDL_MOUSEBUTTONUP && Game.state == Selecting && !Game.machineMode)
-            {
-                if (e.button.button != SDL_BUTTON_LEFT)
-                    continue; // only left click
-
-                int x = e.button.x; // get the click position
-                int y = e.button.y;
-                int i, j;
-                getMatrixClick(renderer, x, y, Game.level + 5, &i, &j); // get the matrix position
-
-                if ((i == -1 && j == -1) || (Game.solution->startI == i && Game.solution->startJ == j)) // if the click is outside the matrix
-                    continue;
-
-                if (Game.solution->endI == i && Game.solution->endJ == j)
-                {
-
-                    Game.helpers.win = 1;
-                }
-                else
-                {
-                    Game.helpers.win = -1;
-                }
-                Game.state = Result;
-            }
-            else if (e.type == SDL_USEREVENT && Game.state == Selecting && Game.machineMode)
-
-            {
-                int x = e.button.x; // get the click position
-                int y = e.button.y;
-                int i, j;
-                getMatrixClick(renderer, x, y, Game.level + 5, &i, &j); // get the matrix position
-
-                if (i == -1 && j == -1) // if the click is outside the matrix
-                    continue;
-
-                if (Game.solution->endI == i && Game.solution->endJ == j)
-                {
-
-                    Game.helpers.win = 1;
-                }
-                else if (Game.solution->startI != i || Game.solution->startJ != j)
-                {
-                    Game.helpers.win = -1;
-                }
-                Game.state = Result;
-            }
-
+            handleGlobal(e, &quit);
+            handleGameMode(e, &Game, renderer);
             // ctrl + p
         }
 
         SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
         SDL_RenderClear(renderer);
-
-        switch (Game.state)
-        {
-        case TextInput:
-
-            drawTextInput(renderer, &Game);
-
-            break;
-        case Memorizing:
-
-            drawGrid(renderer, &Game);
-            drawSideBar(renderer, &Game);
-            if (Game.machineMode)
-                machineModeMemorize(renderer, Game.level + 5, mat);
-            // delay = 3 * 1000;
-            if (Game.helpers.startTime == 0)
-                Game.helpers.startTime = SDL_GetTicks();
-            // Game.state = Selecting;
-            if (SDL_GetTicks() - Game.helpers.startTime > MEMORIZING_TIME)
-            {
-                Game.state = Selecting;
-                Game.helpers.startTime = 0;
-            }
-            break;
-        case Selecting:
-            drawGrid(renderer, &Game);
-            drawSideBar(renderer, &Game);
-            if (Game.machineMode)
-                machineModeSelecting(renderer, Game.level + 5, mat);
-            break;
-
-        case Result:
-            drawGrid(renderer, &Game);
-            drawSideBar(renderer, &Game);
-            drawPath(renderer, Game.level + 5, Game.solution->path);
-            updateLevelAndScore(&Game);
-
-            Game.state = Game.level == 0 || Game.level == MAX_LEVEL ? GameOver : Memorizing;
-
-            break;
-        case Pause:
-            drawPause(renderer, &Game);
-            break;
-        case GameOver:
-            drawGameOver(renderer, &Game);
-            break;
-        }
-
+        renderGameMode(renderer, &Game);
         SDL_RenderPresent(renderer);
 
-        if (graycefulDelay(10))
-            quit = 1;
+        graycefulDelay(10);
     }
 
     return Quit();
 }
 
-void initialize()
+void initializeSDL()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -268,17 +79,17 @@ void initialize()
         // Handle the SDL_image error and exit or return an error code.
     }
 
-    window = SDL_CreateWindow("Pinball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    window = SDL_CreateWindow("Pinball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0); // Create a window
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);                                           // Create a renderer
 
-    SDL_Surface *icon = IMG_Load("assets/images/icon.png");
+    SDL_Surface *icon = IMG_Load("assets/images/icon.png"); // Load the icon
 
-    icon = SDL_ConvertSurfaceFormat(icon, SDL_PIXELFORMAT_RGBA8888, 0);
-    SDL_SetWindowIcon(window, icon);
-    SDL_FreeSurface(icon);
+    icon = SDL_ConvertSurfaceFormat(icon, SDL_PIXELFORMAT_RGBA8888, 0); // Convert the icon to the right format
+    SDL_SetWindowIcon(window, icon);                                    // Set the icon
+    SDL_FreeSurface(icon);                                              // Free the icon surface
 
     // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_RegisterEvents(1);
+    SDL_RegisterEvents(1); // Register a user event (for machine mode)
 }
 
 int Quit()
@@ -286,6 +97,9 @@ int Quit()
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();
+    IMG_Quit();
+    Mix_Quit();
+
     SDL_Quit();
     return 0;
 }

@@ -229,6 +229,7 @@ solution *setupMatrix(int n, int matrix[n][n])
         solution *tmp = solveMatrix(i, obs, n, matrix);
         if (tmp->hit > s->hit)
         {
+            freePath(s->path);
             s = tmp;
         }
     }
@@ -236,14 +237,13 @@ solution *setupMatrix(int n, int matrix[n][n])
     return s;
 }
 
-void printPath(path *p)
+void freePath(path *p)
 {
-    int i = 1;
     while (p != NULL)
     {
-        printf("step%d: i=%d,j=%d\n", i, p->x, p->y);
-        i++;
+        path *tmp = p;
         p = p->next;
+        free(tmp);
     }
 }
 
@@ -320,6 +320,36 @@ void getTopPlayers(player players[])
 game part
 */
 
+void initGame(game *Game, bool machineMode)
+{
+    Game->level = 1;
+    Game->maxLevel = Game->level;
+
+    Game->winStreak = 0;
+    Game->loseStreak = 0;
+    Game->player.score = 0;
+    Game->machineMode = machineMode;
+    // random name
+    if (!machineMode)
+        sprintf(Game->player.name, "Player%d", randomInt(1, 1000));
+    else
+        sprintf(Game->player.name, "Machine");
+
+    Game->player.date = getCurrentDate();
+
+    Game->state = machineMode ? Memorizing : TextInput;
+
+    Game->helpers.startTime = 0;
+    Game->helpers.pauseTime = 0;
+    Game->helpers.selectedI = -1;
+    Game->helpers.selectedJ = -1;
+    Game->helpers.selected = -1;
+    Game->helpers.prevState = Game->state;
+    Game->helpers.win = 0;
+
+    Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+}
+
 void updateLevelAndScore(game *Game)
 {
     if (Game->helpers.win == 0)
@@ -327,9 +357,9 @@ void updateLevelAndScore(game *Game)
 
     if (Game->helpers.win == 1)
     {
+        int addedScore = Game->solution->noHit * 5 + Game->solution->hit * 10 + 100 * Game->level + Game->winStreak * 10;
         if (Game->level == Game->maxLevel)
-            Game->player.score += Game->solution->noHit * 5 + Game->solution->hit * 10 + 100 * Game->level;
-
+            Game->player.score += addedScore;
         Game->winStreak++;
         Game->loseStreak = 0;
     }
@@ -339,11 +369,11 @@ void updateLevelAndScore(game *Game)
         Game->winStreak = 0;
     }
 
-    if (Game->winStreak == 3)
+    if (Game->winStreak % 3 == 0 && Game->winStreak != 0)
     {
         Game->level++;
         Game->loseStreak = 0;
-        Game->winStreak = 0;
+        // Game->winStreak = 0;
         if (Game->level > Game->maxLevel)
             Game->maxLevel = Game->level;
     }
@@ -354,38 +384,7 @@ void updateLevelAndScore(game *Game)
         Game->winStreak = 0;
         Game->loseStreak = 0;
     }
-
+    Game->helpers.win = 0;
     if (Game->level != 0 && Game->level != MAX_LEVEL)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
 }
-
-void initGame(game *Game, bool machineMode)
-{
-    Game->level = 1;
-    Game->maxLevel = Game->level;
-
-    Game->winStreak = 0;
-    Game->loseStreak = 0;
-    Game->player.score = 0;
-
-    // random name
-    sprintf(Game->player.name, "Player%d", randomInt(1, 1000));
-
-    Game->player.date = getCurrentDate();
-
-    Game->state = machineMode ? Memorizing : TextInput;
-
-    Game->machineMode = machineMode;
-    Game->helpers.startTime = 0;
-    Game->helpers.pauseTime = 0;
-    Game->helpers.selectedI = -1;
-    Game->helpers.selectedJ = -1;
-    Game->helpers.selected = -1;
-    Game->helpers.prevState = Game->state;
-
-    Game->solution = setupMatrix(Game->level + 5, Game->matrix);
-}
-
-/*
-machine mode
-*/

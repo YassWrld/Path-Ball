@@ -198,7 +198,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
-    
+
     SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
     int endx = Game->solution->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     int endy = Game->solution->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
