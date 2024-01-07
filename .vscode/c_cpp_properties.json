@@ -3,7 +3,12 @@
     {
       "name": "Win32",
       "includePath": ["${workspaceFolder}/include", "C:/SDL2/include"],
-      "defines": [],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+    
       "compilerPath": "C:/MinGW/bin/gcc.exe",
       "cStandard": "c17",
       "cppStandard": "c++17",

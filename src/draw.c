@@ -510,10 +510,10 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
                 matrix[i][j] = 0;
                 continue;
             }
-            // check if the diagonal is up or down
+            
             int of = cellSize / 4;
-            color = getPixelColor(renderer, x - of, y + of);
-            bool isUp = compareColor(color, DIAGONAL_COLOR);
+            color = getPixelColor(renderer, x - of, y + of); 
+            bool isUp = compareColor(color, DIAGONAL_COLOR);// check if the diagonal is up or down
             if (isUp)
             {
                 matrix[i][j] = 1;
