@@ -4,7 +4,7 @@
 
 #include "draw.h"
 #include "logic.h"
-
-void renderGameMode(SDL_Renderer *renderer, game *game);
+void renderHomeScreen(SDL_Renderer *renderer, game *game);
+void renderGameModeScreen(SDL_Renderer *renderer, game *game);
 
 #endif

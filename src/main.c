@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
     game Game;
-    
+
     initGame(&Game, false);
     printMatrix(Game.level + 5, Game.matrix);
 
@@ -37,12 +37,11 @@ int main(int argc, char *argv[])
         {
             handleGlobal(e, &quit);
             handleGameMode(e, &Game, renderer);
-            // ctrl + p
         }
 
         SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
         SDL_RenderClear(renderer);
-        renderGameMode(renderer, &Game);
+        renderGameModeScreen(renderer, &Game);
         SDL_RenderPresent(renderer);
 
         graycefulDelay(10);

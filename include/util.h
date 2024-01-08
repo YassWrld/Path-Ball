@@ -17,6 +17,6 @@ typedef struct date_t
 void printMatrix(int n, int matrix[n][n]);
 int randomInt(int min, int max);
 date_t getCurrentDate();
-
+char *formatTime(int ms);
 int graycefulDelay(Uint32 ms);
 #endif // UTIL_H

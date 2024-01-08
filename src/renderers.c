@@ -1,6 +1,6 @@
 #include "renderers.h"
 
-void renderGameMode(SDL_Renderer *renderer, game *Game)
+void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
 {
     // Clear screen
     SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
@@ -20,13 +20,13 @@ void renderGameMode(SDL_Renderer *renderer, game *Game)
         if (Game->machineMode)
             machineModeMemorize(renderer, Game->level + 5, Game->machineMatrix);
 
-        if (Game->helpers.startTime == 0)
-            Game->helpers.startTime = SDL_GetTicks();
+        if (Game->helpers.memorizingStartTime == 0)
+            Game->helpers.memorizingStartTime = SDL_GetTicks();
 
-        if (SDL_GetTicks() - Game->helpers.startTime > MEMORIZING_TIME)
+        if (SDL_GetTicks() - Game->helpers.memorizingStartTime > MEMORIZING_TIME)
         {
             Game->state = Selecting;
-            Game->helpers.startTime = 0;
+            Game->helpers.memorizingStartTime = 0;
         }
         break;
     case Selecting:
@@ -39,7 +39,7 @@ void renderGameMode(SDL_Renderer *renderer, game *Game)
     case Result:
         drawGrid(renderer, Game);
         drawSideBar(renderer, Game);
-        drawPath(renderer, Game->level + 5, Game->solution->path);
+        drawPath(renderer, Game);
         updateLevelAndScore(Game);
 
         Game->state = Game->level == 0 || Game->level == MAX_LEVEL ? GameOver : Memorizing;

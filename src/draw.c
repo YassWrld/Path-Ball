@@ -167,9 +167,13 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                 {
                     SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
                 }
-                else if ((hoverI == i && hoverJ == j) || (Game->helpers.selectedI == i && Game->helpers.selectedJ == j))
+                else if (hoverI == i && hoverJ == j)
                 {
                     SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+                }
+                else if (Game->helpers.selectedI == i && Game->helpers.selectedJ == j)
+                {
+                    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
                 }
                 else
                 {
@@ -185,9 +189,13 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                 {
                     SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
                 }
-                else if ((hoverI == j && hoverJ == i) || (Game->helpers.selectedI == j && Game->helpers.selectedJ == i))
+                else if (hoverI == j && hoverJ == i)
                 {
                     SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+                }
+                else if (Game->helpers.selectedI == j && Game->helpers.selectedJ == i)
+                {
+                    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
                 }
                 else
                 {
@@ -198,17 +206,21 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
+    if (strcmp(Game->player.name, "root") || Game->state != Selecting)
+        return;
 
-    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
     int endx = Game->solution->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     int endy = Game->solution->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
-    SDL_RenderDrawLine(renderer, endx, endy, endx + 15, endy + 15);
+    drawFilledCircle(renderer, endx, endy, cellSize / 16);
 }
 
-void drawPath(SDL_Renderer *renderer, int n, path *sPath)
+void drawPath(SDL_Renderer *renderer, game *Game)
 {
+    int n = Game->level + 5;
     int cellSize = GRID_SIZE / n;
-    SDL_SetRenderDrawColor(renderer, PATH_COLOR);
+    path *sPath = Game->solution->path;
+
     while (sPath->next != NULL && sPath != NULL)
     {
         path *start = sPath;
@@ -223,6 +235,7 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
         int circleRadius = cellSize / 8;
         for (int i = 0; i < circlesNumber; i++)
         {
+
             if (i != circlesNumber && i != 0)
             {
                 circleRadius = cellSize / 12;
@@ -232,16 +245,11 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
                 circleRadius = cellSize / 8;
             }
 
-            if (end->next == NULL && i == circlesNumber)
-            {
-                SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
-                circleRadius = cellSize / 4;
-            }
-
             int c1 = startX + (endX - startX) * i / circlesNumber;
             int c2 = startY + (endY - startY) * i / circlesNumber;
-
+            SDL_SetRenderDrawColor(renderer, PATH_COLOR);
             drawFilledCircle(renderer, c1, c2, circleRadius);
+            drawSideBar(renderer, Game);
             SDL_RenderPresent(renderer);
             playSoundEffect("assets/sounds/step.wav");
             graycefulDelay(250);
@@ -257,6 +265,7 @@ void drawPath(SDL_Renderer *renderer, int n, path *sPath)
         int endy = sPath->x * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
         drawFilledCircle(renderer, endx, endy, cellSize / 4);
         // playSoundEffect("assets/sounds/step.wav");
+        drawSideBar(renderer, Game);
         SDL_RenderPresent(renderer);
     }
 
@@ -282,20 +291,26 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
 
     int centerY = outline + HEIGHT / 2;
     char text[100];
+    int fontSize = 24;
+
     sprintf(text, "Score:%d", Game->player.score);
-    int w = mesureTextWidth(GAMEPAUSED_FONT, text, 24);
-    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 100, 24, FONT_COLOR);
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 100, fontSize, FONT_COLOR);
 
     // write player name at the top of the side bar
-    sprintf(text, "Name:%s", Game->player.name);
-    int fontSize = 24;
-    do
-    {
+    sprintf(text, "%s", Game->player.name);
+    // set it in the top center of the side bar
+    fontSize = 34;
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, outline + 10, fontSize, 255, 0, 0, 255);
+    // line under the name
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderDrawLine(renderer, centerX - w / 2, outline + 10 + fontSize, centerX + w / 2, outline + 10 + fontSize);
 
-        w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-        fontSize--;
-    } while (w >= sideBarWidth - 2 * outline - w / 2);
-    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 150, fontSize, FONT_COLOR);
+    // write time
+    sprintf(text, "Time:%s", formatTime(SDL_GetTicks() - Game->helpers.gameStartTime));
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 50, fontSize, FONT_COLOR);
 
     // 3 displays
     // Name
@@ -510,10 +525,10 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
                 matrix[i][j] = 0;
                 continue;
             }
-            
+
             int of = cellSize / 4;
-            color = getPixelColor(renderer, x - of, y + of); 
-            bool isUp = compareColor(color, DIAGONAL_COLOR);// check if the diagonal is up or down
+            color = getPixelColor(renderer, x - of, y + of);
+            bool isUp = compareColor(color, DIAGONAL_COLOR); // check if the diagonal is up or down
             if (isUp)
             {
                 matrix[i][j] = 1;

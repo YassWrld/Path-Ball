@@ -57,6 +57,29 @@ date_t getCurrentDate()
     return currentDate;
 }
 
+char* formatTime(int ms)
+{
+    int seconds = ms / 1000;
+    int minutes = seconds / 60;
+    seconds %= 60;
+    int hours = minutes / 60;
+    minutes %= 60;
+
+    char *time = malloc(9 * sizeof(char));
+    if (hours > 0)
+        sprintf(time, "%02dh:%02dm:%02ds", hours, minutes, seconds);
+    else if (minutes > 0)
+        sprintf(time, "%02dm:%02ds", minutes, seconds);
+    else
+        sprintf(time, "%02ds", seconds);
+    return time;
+}
+
+
+
+
+
+
 int graycefulDelay(Uint32 ms)
 {
 

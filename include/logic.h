@@ -74,9 +74,11 @@ typedef struct helpers
     int selected;  // selected circle (keyboard)
     int selectedI; // selected i
     int selectedJ; // selected j
-    int startTime; // time when the memorizing state started
+    int memorizingStartTime; // time when the memorizing state started
+    int gameStartTime; // time when the game started
     int pauseTime; // time when the pause state started
     int win;       // 1 if win, -1 if lose, 0 if not finished
+    bool savedScore; // true if the score is saved in the file
 
     game_state prevState; // previous state before pause
 
@@ -92,18 +94,27 @@ typedef struct game
 
     int machineMatrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE]; // for machine mode
 
-    int level;        // current level
-    int maxLevel;     // max level reached
-    int winStreak;    // win streak
-    
+    int level;     // current level
+    int maxLevel;  // max level reached
+    int winStreak; // win streak
     int loseStreak;   // lose streak
+
     bool machineMode; // machine mode on/off
+    
 
     solution *solution; // solution for current level
 
     helpers_t helpers; // control variables
 
 } game;
+
+typedef enum Screen // screen enum
+{
+    PlayerGameModeScreen,  // player game mode screen
+    MachineGameModeScreen, // machine game mode screen
+    TopPlayersScreen,      // top players screen
+    CreditsScreen,         // credits screen
+} Screen;
 
 solution *setupMatrix(int n, int matrix[n][n]); // setup the matrix for the current level (initialize, set obstacles,choose start, solve the matrix) and return the solution
 void initializeMatrix(int n, int matrix[n][n]); // initialize outer matrix and fill inner matrix with 0s

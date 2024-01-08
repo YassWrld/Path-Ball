@@ -322,6 +322,10 @@ game part
 
 void initGame(game *Game, bool machineMode)
 {
+
+    if (Game->level < 1 || Game->level > 10)
+        Game->helpers.gameStartTime = SDL_GetTicks();
+
     Game->level = 1;
     Game->maxLevel = Game->level;
 
@@ -339,13 +343,14 @@ void initGame(game *Game, bool machineMode)
 
     Game->state = machineMode ? Memorizing : TextInput;
 
-    Game->helpers.startTime = 0;
+    Game->helpers.memorizingStartTime = 0;
     Game->helpers.pauseTime = 0;
     Game->helpers.selectedI = -1;
     Game->helpers.selectedJ = -1;
     Game->helpers.selected = -1;
     Game->helpers.prevState = Game->state;
     Game->helpers.win = 0;
+    Game->helpers.savedScore = false;
 
     Game->solution = setupMatrix(Game->level + 5, Game->matrix);
 }
