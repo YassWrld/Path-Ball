@@ -1,9 +1,32 @@
 #include "renderers.h"
 
+void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
+{
+    SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
+    SDL_RenderClear(renderer);
+
+    switch (Screen)
+    {
+    case MainMenu:
+        // renderMainMenuScreen(renderer, Game);
+        break;
+    case PlayerGameMode:
+    case MachineGameMode:
+        renderGameModeScreen(renderer, Game);
+        break;
+    case TopPlayers:
+        // renderTopPlayersScreen(renderer, Game);
+        break;
+    case Credits:
+        // renderCreditsScreen(renderer, Game);
+        break;
+    }
+    SDL_RenderPresent(renderer);
+}
 void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
 {
     // Clear screen
-    SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
+    // SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
     SDL_RenderClear(renderer);
 
     switch (Game->state)
@@ -17,8 +40,11 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
 
         drawGrid(renderer, Game);
         drawSideBar(renderer, Game);
-        if (Game->machineMode)
+        if (Game->machineMode && !Game->helpers.filledMachineMatrix)
+        {
             machineModeMemorize(renderer, Game->level + 5, Game->machineMatrix);
+            Game->helpers.filledMachineMatrix = true;
+        }
 
         if (Game->helpers.memorizingStartTime == 0)
             Game->helpers.memorizingStartTime = SDL_GetTicks();
@@ -32,7 +58,7 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
     case Selecting:
         drawGrid(renderer, Game);
         drawSideBar(renderer, Game);
-        if (Game->machineMode)
+        if (Game->machineMode && Game->helpers.filledMachineMatrix)
             machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix);
         break;
 
@@ -54,5 +80,5 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
     }
 
     // Update screen
-    SDL_RenderPresent(renderer);
+    // SDL_RenderPresent(renderer);
 }

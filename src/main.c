@@ -19,30 +19,28 @@ SDL_Renderer *renderer = NULL;
 void initializeSDL();
 int Quit();
 
+game Game;
+screen Screen = PlayerGameMode;
+int fps = 60;
 int main(int argc, char *argv[])
 {
 
     initializeSDL();
     int quit = 0;
     SDL_Event e;
-    game Game;
 
     initGame(&Game, false);
     printMatrix(Game.level + 5, Game.matrix);
 
+    // ca
     while (!quit)
     {
 
         while (SDL_PollEvent(&e) != 0)
         {
-            handleGlobal(e, &quit);
-            handleGameMode(e, &Game, renderer);
+            handleEvents(e, Screen, renderer, &Game, &quit);
         }
-
-        SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-        SDL_RenderClear(renderer);
-        renderGameModeScreen(renderer, &Game);
-        SDL_RenderPresent(renderer);
+        renderScreens(renderer, Screen, &Game);
 
         graycefulDelay(10);
     }
@@ -89,6 +87,7 @@ void initializeSDL()
 
     // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_RegisterEvents(1); // Register a user event (for machine mode)
+    SDL_RenderSetVSync(renderer, true);
 }
 
 int Quit()

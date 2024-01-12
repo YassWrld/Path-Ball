@@ -15,7 +15,8 @@ build:
 	gcc $(src) $(includes) $(libs) $(linkers) $(flags) -o "bin/game.exe"
 run :
 	@echo Run started...
-	./bin/game.exe
+	.\bin\game.exe
+	
 testBuild: 
 	gcc $(src) $(includes) $(libs) $(linkers) $(flags) -o "bin/game${current_date}.exe"
 

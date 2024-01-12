@@ -12,8 +12,18 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
-#include "logic.h"
+
+#ifndef UTIL_H
+
 #include "util.h"
+#endif // UTIL_H
+
+#ifndef LOGIC_H
+
+#include "logic.h"
+#endif // LOGIC_H
+
+
 
 #define HEIGHT 700    // window height
 #define WIDTH 1100    // window width
@@ -43,6 +53,7 @@
 // #define MONOCRAFT_FONT "assets/fonts/monocraft.ttf"// black
 #define GAMEPAUSED_FONT "assets/fonts/gamepaused.otf" // black
 
+
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
 
 // Text input
@@ -59,7 +70,6 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
 void drawSideBar(SDL_Renderer *renderer, game *Game);
 
 void drawGameOver(SDL_Renderer *renderer, game *Game);
-
 void drawPause(SDL_Renderer *renderer, game *Game);
 
 void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
@@ -69,7 +79,7 @@ void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
 
 Mix_Music *playMusic(char *path);
 void playSoundEffect(char *path);
-
+void drawFilledArc(SDL_Renderer *renderer, int centerX, int centerY, int radius, int startAngle, int endAngle);
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
 bool compareColor(SDL_Color color, int r, int g, int b, int a);
 

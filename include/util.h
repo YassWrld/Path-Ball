@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 #include <SDL2/SDL.h>
 
 typedef struct date_t
@@ -19,4 +20,5 @@ int randomInt(int min, int max);
 date_t getCurrentDate();
 char *formatTime(int ms);
 int graycefulDelay(Uint32 ms);
+bool checkAllowedString(char *str);
 #endif // UTIL_H

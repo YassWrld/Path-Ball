@@ -84,13 +84,13 @@ void findStart(int n, int matrix[n][n], int start, int *x, int *y)
 {
     int i = 0;
     int j = 0;
-    if (start < 11 || start > 10 + 4 * (n - 2))
+    /*if (start < 11 || start > 10 + 4 * (n - 2))
     {
         *x = -1;
         *y = -1;
         return;
     }
-
+*/
     while (matrix[i][j] != start)
     {
         if (i == 0 && j < n - 1)
@@ -222,9 +222,9 @@ solution *setupMatrix(int n, int matrix[n][n])
     initializeMatrix(n, matrix);
     int obs = setObstacles(n, matrix);
     // int start = randomInt(11, 4 * (n - 2));
-
-    solution *s = solveMatrix(11, obs, n, matrix);
-    for (int i = 12; i <= 4 * (n - 2); i++)
+    const int start = 11;
+    solution *s = solveMatrix(start, obs, n, matrix);
+    for (int i = start + 1; i <= 4 * (n - 2); i++)
     {
         solution *tmp = solveMatrix(i, obs, n, matrix);
         if (tmp->hit > s->hit)
@@ -323,9 +323,6 @@ game part
 void initGame(game *Game, bool machineMode)
 {
 
-    if (Game->level < 1 || Game->level > 10)
-        Game->helpers.gameStartTime = SDL_GetTicks();
-
     Game->level = 1;
     Game->maxLevel = Game->level;
 
@@ -335,7 +332,10 @@ void initGame(game *Game, bool machineMode)
     Game->machineMode = machineMode;
     // random name
     if (!machineMode)
+    {
         sprintf(Game->player.name, "Player%d", randomInt(1, 1000));
+        SDL_StartTextInput();
+    }
     else
         sprintf(Game->player.name, "Machine");
 
@@ -351,8 +351,10 @@ void initGame(game *Game, bool machineMode)
     Game->helpers.prevState = Game->state;
     Game->helpers.win = 0;
     Game->helpers.savedScore = false;
+    Game->helpers.filledMachineMatrix = false;
 
     Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+    Game->helpers.gameStartTime = SDL_GetTicks();
 }
 
 void updateLevelAndScore(game *Game)
@@ -378,7 +380,7 @@ void updateLevelAndScore(game *Game)
     {
         Game->level++;
         Game->loseStreak = 0;
-        // Game->winStreak = 0;
+
         if (Game->level > Game->maxLevel)
             Game->maxLevel = Game->level;
     }
@@ -390,6 +392,32 @@ void updateLevelAndScore(game *Game)
         Game->loseStreak = 0;
     }
     Game->helpers.win = 0;
+    Game->helpers.filledMachineMatrix = false;
+    Game->helpers.selectedI = -1;
+    Game->helpers.selectedJ = -1;
+    Game->helpers.selected = -1;
+
+    freePath(Game->solution->path);
     if (Game->level != 0 && Game->level != MAX_LEVEL)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+}
+
+bool isClickInButton(SDL_Event event, button *Button)
+{
+    if (event.type != SDL_MOUSEBUTTONUP || event.button.button != SDL_BUTTON_LEFT)
+        return false;
+
+    int x = Button->centerX;
+    int y = Button->centerY;
+    int w = Button->width;
+    int h = Button->height;
+
+    int mouseX = event.button.x;
+    int mouseY = event.button.y;
+
+    if (mouseX >= x - w / 2 && mouseX <= x + w / 2 && mouseY >= y - h / 2 && mouseY <= y + h / 2)
+    {
+        return true;
+    }
+    return false;
 }

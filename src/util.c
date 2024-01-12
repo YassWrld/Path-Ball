@@ -11,6 +11,29 @@ int randomInt(int min, int max)
     }
     return rand() % (max - min + 1) + min;
 }
+bool checkAllowedString(char *str)
+{
+
+    int len = strlen(str);
+    bool isAllowed = false;
+    for (int i = 0; i < len; i++)
+    {
+        if (str[i] >= 'a' && str[i] <= 'z')
+            isAllowed = true;
+        else if (str[i] >= 'A' && str[i] <= 'Z')
+            isAllowed = true;
+        else if (str[i] >= '0' && str[i] <= '9')
+            isAllowed = true;
+        else if (str[i] == ' ' || str[i] == '_' || str[i] == '-' || str[i] == '.')
+            isAllowed = true;
+        else
+        {
+            isAllowed = false;
+            break;
+        }
+    }
+    return isAllowed;
+}
 
 void printMatrix(int n, int matrix[n][n])
 {
@@ -57,7 +80,7 @@ date_t getCurrentDate()
     return currentDate;
 }
 
-char* formatTime(int ms)
+char *formatTime(int ms)
 {
     int seconds = ms / 1000;
     int minutes = seconds / 60;
@@ -75,14 +98,8 @@ char* formatTime(int ms)
     return time;
 }
 
-
-
-
-
-
 int graycefulDelay(Uint32 ms)
 {
-
     if (ms < 100)
     {
         SDL_Delay(ms);

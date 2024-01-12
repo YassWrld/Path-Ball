@@ -1,5 +1,26 @@
 #include "handlers.h"
 
+void handleEvents(SDL_Event event, screen Screen, SDL_Renderer *renderer, game *Game, int *quit)
+{
+    handleGlobal(event, quit);
+    switch (Screen)
+    {
+    case MainMenu:
+        // handleMainMenu(event,renderer, Game);
+        break;
+    case PlayerGameMode:
+    case MachineGameMode:
+        handleGameMode(event, renderer, Game);
+        break;
+    case TopPlayers:
+        // handleTopPlayers(event, renderer, Game);
+        break;
+    case Credits:
+        // handleCredits(event, renderer, Game);
+        break;
+    }
+}
+
 void handleGlobal(SDL_Event event, int *quit)
 {
     if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) // quit
@@ -9,7 +30,7 @@ void handleGlobal(SDL_Event event, int *quit)
     }
 }
 
-void handleGameMode(SDL_Event event, game *Game, SDL_Renderer *renderer)
+void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
 {
 
     if (Game->state == TextInput) // Text input mode
@@ -34,6 +55,8 @@ void handleGameMode(SDL_Event event, game *Game, SDL_Renderer *renderer)
         if (event.type == SDL_TEXTINPUT)
         {
             // check if the name is too long
+            if (!checkAllowedString(event.text.text))
+                return;
             if (strlen(Game->player.name) >= 20)
                 return;
 
@@ -44,7 +67,7 @@ void handleGameMode(SDL_Event event, game *Game, SDL_Renderer *renderer)
 
     // Pause mode
 
-    if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p && SDL_GetModState() & KMOD_CTRL) // pause
+    if ((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p && SDL_GetModState() & KMOD_CTRL) || isClickInButton(event, &Game->buttons.pause)) // pause
     {
         if (Game->state == TextInput || Game->state == Result || Game->state == GameOver)
             return;

@@ -36,6 +36,45 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
 }
 
 // void getClickCenter()
+void drawButton(SDL_Renderer *renderer, button *Button)
+{
+    int x = Button->centerX;
+    int y = Button->centerY;
+    int w = Button->width;
+    int h = Button->height;
+
+    SDL_Rect rect = {x - w / 2, y - h / 2, w, h};
+    SDL_SetRenderDrawColor(renderer, Button->outlineColor.r, Button->outlineColor.g, Button->outlineColor.b, Button->outlineColor.a);
+    for (int i = 0; i < Button->outlineThickness; i++)
+    {
+        SDL_RenderDrawRect(renderer, &rect);
+        rect.x++;
+        rect.y++;
+        rect.w -= 2;
+        rect.h -= 2;
+    }
+    SDL_Color color = Button->color;
+    if (Button->hoverColor.r != -1)
+    {
+        int mouseX, mouseY;
+        SDL_GetMouseState(&mouseX, &mouseY);
+        if (mouseX >= x - w / 2 && mouseX <= x + w / 2 && mouseY >= y - h / 2 && mouseY <= y + h / 2)
+        {
+            color = Button->hoverColor;
+        }
+    }
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderFillRect(renderer, &rect);
+    // rounded corners
+
+    color = Button->textColor;
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+    int fontSize = 24;
+    int textWidth = mesureTextWidth(GAMEPAUSED_FONT, Button->label, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, Button->label, x - textWidth / 2, y - fontSize / 2, fontSize, color.r, color.g, color.b, color.a);
+}
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius)
 {
@@ -99,12 +138,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
 {
     int n = Game->level + 5;
     int cellSize = GRID_SIZE / n;
-
-    int matrix[n][n];
-
-    // cast the matrix using mmset
-    memcpy(matrix, Game->matrix, sizeof(matrix));
-    // copy the matrix
+    int(*matrix)[n] = Game->matrix;
 
     SDL_SetRenderDrawColor(renderer, BORDER_COLOR);
 
@@ -138,10 +172,10 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             if (j > 0 && j < n - 1)
             {
                 int current = matrix[i][j];
+
                 if (current != 0 && Game->state != Selecting)
                 {
                     drawDiagonal(renderer, n, current, x, y);
-                    // drawDiagonal(renderer, n, current, x, y);
                 }
 
                 continue;
@@ -206,6 +240,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
         }
     }
+
     if (strcmp(Game->player.name, "root") || Game->state != Selecting)
         return;
 
@@ -312,6 +347,11 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 50, fontSize, FONT_COLOR);
 
+    // write level
+    sprintf(text, "Level:%d", Game->level);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY, fontSize, FONT_COLOR);
+
     // 3 displays
     // Name
     // Level
@@ -320,6 +360,37 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     // 2 buttons
     // Pause
     // Save & Quit
+
+    // pause and save & quit buttons are in the bottom of the side bar one under the other
+    // pause button
+    button pauseButton = {
+        centerX, // center of the side bar
+        centerY + 100,
+        200,
+        50,
+        {0, 169, 157, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Pause"};
+    Game->buttons.pause = pauseButton;
+    drawButton(renderer, &pauseButton);
+
+    // save & quit button
+
+    button saveAndQuitButton = {
+        centerX,
+        centerY + 200,
+        200,
+        50,
+        {255, 0, 0, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Save & Quit"};
+    drawButton(renderer, &saveAndQuitButton);
 }
 
 void drawTextInput(SDL_Renderer *renderer, game *Game)
@@ -376,9 +447,20 @@ void drawPause(SDL_Renderer *renderer, game *Game)
 
     writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
 
-    sprintf(text, "Press Ctrl + P to Resume");
-    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
+    // resume button
+    button resumeButton = {
+        WIDTH / 2,
+        HEIGHT / 2,
+        200,
+        50,
+        {0, 169, 157, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Resume"};
+    Game->buttons.pause = resumeButton;
+    drawButton(renderer, &resumeButton);
 }
 
 Mix_Music *
@@ -503,7 +585,6 @@ bool compareColor(SDL_Color color, int r, int g, int b, int a)
 void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
 {
     int cellSize = GRID_SIZE / n;
-    printf("cellSize: %d\n", cellSize);
     initializeMatrix(n, matrix);
 
     for (int i = 1; i < n - 1; i++)
@@ -513,12 +594,13 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
             int x = OFFSET + j * cellSize + cellSize / 2 + THICKNESS / 2;
             int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
 
-            if (j <= 0 || j >= n - 1)
+            if (j <= 0 || j >= n - 1 || i <= 0 || i >= n - 1)
             {
                 continue;
             }
 
             SDL_Color color = getPixelColor(renderer, x, y);
+            // printf("color: %d %d %d %d\n at i=%d,j=%d", color.r, color.g, color.b, color.a, i, j);
             bool isDiagonal = compareColor(color, DIAGONAL_COLOR);
             if (!isDiagonal)
             {
@@ -545,43 +627,40 @@ void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n])
 {
     int cellSize = GRID_SIZE / n;
     int startI = 0, startJ = 0;
+
     for (int i = 1; i < n - 1; i++)
     {
-        for (int j = 0; j < n - 1; j++)
+        for (int j = 0; j < n; j++)
         {
+            if (j > 0 && j < n - 1)
+                continue;
             int x = OFFSET + j * cellSize + cellSize / 2 + THICKNESS / 2;
             int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
-            if (j <= 0 || j >= n - 1)
+
+            SDL_Color color1 = getPixelColor(renderer, x, y);
+            SDL_Color color2 = getPixelColor(renderer, y, x);
+            bool isStart1 = compareColor(color1, START_CIRCLE_COLOR);
+            bool isStart2 = compareColor(color2, START_CIRCLE_COLOR);
+            if (isStart1 || isStart2)
             {
-
-                SDL_Color color1 = getPixelColor(renderer, x, y);
-                SDL_Color color2 = getPixelColor(renderer, y, x);
-                bool isStart1 = compareColor(color1, START_CIRCLE_COLOR);
-                bool isStart2 = compareColor(color2, START_CIRCLE_COLOR);
-                if (isStart1)
-                {
-                    startI = i;
-                    startJ = j;
-                }
-
-                if (isStart2)
-                {
-                    startI = j;
-                    startJ = i;
-                }
-
-                continue;
+                startI = isStart1 ? i : j;
+                startJ = isStart1 ? j : i;
+                goto afterloop;
             }
         }
     }
+afterloop:;
 
     solution *s = solveMatrix(matrix[startI][startJ], 0, n, matrix); // obs = 0
+    // free Game->
+    freePath(s->path);
 
     int endX = s->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     int endY = s->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
-    // SDL_WarpMouseInWindow(NULL, endX, endY);
+    free(s);
+
     graycefulDelay(1000);
-    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
     drawFilledCircle(renderer, endX, endY, cellSize / 4);
     SDL_RenderPresent(renderer);
     graycefulDelay(1000);

@@ -58,7 +58,19 @@ typedef struct player
     date_t date;                // date of the game
 
 } player;
+typedef struct Button
+{
+    int centerX, centerY;
+    int width, height;
+    SDL_Color color;
+    SDL_Color hoverColor;
+    SDL_Color textColor;
+    SDL_Color outlineColor;
+    int outlineThickness;
 
+    char label[20];
+    // void (*onClick)(SDL_Renderer *renderer, game *Game);
+} button;
 typedef enum game_state
 {
     TextInput,  // text input mode (for player name)
@@ -71,18 +83,27 @@ typedef enum game_state
 
 typedef struct helpers
 {
-    int selected;  // selected circle (keyboard)
-    int selectedI; // selected i
-    int selectedJ; // selected j
-    int memorizingStartTime; // time when the memorizing state started
-    int gameStartTime; // time when the game started
-    int pauseTime; // time when the pause state started
-    int win;       // 1 if win, -1 if lose, 0 if not finished
-    bool savedScore; // true if the score is saved in the file
-
+    int selected;             // selected circle (keyboard)
+    int selectedI;            // selected i
+    int selectedJ;            // selected j
+    int memorizingStartTime;  // time when the memorizing state started
+    int gameStartTime;        // time when the game started
+    int resultTime;           // time when the result state started
+    int pauseTime;            // time when the pause state started
+    int win;                  // 1 if win, -1 if lose, 0 if not finished
+    bool savedScore;          // true if the score is saved in the file
+    bool filledMachineMatrix; // true if the machine matrix is filled
+    // path *currentPath;       // current path of the ball
+    // int currentPathLength;   // current path length
     game_state prevState; // previous state before pause
 
 } helpers_t;
+
+typedef struct buttonsHandle
+{
+    button pause;
+    button saveAndExit;
+} buttonsHandle;
 
 typedef struct game
 {
@@ -94,27 +115,29 @@ typedef struct game
 
     int machineMatrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE]; // for machine mode
 
-    int level;     // current level
-    int maxLevel;  // max level reached
-    int winStreak; // win streak
-    int loseStreak;   // lose streak
+    int level;      // current level
+    int maxLevel;   // max level reached
+    int winStreak;  // win streak
+    int loseStreak; // lose streak
 
     bool machineMode; // machine mode on/off
-    
 
     solution *solution; // solution for current level
 
     helpers_t helpers; // control variables
 
+    buttonsHandle buttons; // buttons
+
 } game;
 
 typedef enum Screen // screen enum
 {
-    PlayerGameModeScreen,  // player game mode screen
-    MachineGameModeScreen, // machine game mode screen
-    TopPlayersScreen,      // top players screen
-    CreditsScreen,         // credits screen
-} Screen;
+    MainMenu,        // main menu screen
+    PlayerGameMode,  // player game mode screen
+    MachineGameMode, // machine game mode screen
+    TopPlayers,      // top players screen
+    Credits,         // credits screen
+} screen;
 
 solution *setupMatrix(int n, int matrix[n][n]); // setup the matrix for the current level (initialize, set obstacles,choose start, solve the matrix) and return the solution
 void initializeMatrix(int n, int matrix[n][n]); // initialize outer matrix and fill inner matrix with 0s
@@ -131,5 +154,6 @@ void updateLevelAndScore(game *Game);        // update the level and score of th
 void insertScore(player current);            // insert the score of the current player in the file
 void sortTopPlayers(player arr[]);           // sort the top players by score
 void getTopPlayers(player players[]);        // get the top players from the file (5 players)
+bool isClickInButton(SDL_Event event, button *Button);
 
 #endif // LOGIC_H
