@@ -1,6 +1,6 @@
 #include <draw.h>
 
-void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j)
+void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside)
 {
     if (clickX <= OFFSET || clickX >= OFFSET + GRID_SIZE || clickY <= OFFSET || clickY >= OFFSET + GRID_SIZE)
     {
@@ -14,13 +14,17 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
 
     // check if the click in the circle
 
-    bool isOuterMatrix = *i == 0 || *i == n - 1 || *j == 0 || *j == n - 1;
-    if (!isOuterMatrix)
+    bool isCorner = (*i == 0 && *j == 0) || (*i == 0 && *j == n - 1) || (*i == n - 1 && *j == 0) || (*i == n - 1 && *j == n - 1);
+    bool out = *i == 0 || *i == n - 1 || *j == 0 || *j == n - 1;
+    if (isCorner)
     {
         *i = -1;
         *j = -1;
         return;
     }
+    *isOutside = out;
+    if (!out)
+        return;
 
     int cellSize = GRID_SIZE / n;
     int x = OFFSET + *j * cellSize + cellSize / 2 + THICKNESS / 2;
@@ -186,28 +190,39 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             drawFilledCircle(renderer, x, y, cellSize / 3); // Draw the big circle vertically
 
             drawFilledCircle(renderer, y, x, cellSize / 3); // Draw the big circle horizontally
-            int startI = Game->solution->startI, startJ = Game->solution->startJ;
-
+            int startI = -1, startJ = -1;
+            if (Game->solution)
+            {
+                startI = Game->solution->startI, startJ = Game->solution->startJ;
+            }
             int hoverX, hoverY;
             SDL_GetMouseState(&hoverX, &hoverY);
 
             int hoverI, hoverJ;
-            getMatrixClick(renderer, hoverX, hoverY, n, &hoverI, &hoverJ);
+            bool isOutside = false;
+            getMatrixClick(renderer, hoverX, hoverY, n, &hoverI, &hoverJ, &isOutside);
+            if (!isOutside)
+            {
+                hoverI = -1;
+                hoverJ = -1;
+            }
 
             SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR); // Color of the small circle
-            if (Game->state == Selecting)
+            if (Game->state == Selecting || Game->state == Filling)
             {
-                if (startI == i && startJ == j)
+                if (startI == i && startJ == j && Game->state != Filling)
                 {
                     SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
                 }
                 else if (hoverI == i && hoverJ == j)
                 {
-                    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+                    Game->manualFill && Game->state == Filling ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR)
+                                                               : SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
                 }
                 else if (Game->helpers.selectedI == i && Game->helpers.selectedJ == j)
                 {
-                    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
+                    Game->manualFill && Game->state == Filling ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR)
+                                                               : SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
                 }
                 else
                 {
@@ -217,19 +232,21 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
 
             drawFilledCircle(renderer, x, y, cellSize / 4); // Draw the small circle vertically
 
-            if (Game->state == Selecting)
+            if (Game->state == Selecting || Game->state == Filling)
             {
-                if (startI == j && startJ == i)
+                if (startI == j && startJ == i && Game->state != Filling)
                 {
                     SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
                 }
                 else if (hoverI == j && hoverJ == i)
                 {
-                    SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
+                    Game->manualFill && Game->state == Filling ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR)
+                                                               : SDL_SetRenderDrawColor(renderer, HOVER_CIRCLE_COLOR);
                 }
                 else if (Game->helpers.selectedI == j && Game->helpers.selectedJ == i)
                 {
-                    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
+                    Game->manualFill ? SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR)
+                                     : SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
                 }
                 else
                 {
@@ -282,11 +299,19 @@ void drawPath(SDL_Renderer *renderer, game *Game)
 
             int c1 = startX + (endX - startX) * i / circlesNumber;
             int c2 = startY + (endY - startY) * i / circlesNumber;
+
+            SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
+            SDL_RenderClear(renderer);
+            drawGrid(renderer, Game);
+            drawSideBar(renderer, Game);
+
             SDL_SetRenderDrawColor(renderer, PATH_COLOR);
+
             drawFilledCircle(renderer, c1, c2, circleRadius);
             drawSideBar(renderer, Game);
             SDL_RenderPresent(renderer);
-            playSoundEffect("assets/sounds/step.wav");
+
+            playSoundEffect(STEPS_SOUND_PATH);
             graycefulDelay(250);
         }
 
@@ -295,12 +320,17 @@ void drawPath(SDL_Renderer *renderer, game *Game)
     }
     if (sPath->next == NULL)
     {
-        SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
         int endx = sPath->y * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
         int endy = sPath->x * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
-        drawFilledCircle(renderer, endx, endy, cellSize / 4);
-        // playSoundEffect("assets/sounds/step.wav");
+        SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
+        SDL_RenderClear(renderer);
+        drawGrid(renderer, Game);
         drawSideBar(renderer, Game);
+
+        SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
+        drawFilledCircle(renderer, endx, endy, cellSize / 4);
+        // copy the screen
+
         SDL_RenderPresent(renderer);
     }
 

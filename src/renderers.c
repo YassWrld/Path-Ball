@@ -36,6 +36,10 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawTextInput(renderer, Game);
 
         break;
+    case Filling:
+        drawGrid(renderer, Game);
+        drawSideBar(renderer, Game);
+        break;
     case Memorizing:
 
         drawGrid(renderer, Game);
@@ -68,7 +72,8 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawPath(renderer, Game);
         updateLevelAndScore(Game);
 
-        Game->state = Game->level == 0 || Game->level == MAX_LEVEL ? GameOver : Memorizing;
+        Game->state = Game->level == 0 || Game->level == MAX_LEVEL ? GameOver : Game->manualFill ? Filling
+                                                                                                 : Memorizing;
 
         break;
     case Pause:

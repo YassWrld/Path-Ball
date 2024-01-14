@@ -13,17 +13,9 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
-#ifndef UTIL_H
-
 #include "util.h"
-#endif // UTIL_H
-
-#ifndef LOGIC_H
 
 #include "logic.h"
-#endif // LOGIC_H
-
-
 
 #define HEIGHT 700    // window height
 #define WIDTH 1100    // window width
@@ -53,6 +45,8 @@
 // #define MONOCRAFT_FONT "assets/fonts/monocraft.ttf"// black
 #define GAMEPAUSED_FONT "assets/fonts/gamepaused.otf" // black
 
+#define MUSIC_PATH "assets/sounds/music.mp3"
+#define STEPS_SOUND_PATH "assets/sounds/step.wav"
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
 
@@ -64,7 +58,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game);
 void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
 void drawPath(SDL_Renderer *renderer, game *Game);
 
-void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j);
+void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside);
 
 // Side bar
 void drawSideBar(SDL_Renderer *renderer, game *Game);

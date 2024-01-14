@@ -69,11 +69,12 @@ typedef struct Button
     int outlineThickness;
 
     char label[20];
-    // void (*onClick)(SDL_Renderer *renderer, game *Game);
 } button;
+
 typedef enum game_state
 {
     TextInput,  // text input mode (for player name)
+    Filling,    // filling the matrix with obstacles
     Memorizing, // memorizing state
     Selecting,  // selecting state
     Result,     // result state
@@ -90,17 +91,21 @@ typedef struct helpers
     int gameStartTime;        // time when the game started
     int resultTime;           // time when the result state started
     int pauseTime;            // time when the pause state started
+    int filledObstacles;      // number of filled obstacles
     int win;                  // 1 if win, -1 if lose, 0 if not finished
     bool savedScore;          // true if the score is saved in the file
     bool filledMachineMatrix; // true if the machine matrix is filled
+
     // path *currentPath;       // current path of the ball
     // int currentPathLength;   // current path length
     game_state prevState; // previous state before pause
+
 
 } helpers_t;
 
 typedef struct buttonsHandle
 {
+
     button pause;
     button saveAndExit;
 } buttonsHandle;
@@ -121,6 +126,7 @@ typedef struct game
     int loseStreak; // lose streak
 
     bool machineMode; // machine mode on/off
+    bool manualFill;  // manual fill on/off
 
     solution *solution; // solution for current level
 
@@ -149,7 +155,8 @@ solution *solveMatrix(int start, int obs, int n, int matrix[n][n]); // solve the
 
 void freePath(path *p);
 
-void initGame(game *Game, bool machineMode); // initialize the game
+void initGame(game *Game, bool machineMode, bool manualFill);
+// initialize the game
 void updateLevelAndScore(game *Game);        // update the level and score of the player and the game
 void insertScore(player current);            // insert the score of the current player in the file
 void sortTopPlayers(player arr[]);           // sort the top players by score

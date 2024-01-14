@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
 
-    initGame(&Game, false);
+    initGame(&Game, true,true);
     printMatrix(Game.level + 5, Game.matrix);
 
     // ca

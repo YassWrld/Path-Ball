@@ -89,8 +89,94 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
         return;
     }
 
-    if (Game->state == Pause)
+    if (Game->state == Filling)
     {
+
+        if (event.type == SDL_MOUSEBUTTONUP)
+        {
+            if (event.button.button != SDL_BUTTON_LEFT)
+                return; // only left click
+
+            int x = event.button.x; // get the click position
+            int y = event.button.y;
+            int i, j;
+            bool isOutside;
+            getMatrixClick(renderer, x, y, Game->level + 5, &i, &j, &isOutside);
+            // get the matrix position
+
+            if (i == -1 && j == -1) // if the click is outside the matrix
+                return;
+            int n = Game->level + 5;
+            int(*matrix)[n] = Game->matrix;
+            if (isOutside)
+            {
+                Game->solution = solveMatrix(matrix[i][j], Game->helpers.filledObstacles, n, Game->matrix);
+                Game->state = Memorizing;
+                return;
+            }
+            return;
+
+            if (matrix[i][j] == 0)
+            {
+                matrix[i][j] = 1;
+                Game->helpers.filledObstacles++;
+            }
+            else if (matrix[i][j] == 1)
+                matrix[i][j] = -1;
+            else if (matrix[i][j] == -1)
+            {
+                matrix[i][j] = 0;
+
+                Game->helpers.filledObstacles--;
+            }
+            printf("new Matrix\n");
+            printMatrix(Game->level + 5, Game->matrix);
+            return;
+        }
+        if (event.type == SDL_KEYDOWN)
+        {
+            if (!Game->machineMode && Game->manualFill) // if machine mode is on, return (no user input)
+                return;
+            int key = event.key.keysym.sym;
+            if (key != SDLK_RIGHT && key != SDLK_LEFT && key != SDLK_UP && key != SDLK_DOWN && key != SDLK_RETURN)
+                return;
+
+            int n = Game->level + 5;
+
+            if (Game->helpers.selectedI == -1 && Game->helpers.selectedJ == -1)
+            {
+                Game->helpers.selected = 11;
+
+                Game->helpers.selectedI = 0;
+                Game->helpers.selectedJ = 1;
+
+                return;
+            }
+            if (key == SDLK_RETURN)
+            {
+
+                Game->solution = solveMatrix(Game->helpers.selected, Game->helpers.filledObstacles, n, Game->matrix);
+                Game->state = Memorizing;
+                return;
+            }
+
+            if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_DOWN)
+            {
+                Game->helpers.selected++;
+            }
+            else if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_UP)
+            {
+                Game->helpers.selected--;
+            }
+
+            if (Game->helpers.selected < 11)
+                Game->helpers.selected = 10 + 4 * (n - 2);
+            else if (Game->helpers.selected > 10 + 4 * (n - 2))
+                Game->helpers.selected = 11;
+
+            findStart(n, Game->matrix, Game->helpers.selected, &Game->helpers.selectedI, &Game->helpers.selectedJ);
+            return;
+        }
     }
 
     // Selecting mode (keyboard)
@@ -163,7 +249,12 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
             int x = event.button.x; // get the click position
             int y = event.button.y;
             int i, j;
-            getMatrixClick(renderer, x, y, Game->level + 5, &i, &j); // get the matrix position
+            bool isOutside;
+            getMatrixClick(renderer, x, y, Game->level + 5, &i, &j, &isOutside);
+            // get the matrix position
+
+            if (!isOutside)
+                return;
 
             if ((i == -1 && j == -1) || (Game->solution->startI == i && Game->solution->startJ == j)) // if the click is outside the matrix
                 return;
@@ -189,7 +280,10 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
             int x = event.button.x; // get the click position
             int y = event.button.y;
             int i, j;
-            getMatrixClick(renderer, x, y, Game->level + 5, &i, &j); // get the matrix position
+            bool isOutside;
+            getMatrixClick(renderer, x, y, Game->level + 5, &i, &j, &isOutside); // get the matrix position
+            if (!isOutside)
+                return;
 
             if (i == -1 && j == -1) // if the click is outside the matrix
                 return;

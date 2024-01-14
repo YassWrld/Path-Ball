@@ -320,7 +320,7 @@ void getTopPlayers(player players[])
 game part
 */
 
-void initGame(game *Game, bool machineMode)
+void initGame(game *Game, bool machineMode, bool manualFill)
 {
 
     Game->level = 1;
@@ -330,6 +330,10 @@ void initGame(game *Game, bool machineMode)
     Game->loseStreak = 0;
     Game->player.score = 0;
     Game->machineMode = machineMode;
+    Game->manualFill = manualFill;
+    if (manualFill && !machineMode)
+        exit(1);
+
     // random name
     if (!machineMode)
     {
@@ -341,7 +345,7 @@ void initGame(game *Game, bool machineMode)
 
     Game->player.date = getCurrentDate();
 
-    Game->state = machineMode ? Memorizing : TextInput;
+    Game->state = machineMode ? manualFill ? Filling : Memorizing : TextInput;
 
     Game->helpers.memorizingStartTime = 0;
     Game->helpers.pauseTime = 0;
@@ -350,10 +354,17 @@ void initGame(game *Game, bool machineMode)
     Game->helpers.selected = -1;
     Game->helpers.prevState = Game->state;
     Game->helpers.win = 0;
+    Game->helpers.filledObstacles = 0;
     Game->helpers.savedScore = false;
     Game->helpers.filledMachineMatrix = false;
 
-    Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+    if (!Game->manualFill)
+        Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+    else
+    {
+        initializeMatrix(Game->level + 5, Game->matrix);
+        Game->solution = NULL;
+    }
     Game->helpers.gameStartTime = SDL_GetTicks();
 }
 
@@ -399,7 +410,16 @@ void updateLevelAndScore(game *Game)
 
     freePath(Game->solution->path);
     if (Game->level != 0 && Game->level != MAX_LEVEL)
-        Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+    {
+        if (!Game->manualFill)
+            Game->solution = setupMatrix(Game->level + 5, Game->matrix);
+        else
+        {
+            initializeMatrix(Game->level + 5, Game->matrix);
+            Game->solution = NULL;
+            Game->helpers.filledObstacles = 0;
+        }
+    }
 }
 
 bool isClickInButton(SDL_Event event, button *Button)
