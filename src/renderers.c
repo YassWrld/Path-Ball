@@ -9,6 +9,7 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
     {
     case MainMenu:
         // renderMainMenuScreen(renderer, Game);
+        drawMainMenu(renderer, Game);
         break;
     case PlayerGameMode:
     case MachineGameMode:
@@ -25,9 +26,6 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
 }
 void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
 {
-    // Clear screen
-    // SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-    SDL_RenderClear(renderer);
 
     switch (Game->state)
     {
@@ -83,7 +81,4 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawGameOver(renderer, Game);
         break;
     }
-
-    // Update screen
-    // SDL_RenderPresent(renderer);
 }

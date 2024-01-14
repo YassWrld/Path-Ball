@@ -108,6 +108,12 @@ typedef struct buttonsHandle
 
     button pause;
     button saveAndExit;
+    button topPlayers;
+    button playAgain;
+    button PlayerGameMode;
+    button MachineGameAutoMode;
+    button MachineGameManualMode;
+
 } buttonsHandle;
 
 typedef struct game

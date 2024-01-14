@@ -20,7 +20,7 @@ void initializeSDL();
 int Quit();
 
 game Game;
-screen Screen = PlayerGameMode;
+screen Screen = MainMenu;
 int fps = 60;
 int main(int argc, char *argv[])
 {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
 
-    initGame(&Game, true,true);
+    initGame(&Game, false, false);
     printMatrix(Game.level + 5, Game.matrix);
 
     // ca
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
         while (SDL_PollEvent(&e) != 0)
         {
-            handleEvents(e, Screen, renderer, &Game, &quit);
+            handleEvents(e, renderer, &Screen, &Game, &quit);
         }
         renderScreens(renderer, Screen, &Game);
 

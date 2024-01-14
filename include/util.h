@@ -7,6 +7,7 @@
 #include <time.h>
 #include <string.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 typedef struct date_t
 {
@@ -21,4 +22,7 @@ date_t getCurrentDate();
 char *formatTime(int ms);
 int graycefulDelay(Uint32 ms);
 bool checkAllowedString(char *str);
+Mix_Music *playMusic(char *path);
+void playSoundEffect(char *path);
+
 #endif // UTIL_H

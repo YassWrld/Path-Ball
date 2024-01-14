@@ -357,6 +357,7 @@ void initGame(game *Game, bool machineMode, bool manualFill)
     Game->helpers.filledObstacles = 0;
     Game->helpers.savedScore = false;
     Game->helpers.filledMachineMatrix = false;
+    
 
     if (!Game->manualFill)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);

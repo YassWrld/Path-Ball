@@ -9,7 +9,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <SDL2/SDL_mixer.h>
+
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
@@ -48,35 +48,42 @@
 #define MUSIC_PATH "assets/sounds/music.mp3"
 #define STEPS_SOUND_PATH "assets/sounds/step.wav"
 
+
+
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
+void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
+void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
+void drawButton(SDL_Renderer *renderer, button *Button);
+
 
 // Text input
 void drawTextInput(SDL_Renderer *renderer, game *Game);
-
 // Matrix
 void drawGrid(SDL_Renderer *renderer, game *Game);
 void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
 void drawPath(SDL_Renderer *renderer, game *Game);
 
-void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside);
+void drawSideBar(SDL_Renderer *renderer, game *Game); // Side bar
+void drawGameOver(SDL_Renderer *renderer, game *Game); // Game over
+void drawPause(SDL_Renderer *renderer, game *Game);   // Pause
 
-// Side bar
-void drawSideBar(SDL_Renderer *renderer, game *Game);
-
-void drawGameOver(SDL_Renderer *renderer, game *Game);
-void drawPause(SDL_Renderer *renderer, game *Game);
-
-void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
-int mesureTextWidth(char *fontPath, char *text, int size);
-
-void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
-
-Mix_Music *playMusic(char *path);
-void playSoundEffect(char *path);
-void drawFilledArc(SDL_Renderer *renderer, int centerX, int centerY, int radius, int startAngle, int endAngle);
-SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
-bool compareColor(SDL_Color color, int r, int g, int b, int a);
+void drawMainMenu(SDL_Renderer *renderer, game *Game);
 
 void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n]);
 void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n]);
+
+
+void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside); // Get matrix click
+SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
+bool compareColor(SDL_Color color, int r, int g, int b, int a);
+int mesureTextWidth(char *fontPath, char *text, int size);
+
+
+
+
+
+
+
+
+
 #endif // DRAW_H

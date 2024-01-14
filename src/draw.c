@@ -1,42 +1,31 @@
 #include <draw.h>
 
-void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside)
+void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a)
 {
-    if (clickX <= OFFSET || clickX >= OFFSET + GRID_SIZE || clickY <= OFFSET || clickY >= OFFSET + GRID_SIZE)
+    if (!text || text[0] == '\0')
     {
-        *i = -1;
-        *j = -1;
+        return; // Don't render anything if the text is empty
+    }
+    TTF_Font *font = TTF_OpenFont(fontPath, size);
+    if (!font)
+    {
+        printf("TTF_OpenFont Error: %s\n", TTF_GetError());
         return;
     }
 
-    *j = (clickX - OFFSET) * n / GRID_SIZE;
-    *i = (clickY - OFFSET) * n / GRID_SIZE;
+    // TTF_SetFontWrappedAlign(font, TTF_WRAPPED_ALIGN_CENTER);
 
-    // check if the click in the circle
+    SDL_Color color = {r, g, b, a};
+    // TTF_SetFontStyle(font, TTF_STYLE_BOLD);
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
 
-    bool isCorner = (*i == 0 && *j == 0) || (*i == 0 && *j == n - 1) || (*i == n - 1 && *j == 0) || (*i == n - 1 && *j == n - 1);
-    bool out = *i == 0 || *i == n - 1 || *j == 0 || *j == n - 1;
-    if (isCorner)
-    {
-        *i = -1;
-        *j = -1;
-        return;
-    }
-    *isOutside = out;
-    if (!out)
-        return;
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect = {x, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
 
-    int cellSize = GRID_SIZE / n;
-    int x = OFFSET + *j * cellSize + cellSize / 2 + THICKNESS / 2;
-    int y = OFFSET + *i * cellSize + cellSize / 2 + THICKNESS / 2;
-    int radius = cellSize / 3; // radius of the small circle
-
-    if (clickX < x - radius || clickX > x + radius || clickY < y - radius || clickY > y + radius)
-    {
-        *i = -1;
-        *j = -1;
-        return;
-    }
+    TTF_CloseFont(font);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 // void getClickCenter()
@@ -109,33 +98,34 @@ void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radi
         }
     }
 }
-
-void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY)
+void drawTextInput(SDL_Renderer *renderer, game *Game)
 {
-    // Set the length of the diagonal line
 
-    // Calculate the end points of the diagonal based on the direction
-    int cellSize = GRID_SIZE / n;
-    int of = cellSize / 4;    // OFFSET
-    int bold = cellSize / 10; // boldness
+    char text[100];
+    int fontSize = 24;
+    sprintf(text, "Enter Your Name:");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    int Sx = centerX - of; // Start x
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
 
-    int Ex = centerX + of; // End x
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    sprintf(text, "%s", Game->player.name);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, 255, 0, 0, 255);
 
-    int Sy = direction > 0 ? centerY + of : centerY - of; // Start y depending on the direction
-    int Ey = direction > 0 ? centerY - of : centerY + of; // End y depending on the direction
+    // draw wrting line
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
-    SDL_SetRenderDrawColor(renderer, DIAGONAL_COLOR); // Set the color of the diagonal
-    if (direction < 0)
-    {
-        SDL_SetRenderDrawColor(renderer, DIAGONAL_COLOR);
-    }
-    for (int s = 0; s < bold; ++s)
-    {
-        SDL_RenderDrawLine(renderer, Sx, Sy + s, Ex, Ey + s);
-        SDL_RenderDrawLine(renderer, Sx, Sy - s, Ex, Ey - s);
-    }
+    if (strlen(text))
+        SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 2 - 50 + fontSize, WIDTH / 2 + w / 2, HEIGHT / 2 - 50 + fontSize);
+
+    // draw cursor to blink
+
+    sprintf(text, "Press Enter to Start");
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
+
+    drawSVG(renderer, "assets/images/enter.png", WIDTH / 2 - 50, HEIGHT / 2 + 100, 100, 100);
 }
 
 void drawGrid(SDL_Renderer *renderer, game *Game)
@@ -265,6 +255,34 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
     int endx = Game->solution->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     int endy = Game->solution->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     drawFilledCircle(renderer, endx, endy, cellSize / 16);
+}
+
+void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY)
+{
+    // Set the length of the diagonal line
+
+    // Calculate the end points of the diagonal based on the direction
+    int cellSize = GRID_SIZE / n;
+    int of = cellSize / 4;    // OFFSET
+    int bold = cellSize / 10; // boldness
+
+    int Sx = centerX - of; // Start x
+
+    int Ex = centerX + of; // End x
+
+    int Sy = direction > 0 ? centerY + of : centerY - of; // Start y depending on the direction
+    int Ey = direction > 0 ? centerY - of : centerY + of; // End y depending on the direction
+
+    SDL_SetRenderDrawColor(renderer, DIAGONAL_COLOR); // Set the color of the diagonal
+    if (direction < 0)
+    {
+        SDL_SetRenderDrawColor(renderer, DIAGONAL_COLOR);
+    }
+    for (int s = 0; s < bold; ++s)
+    {
+        SDL_RenderDrawLine(renderer, Sx, Sy + s, Ex, Ey + s);
+        SDL_RenderDrawLine(renderer, Sx, Sy - s, Ex, Ey - s);
+    }
 }
 
 void drawPath(SDL_Renderer *renderer, game *Game)
@@ -420,34 +438,15 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
         {0, 0, 0, 255},
         4,
         "Save & Quit"};
+    Game->buttons.saveAndExit = saveAndQuitButton;
     drawButton(renderer, &saveAndQuitButton);
-}
 
-void drawTextInput(SDL_Renderer *renderer, game *Game)
-{
-
-    char text[100];
-    int fontSize = 24;
-    sprintf(text, "Enter Your Name:");
-    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
-
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    sprintf(text, "%s", Game->player.name);
-    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, 255, 0, 0, 255);
-
-    // draw wrting line
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    if (strlen(text))
-        SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 2 - 50 + fontSize, WIDTH / 2 + w / 2, HEIGHT / 2 - 50 + fontSize);
-
-    sprintf(text, "Press Enter to Start");
-    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
-
-    drawSVG(renderer, "assets/images/enter.png", WIDTH / 2 - 50, HEIGHT / 2 + 100, 100, 100);
+    // hearts display
+    int heartsN = 3 - Game->loseStreak;
+    for (int i = 0; i < heartsN; i++)
+    {
+        drawSVG(renderer, "assets/images/heart.png", centerX - 50 * (heartsN - 1) + 100 * i, centerY + 300, 20, 20);
+    }
 }
 
 void drawGameOver(SDL_Renderer *renderer, game *Game)
@@ -493,57 +492,64 @@ void drawPause(SDL_Renderer *renderer, game *Game)
     drawButton(renderer, &resumeButton);
 }
 
-Mix_Music *
-playMusic(char *path)
+void drawMainMenu(SDL_Renderer *renderer, game *Game)
 {
-    Mix_Music *music = Mix_LoadMUS(path);
-    if (!music)
-    {
-        printf("Mix_LoadMUS Error: %s\n", Mix_GetError());
-        return NULL;
-    }
-    Mix_PlayMusic(music, 0);
+    // background
+    SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
+    SDL_RenderClear(renderer);
 
-    return music;
-}
+    // title
+    char text[100];
+    int fontSize = 64;
+    sprintf(text, "Pinball Recall");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
 
-void playSoundEffect(char *path)
-{
-    Mix_Chunk *soundEffect = Mix_LoadWAV(path);
-    if (!soundEffect)
-    {
-        printf("Mix_LoadWAV Error: %s\n", Mix_GetError());
-        return;
-    }
-    Mix_PlayChannel(-1, soundEffect, 0);
-}
+    // play button
+    button playButton = {
+        WIDTH / 2,
+        HEIGHT / 2,
+        200,
+        50,
+        {0, 169, 157, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Play"};
+    Game->buttons.PlayerGameMode = playButton;
+    drawButton(renderer, &playButton);
 
-void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a)
-{
-    if (!text || text[0] == '\0')
-    {
-        return; // Don't render anything if the text is empty
-    }
-    TTF_Font *font = TTF_OpenFont(fontPath, size);
-    if (!font)
-    {
-        printf("TTF_OpenFont Error: %s\n", TTF_GetError());
-        return;
-    }
+    // machine button
+    button machineAutoButton = {
+        WIDTH / 2,
+        HEIGHT / 2 + 100,
+        200,
+        50,
+        {0, 169, 157, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Machine (Auto)"};
+    Game->buttons.MachineGameAutoMode = machineAutoButton;
 
-    // TTF_SetFontWrappedAlign(font, TTF_WRAPPED_ALIGN_CENTER);
+    drawButton(renderer, &machineAutoButton);
 
-    SDL_Color color = {r, g, b, a};
-    // TTF_SetFontStyle(font, TTF_STYLE_BOLD);
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+    button machineManualButton = {
+        WIDTH / 2,
+        HEIGHT / 2 + 200,
+        200,
+        50,
+        {0, 169, 157, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Machine (Manual)"};
 
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect rect = {x, y, surface->w, surface->h};
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
-
-    TTF_CloseFont(font);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
+    Game->buttons.MachineGameManualMode = machineManualButton;
+    drawButton(renderer, &machineManualButton);
 }
 
 int mesureTextWidth(char *fontPath, char *text, int size)
@@ -565,6 +571,12 @@ int mesureTextWidth(char *fontPath, char *text, int size)
 void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
 {
     SDL_Surface *surface = IMG_Load(path);
+    if (!surface)
+    {
+        printf("IMG_Load Error: %s\n", IMG_GetError());
+        return;
+    }
+
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_Rect rect = {x, y, w, h};
     SDL_RenderCopy(renderer, texture, NULL, &rect);
@@ -605,11 +617,6 @@ SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
     SDL_GetRGBA(pixelData, getPixel_Surface->format, &pixelColor.r, &pixelColor.g, &pixelColor.b, &pixelColor.a);
 
     return pixelColor;
-}
-
-bool compareColor(SDL_Color color, int r, int g, int b, int a)
-{
-    return (r == color.r) && (g == color.g) && (b == color.b) && (a = color.a);
 }
 
 void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
@@ -707,4 +714,48 @@ afterloop:;
     e.button.y = endY;
 
     SDL_PushEvent(&e);
+}
+
+void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside)
+{
+    if (clickX <= OFFSET || clickX >= OFFSET + GRID_SIZE || clickY <= OFFSET || clickY >= OFFSET + GRID_SIZE)
+    {
+        *i = -1;
+        *j = -1;
+        return;
+    }
+
+    *j = (clickX - OFFSET) * n / GRID_SIZE;
+    *i = (clickY - OFFSET) * n / GRID_SIZE;
+
+    // check if the click in the circle
+
+    bool isCorner = (*i == 0 && *j == 0) || (*i == 0 && *j == n - 1) || (*i == n - 1 && *j == 0) || (*i == n - 1 && *j == n - 1);
+    bool out = *i == 0 || *i == n - 1 || *j == 0 || *j == n - 1;
+    if (isCorner)
+    {
+        *i = -1;
+        *j = -1;
+        return;
+    }
+    *isOutside = out;
+    if (!out)
+        return;
+
+    int cellSize = GRID_SIZE / n;
+    int x = OFFSET + *j * cellSize + cellSize / 2 + THICKNESS / 2;
+    int y = OFFSET + *i * cellSize + cellSize / 2 + THICKNESS / 2;
+    int radius = cellSize / 3; // radius of the small circle
+
+    if (clickX < x - radius || clickX > x + radius || clickY < y - radius || clickY > y + radius)
+    {
+        *i = -1;
+        *j = -1;
+        return;
+    }
+}
+
+bool compareColor(SDL_Color color, int r, int g, int b, int a)
+{
+    return (r == color.r) && (g == color.g) && (b == color.b) && (a = color.a);
 }

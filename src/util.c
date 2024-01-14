@@ -126,3 +126,28 @@ int graycefulDelay(Uint32 ms)
 
     return 0;
 }
+
+Mix_Music *
+playMusic(char *path)
+{
+    Mix_Music *music = Mix_LoadMUS(path);
+    if (!music)
+    {
+        printf("Mix_LoadMUS Error: %s\n", Mix_GetError());
+        return NULL;
+    }
+    Mix_PlayMusic(music, 0);
+
+    return music;
+}
+
+void playSoundEffect(char *path)
+{
+    Mix_Chunk *soundEffect = Mix_LoadWAV(path);
+    if (!soundEffect)
+    {
+        printf("Mix_LoadWAV Error: %s\n", Mix_GetError());
+        return;
+    }
+    Mix_PlayChannel(-1, soundEffect, 0);
+}

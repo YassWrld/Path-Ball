@@ -1,16 +1,16 @@
 #include "handlers.h"
 
-void handleEvents(SDL_Event event, screen Screen, SDL_Renderer *renderer, game *Game, int *quit)
+void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game, int *quit)
 {
     handleGlobal(event, quit);
-    switch (Screen)
+    switch (*Screen)
     {
     case MainMenu:
-        // handleMainMenu(event,renderer, Game);
+        handleMainMenu(event, renderer, Screen, Game);
         break;
     case PlayerGameMode:
     case MachineGameMode:
-        handleGameMode(event, renderer, Game);
+        handleGameMode(event, renderer, Screen, Game);
         break;
     case TopPlayers:
         // handleTopPlayers(event, renderer, Game);
@@ -30,7 +30,7 @@ void handleGlobal(SDL_Event event, int *quit)
     }
 }
 
-void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
+void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game)
 {
 
     if (Game->state == TextInput) // Text input mode
@@ -299,5 +299,32 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
             Game->state = Result;
             return;
         }
+    }
+}
+
+void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game)
+{
+    if (event.type != SDL_MOUSEBUTTONUP)
+        return;
+    if (event.button.button != SDL_BUTTON_LEFT)
+        return;
+
+    if (isClickInButton(event, &Game->buttons.PlayerGameMode))
+    {
+        *Secreen = PlayerGameMode;
+        initGame(Game, false, false);
+        return;
+    }
+    if (isClickInButton(event, &Game->buttons.MachineGameAutoMode))
+    {
+        *Secreen = MachineGameMode;
+        initGame(Game, true, false);
+        return;
+    }
+    if (isClickInButton(event, &Game->buttons.MachineGameManualMode))
+    {
+        *Secreen = MachineGameMode;
+        initGame(Game, true, true);
+        return;
     }
 }

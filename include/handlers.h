@@ -11,9 +11,10 @@
 #include "draw.h"
 #include "util.h"
 
-void handleEvents(SDL_Event event, screen Screen, SDL_Renderer *renderer, game *Game, int *quit);
+void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen,  game *Game, int *quit);
 void handleGlobal(SDL_Event event, int *quit);
+void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game);
+void handleGameMode(SDL_Event event,SDL_Renderer *renderer,screen *Screen, game *Game);
 
-void handleGameMode(SDL_Event event,SDL_Renderer *renderer, game *Game);
 
 #endif // HANDLERS_H
