@@ -114,7 +114,6 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, game *Game)
                 Game->state = Memorizing;
                 return;
             }
-            return;
 
             if (matrix[i][j] == 0)
             {
