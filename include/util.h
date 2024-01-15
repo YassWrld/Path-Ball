@@ -1,5 +1,4 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +21,6 @@ date_t getCurrentDate();
 char *formatTime(int ms);
 int graycefulDelay(Uint32 ms);
 bool checkAllowedString(char *str);
+
 Mix_Music *playMusic(char *path);
 void playSoundEffect(char *path);
-
-#endif // UTIL_H

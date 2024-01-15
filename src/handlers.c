@@ -128,10 +128,9 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
                 Game->helpers.filledObstacles--;
             }
-            printf("new Matrix\n");
-            printMatrix(Game->level + 5, Game->matrix);
             return;
         }
+
         if (event.type == SDL_KEYDOWN)
         {
             if (!Game->machineMode && Game->manualFill) // if machine mode is on, return (no user input)
@@ -177,7 +176,22 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             return;
         }
     }
+    if (isClickInButton(event, &Game->buttons.playAgain))
+    {
+        printf("Hi here");
+        initGame(Game, Game->machineMode, Game->manualFill);
 
+        return;
+    }
+
+    if (isClickInButton(event, &Game->buttons.saveAndExit))
+    {
+        if (!Game->machineMode)
+            insertScore(Game->player);
+
+        *Secreen = MainMenu;
+        return;
+    }
     // Selecting mode (keyboard)
     if (Game->state == Selecting)
     {

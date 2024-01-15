@@ -70,9 +70,6 @@ int setObstacles(int n, int matrix[n][n])
             int obstacle = (randomInt(-1, 0) == 0) ? 1 : -1;
             matrix[x][y] = obstacle;
 
-            // Print the coordinates of the generated obstacle
-            // printf("Obstacle at (x, y) = (%d, %d)\n", x, y);
-
             k--;
         }
     }
@@ -285,8 +282,6 @@ void insertScore(player current)
 
     // Close the file
     fclose(file);
-
-    printf("Score saved successfully!\n");
 }
 
 void getTopPlayers(player players[])
@@ -357,7 +352,6 @@ void initGame(game *Game, bool machineMode, bool manualFill)
     Game->helpers.filledObstacles = 0;
     Game->helpers.savedScore = false;
     Game->helpers.filledMachineMatrix = false;
-    
 
     if (!Game->manualFill)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);

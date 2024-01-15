@@ -125,7 +125,7 @@ void drawTextInput(SDL_Renderer *renderer, game *Game)
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
 
-    drawSVG(renderer, "assets/images/enter.png", WIDTH / 2 - 50, HEIGHT / 2 + 100, 100, 100);
+    drawImage(renderer, "assets/images/enter.png", WIDTH / 2 - 50, HEIGHT / 2 + 100, 100, 100);
 }
 
 void drawGrid(SDL_Renderer *renderer, game *Game)
@@ -443,9 +443,10 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
 
     // hearts display
     int heartsN = 3 - Game->loseStreak;
+    int heartSize = 20;
     for (int i = 0; i < heartsN; i++)
     {
-        drawSVG(renderer, "assets/images/heart.png", centerX - 50 * (heartsN - 1) + 100 * i, centerY + 300, 20, 20);
+        drawImage(renderer, "assets/images/heart.png", centerX - 50 * 2 + 100 * i, centerY + 300, heartSize, heartSize);
     }
 }
 
@@ -465,6 +466,39 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
     sprintf(text, "Your Score:%d", Game->player.score);
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, FONT_COLOR);
+
+    // play again button
+
+    button playAgainButton = {
+        WIDTH / 2,
+        HEIGHT / 2,
+        200,
+        50,
+        {0, 169, 157, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Play Again"};
+
+    Game->buttons.playAgain = playAgainButton;
+    drawButton(renderer, &playAgainButton);
+
+    // save and exit button
+
+    button saveAndExitButton = {
+        WIDTH / 2,
+        HEIGHT / 2 + 100,
+        200,
+        50,
+        {255, 0, 0, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Save & Exit"};
+
+    Game->buttons.saveAndExit = saveAndExitButton;
 }
 
 void drawPause(SDL_Renderer *renderer, game *Game)
@@ -568,7 +602,7 @@ int mesureTextWidth(char *fontPath, char *text, int size)
     return w;
 }
 
-void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
+void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
 {
     SDL_Surface *surface = IMG_Load(path);
     if (!surface)
@@ -637,7 +671,6 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
             }
 
             SDL_Color color = getPixelColor(renderer, x, y);
-            // printf("color: %d %d %d %d\n at i=%d,j=%d", color.r, color.g, color.b, color.a, i, j);
             bool isDiagonal = compareColor(color, DIAGONAL_COLOR);
             if (!isDiagonal)
             {

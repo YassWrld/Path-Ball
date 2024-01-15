@@ -1,7 +1,7 @@
 
+#pragma once
 
-#ifndef DRAW_H
-#define DRAW_H
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,7 +14,6 @@
 #include <SDL2/SDL_image.h>
 
 #include "util.h"
-
 #include "logic.h"
 
 #define HEIGHT 700    // window height
@@ -51,7 +50,7 @@
 
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
-void drawSVG(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
+void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
 void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
 void drawButton(SDL_Renderer *renderer, button *Button);
 
@@ -86,4 +85,3 @@ int mesureTextWidth(char *fontPath, char *text, int size);
 
 
 
-#endif // DRAW_H

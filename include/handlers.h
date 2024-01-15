@@ -1,6 +1,6 @@
+#pragma once
 
-#ifndef HANDLERS_H
-#define HANDLERS_H
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,4 +17,3 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Screen, gam
 void handleGameMode(SDL_Event event,SDL_Renderer *renderer,screen *Screen, game *Game);
 
 
-#endif // HANDLERS_H

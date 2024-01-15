@@ -1,5 +1,4 @@
-#ifndef LOGIC_H
-#define LOGIC_H
+#pragma once
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -100,7 +99,6 @@ typedef struct helpers
     // int currentPathLength;   // current path length
     game_state prevState; // previous state before pause
 
-
 } helpers_t;
 
 typedef struct buttonsHandle
@@ -113,7 +111,6 @@ typedef struct buttonsHandle
     button PlayerGameMode;
     button MachineGameAutoMode;
     button MachineGameManualMode;
-
 } buttonsHandle;
 
 typedef struct game
@@ -163,10 +160,8 @@ void freePath(path *p);
 
 void initGame(game *Game, bool machineMode, bool manualFill);
 // initialize the game
-void updateLevelAndScore(game *Game);        // update the level and score of the player and the game
-void insertScore(player current);            // insert the score of the current player in the file
-void sortTopPlayers(player arr[]);           // sort the top players by score
-void getTopPlayers(player players[]);        // get the top players from the file (5 players)
+void updateLevelAndScore(game *Game); // update the level and score of the player and the game
+void insertScore(player current);     // insert the score of the current player in the file
+void sortTopPlayers(player arr[]);    // sort the top players by score
+void getTopPlayers(player players[]); // get the top players from the file (5 players)
 bool isClickInButton(SDL_Event event, button *Button);
-
-#endif // LOGIC_H
