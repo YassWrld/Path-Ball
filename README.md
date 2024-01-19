@@ -18,4 +18,13 @@ if it didn't work, try to run `mingw32-make` instead.
 - `assets/` : Contains all the assets used in the game.
 - `src/` : Contains all the source files.
 - `include/` : Contains all the header files.
-- `Makefile` : Makefile for the project.
+- `Makefile` : Makefile for the project (compile, clean, etc...).
+
+
+## Authors
+-`Yahiaoui Abderrahmane` : [GitHub](https://github.com/Abdo30004)
+-`Obyi Yacine` : [GitHub](https://github.com/YassWrld)
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+

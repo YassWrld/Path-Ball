@@ -75,7 +75,6 @@ void initializeSDL()
         fprintf(stderr, "SDL_image could not be initialized! SDL_image Error: %s\n", IMG_GetError());
         // Handle the SDL_image error and exit or return an error code.
     }
-
     window = SDL_CreateWindow("Pinball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0); // Create a window
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);                                           // Create a renderer
 

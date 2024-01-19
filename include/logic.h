@@ -94,6 +94,8 @@ typedef struct helpers
     int win;                  // 1 if win, -1 if lose, 0 if not finished
     bool savedScore;          // true if the score is saved in the file
     bool filledMachineMatrix; // true if the machine matrix is filled
+    bool updatedTopPlayers;   // true if the top players are updated
+    player topPlayers[5];     // top players
 
     // path *currentPath;       // current path of the ball
     // int currentPathLength;   // current path length
@@ -105,12 +107,14 @@ typedef struct buttonsHandle
 {
 
     button pause;
-    button saveAndExit;
-    button topPlayers;
     button playAgain;
+    
+    button MainMenu;
     button PlayerGameMode;
+    button MachineGameMode;
     button MachineGameAutoMode;
     button MachineGameManualMode;
+    button TopPlayers;
 } buttonsHandle;
 
 typedef struct game
@@ -141,11 +145,12 @@ typedef struct game
 
 typedef enum Screen // screen enum
 {
-    MainMenu,        // main menu screen
-    PlayerGameMode,  // player game mode screen
-    MachineGameMode, // machine game mode screen
-    TopPlayers,      // top players screen
-    Credits,         // credits screen
+    MainMenu,              // main menu screen
+    ChooseMachineGameMode, // choose game mode screen
+    PlayerGameMode,        // player game mode screen
+    MachineGameMode,       // machine game mode screen
+    TopPlayers,            // top players screen
+    Credits,               // credits screen
 } screen;
 
 solution *setupMatrix(int n, int matrix[n][n]); // setup the matrix for the current level (initialize, set obstacles,choose start, solve the matrix) and return the solution
@@ -164,4 +169,3 @@ void updateLevelAndScore(game *Game); // update the level and score of the playe
 void insertScore(player current);     // insert the score of the current player in the file
 void sortTopPlayers(player arr[]);    // sort the top players by score
 void getTopPlayers(player players[]); // get the top players from the file (5 players)
-bool isClickInButton(SDL_Event event, button *Button);

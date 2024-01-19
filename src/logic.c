@@ -294,19 +294,28 @@ void getTopPlayers(player players[])
     }
 
     player current;
-
+    player last;
+    last.score = 0;
+    last.date.day = 0;
+    last.date.month = 0;
+    last.date.year = 0;
+    strcpy(last.name, "empty");
+    int c;
     while (!(feof(file)))
     {
         fscanf(file, "%d,%d-%d-%d,%s", &current.score, &current.date.day, &current.date.month, &current.date.year, current.name);
-        int c;
+
+        bool duplicate = current.score == last.score && strcmp(current.name, last.name) == 0 && current.date.day == last.date.day && current.date.month == last.date.month && current.date.year == last.date.year;
+        if (current.score > players[4].score && !duplicate)
+        {
+            last = current;
+            players[4] = current;
+            sortTopPlayers(players);
+        }
+
         while ((c = fgetc(file)) != '\n' && c != EOF)
         {
             // Do nothing, just advance the file position
-        }
-        if (current.score > players[4].score)
-        {
-            players[4] = current;
-            sortTopPlayers(players);
         }
     }
 }
@@ -352,6 +361,7 @@ void initGame(game *Game, bool machineMode, bool manualFill)
     Game->helpers.filledObstacles = 0;
     Game->helpers.savedScore = false;
     Game->helpers.filledMachineMatrix = false;
+    Game->helpers.updatedTopPlayers = false;
 
     if (!Game->manualFill)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
@@ -415,24 +425,4 @@ void updateLevelAndScore(game *Game)
             Game->helpers.filledObstacles = 0;
         }
     }
-}
-
-bool isClickInButton(SDL_Event event, button *Button)
-{
-    if (event.type != SDL_MOUSEBUTTONUP || event.button.button != SDL_BUTTON_LEFT)
-        return false;
-
-    int x = Button->centerX;
-    int y = Button->centerY;
-    int w = Button->width;
-    int h = Button->height;
-
-    int mouseX = event.button.x;
-    int mouseY = event.button.y;
-
-    if (mouseX >= x - w / 2 && mouseX <= x + w / 2 && mouseY >= y - h / 2 && mouseY <= y + h / 2)
-    {
-        return true;
-    }
-    return false;
 }

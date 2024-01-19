@@ -15,5 +15,5 @@ void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen,  game
 void handleGlobal(SDL_Event event, int *quit);
 void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game);
 void handleGameMode(SDL_Event event,SDL_Renderer *renderer,screen *Screen, game *Game);
-
-
+void handleChooseMachineGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game);
+void handleTopPlayers(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game);

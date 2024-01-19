@@ -1,4 +1,4 @@
-all: build run
+all: clean build run
 
 current_date := $(shell powershell Get-Date -Format "-dd-MM-HH-mm-ss")
 

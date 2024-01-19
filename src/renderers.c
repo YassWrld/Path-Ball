@@ -8,15 +8,18 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
     switch (Screen)
     {
     case MainMenu:
-        // renderMainMenuScreen(renderer, Game);
-        drawMainMenu(renderer, Game);
+        renderMainMenuScreen(renderer, Game);
+        break;
+
+    case ChooseMachineGameMode:
+        renderChooseMachineGameModeScreen(renderer, Game);
         break;
     case PlayerGameMode:
     case MachineGameMode:
         renderGameModeScreen(renderer, Game);
         break;
     case TopPlayers:
-        // renderTopPlayersScreen(renderer, Game);
+        renderTopPlayersScreen(renderer, Game);
         break;
     case Credits:
         // renderCreditsScreen(renderer, Game);
@@ -70,8 +73,16 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawPath(renderer, Game);
         updateLevelAndScore(Game);
 
-        Game->state = Game->level == 0 || Game->level == MAX_LEVEL ? GameOver : Game->manualFill ? Filling
-                                                                                                 : Memorizing;
+        Game->state = (Game->level == 0 || Game->level == MAX_LEVEL)
+                          ? GameOver
+                          : (Game->manualFill ? Filling : Memorizing);
+
+        if (Game->state == GameOver && !Game->helpers.savedScore)
+        {
+            insertScore(Game->player);
+            Game->helpers.updatedTopPlayers = true;
+            Game->helpers.savedScore = true;
+        }
 
         break;
     case Pause:
@@ -81,4 +92,25 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawGameOver(renderer, Game);
         break;
     }
+}
+/*
+void renderCreditsScreen(SDL_Renderer *renderer, game *game)
+{
+    drawCredits(renderer, game);
+}
+
+*/
+
+void renderMainMenuScreen(SDL_Renderer *renderer, game *game)
+{
+    drawMainMenu(renderer, game);
+}
+void renderTopPlayersScreen(SDL_Renderer *renderer, game *game)
+{
+    drawTopPlayers(renderer, game);
+}
+
+void renderChooseMachineGameModeScreen(SDL_Renderer *renderer, game *game)
+{
+    drawChooseMachineGameMode(renderer, game);
 }
