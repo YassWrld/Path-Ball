@@ -1,5 +1,4 @@
 #include "handlers.h"
-
 void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game, int *quit)
 {
     handleGlobal(event, quit);
@@ -101,7 +100,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (isClickInButton(event, &Game->buttons.MainMenu))
     {
-        if (!Game->machineMode && !Game->helpers.savedScore)
+        if (Game->player.score != 0 && !Game->machineMode && !Game->helpers.savedScore)
         {
             insertScore(Game->player);
             Game->helpers.updatedTopPlayers = true;
@@ -342,6 +341,8 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     }
     if (isClickInButton(event, &Game->buttons.TopPlayers))
     {
+
+
         *Secreen = TopPlayers;
         return;
     }
@@ -382,6 +383,7 @@ void handleTopPlayers(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, 
 
     if (isClickInButton(event, &Game->buttons.MainMenu))
     {
+
         *Secreen = MainMenu;
         return;
     }

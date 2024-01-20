@@ -362,6 +362,7 @@ void initGame(game *Game, bool machineMode, bool manualFill)
     Game->helpers.savedScore = false;
     Game->helpers.filledMachineMatrix = false;
     Game->helpers.updatedTopPlayers = false;
+    //Game->clickSound = Mix_LoadWAV("assets/sounds/click.wav");
 
     if (!Game->manualFill)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
@@ -412,8 +413,9 @@ void updateLevelAndScore(game *Game)
     Game->helpers.selectedI = -1;
     Game->helpers.selectedJ = -1;
     Game->helpers.selected = -1;
+    Game->helpers.filledObstacles = 0;
 
-    freePath(Game->solution->path);
+        freePath(Game->solution->path);
     if (Game->level != 0 && Game->level != MAX_LEVEL)
     {
         if (!Game->manualFill)

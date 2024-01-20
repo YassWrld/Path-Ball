@@ -43,6 +43,9 @@
 
 #define MUSIC_PATH "assets/sounds/music.mp3"
 #define STEPS_SOUND_PATH "assets/sounds/step.wav"
+#define CLICK_SOUND_PATH "assets/sounds/click.wav"
+
+#define ICON_PATH "assets/images/icon.png"
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
 void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);

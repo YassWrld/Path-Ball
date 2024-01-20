@@ -77,7 +77,7 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
                           ? GameOver
                           : (Game->manualFill ? Filling : Memorizing);
 
-        if (Game->state == GameOver && !Game->helpers.savedScore)
+        if (Game->state == GameOver && !Game->helpers.savedScore && !Game->machineMode && Game->player.score != 0)
         {
             insertScore(Game->player);
             Game->helpers.updatedTopPlayers = true;

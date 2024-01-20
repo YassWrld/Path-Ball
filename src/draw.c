@@ -548,10 +548,13 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
 
     // title
     char text[100];
-    int fontSize = 64;
-    sprintf(text, "Pinball Recall");
+    int fontSize = 90;
+    // draw the title and the logo of the game the logo is next to the title
+    sprintf(text, "PinBall recall");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - 100, HEIGHT / 8, fontSize, FONT_COLOR);
+    int logoSize = 200;
+    drawImage(renderer, "assets/images/icon-removebg-preview.png", WIDTH / 2 + w / 2 - logoSize / 2, HEIGHT / 8 - logoSize / 2, logoSize, logoSize);
 
     // play button
     button playerGameModeButton = {
@@ -914,6 +917,8 @@ bool isClickInButton(SDL_Event event, button *Button)
 
     if (mouseX >= x - w / 2 && mouseX <= x + w / 2 && mouseY >= y - h / 2 && mouseY <= y + h / 2)
     {
+        playSoundEffect(CLICK_SOUND_PATH);
+
         return true;
     }
     return false;

@@ -140,6 +140,7 @@ typedef struct game
     helpers_t helpers; // control variables
 
     buttonsHandle buttons; // buttons
+   // Mix_Chunk *clickSound;
 
 } game;
 

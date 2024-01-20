@@ -18,10 +18,10 @@ SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 void initializeSDL();
 int Quit();
-
 game Game;
 screen Screen = MainMenu;
 int fps = 60;
+
 int main(int argc, char *argv[])
 {
 
@@ -29,10 +29,13 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
 
-    initGame(&Game, false, false);
+    initGame(&Game, true, true);
     printMatrix(Game.level + 5, Game.matrix);
 
+    printf("Memorizing\n");
+
     // ca
+    // playMusic(MUSIC_PATH);
     while (!quit)
     {
 
@@ -78,7 +81,7 @@ void initializeSDL()
     window = SDL_CreateWindow("Pinball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0); // Create a window
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);                                           // Create a renderer
 
-    SDL_Surface *icon = IMG_Load("assets/images/icon.png"); // Load the icon
+    SDL_Surface *icon = IMG_Load(ICON_PATH); // Load the icon
 
     icon = SDL_ConvertSurfaceFormat(icon, SDL_PIXELFORMAT_RGBA8888, 0); // Convert the icon to the right format
     SDL_SetWindowIcon(window, icon);                                    // Set the icon
