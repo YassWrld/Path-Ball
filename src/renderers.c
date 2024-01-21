@@ -2,6 +2,7 @@
 
 void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
 {
+
     SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
     SDL_RenderClear(renderer);
 

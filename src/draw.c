@@ -543,8 +543,6 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
 void drawMainMenu(SDL_Renderer *renderer, game *Game)
 {
     // background
-    SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-    SDL_RenderClear(renderer);
 
     // title
     char text[100];
@@ -758,6 +756,8 @@ SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
     }
 
     SDL_GetRGBA(pixelData, getPixel_Surface->format, &pixelColor.r, &pixelColor.g, &pixelColor.b, &pixelColor.a);
+
+    SDL_FreeSurface(getPixel_Surface);
 
     return pixelColor;
 }

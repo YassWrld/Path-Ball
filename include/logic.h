@@ -108,7 +108,7 @@ typedef struct buttonsHandle
 
     button pause;
     button playAgain;
-    
+
     button MainMenu;
     button PlayerGameMode;
     button MachineGameMode;
@@ -140,7 +140,7 @@ typedef struct game
     helpers_t helpers; // control variables
 
     buttonsHandle buttons; // buttons
-   // Mix_Chunk *clickSound;
+                           // Mix_Chunk *clickSound;
 
 } game;
 

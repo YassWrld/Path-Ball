@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
         {
             handleEvents(e, renderer, &Screen, &Game, &quit);
         }
+        playSoundEffect(CLICK_SOUND_PATH);
         renderScreens(renderer, Screen, &Game);
 
         graycefulDelay(10);

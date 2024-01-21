@@ -141,19 +141,16 @@ playMusic(char *path)
     return music;
 }
 
-
-
 void playSoundEffect(char *path)
 {
 
-    
     Mix_Chunk *soundEffect = Mix_LoadWAV(path);
-    
+
     if (!soundEffect)
     {
         printf("Mix_LoadWAV Error: %s\n", Mix_GetError());
         return;
     }
+    //Mix_VolumeChunk(soundEffect, MIX_MAX_VOLUME / 2);
     Mix_PlayChannel(-1, soundEffect, 0);
-
 }
