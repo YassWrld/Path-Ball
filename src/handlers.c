@@ -92,7 +92,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     }
     if (isClickInButton(event, &Game->buttons.playAgain))
     {
-        printf("Hi here");
+
         initGame(Game, Game->machineMode, Game->manualFill);
 
         return;
@@ -286,6 +286,8 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             {
                 Game->helpers.win = -1;
             }
+            Game->helpers.selectedI = i;
+            Game->helpers.selectedJ = j;
             Game->state = Result;
             return;
         }
@@ -341,7 +343,6 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     }
     if (isClickInButton(event, &Game->buttons.TopPlayers))
     {
-
 
         *Secreen = TopPlayers;
         return;

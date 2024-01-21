@@ -233,8 +233,14 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                     SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
                 }
             }
+            else if (Game->state == Result && Game->helpers.win == -1)
+            {
+                if (Game->helpers.selectedI == i && Game->helpers.selectedJ == j)
+                    SDL_SetRenderDrawColor(renderer, WRONG_CIRCLE_COLOR);
+            }
 
-            drawFilledCircle(renderer, x, y, cellSize / 4); // Draw the small circle vertically
+            drawFilledCircle(renderer, x, y, cellSize / 4);       // Draw the small circle vertically
+            SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR); // Color of the small circle
 
             if (Game->state == Selecting || Game->state == Filling)
             {
@@ -256,6 +262,11 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
                 {
                     SDL_SetRenderDrawColor(renderer, SMALL_CIRCLE_COLOR);
                 }
+            }
+            else if (Game->state == Result && Game->helpers.win == -1)
+            {
+                if (Game->helpers.selectedI == j && Game->helpers.selectedJ == i)
+                    SDL_SetRenderDrawColor(renderer, WRONG_CIRCLE_COLOR);
             }
 
             drawFilledCircle(renderer, y, x, cellSize / 4); // Draw the small circle horizontally
