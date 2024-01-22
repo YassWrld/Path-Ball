@@ -908,6 +908,10 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
     }
 }
 
+
+
+
+
 bool compareColor(SDL_Color color, int r, int g, int b, int a)
 {
     return (r == color.r) && (g == color.g) && (b == color.b) && (a = color.a);

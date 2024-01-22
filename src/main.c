@@ -28,14 +28,10 @@ int main(int argc, char *argv[])
     initializeSDL();
     int quit = 0;
     SDL_Event e;
+    //initGame(&Game, true, true);
+    //printMatrix(Game.level + 5, Game.matrix);
 
-    initGame(&Game, true, true);
-    printMatrix(Game.level + 5, Game.matrix);
 
-    printf("Memorizing\n");
-
-    // ca
-    // playMusic(MUSIC_PATH);
     while (!quit)
     {
 
@@ -43,7 +39,6 @@ int main(int argc, char *argv[])
         {
             handleEvents(e, renderer, &Screen, &Game, &quit);
         }
-        playSoundEffect(CLICK_SOUND_PATH);
         renderScreens(renderer, Screen, &Game);
 
         graycefulDelay(10);

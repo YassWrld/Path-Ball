@@ -136,7 +136,7 @@ playMusic(char *path)
         printf("Mix_LoadMUS Error: %s\n", Mix_GetError());
         return NULL;
     }
-    Mix_PlayMusic(music, 0);
+    Mix_PlayMusic(music, 0); // returns int
 
     return music;
 }
@@ -151,6 +151,5 @@ void playSoundEffect(char *path)
         printf("Mix_LoadWAV Error: %s\n", Mix_GetError());
         return;
     }
-    //Mix_VolumeChunk(soundEffect, MIX_MAX_VOLUME / 2);
     Mix_PlayChannel(-1, soundEffect, 0);
 }

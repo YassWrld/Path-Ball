@@ -24,3 +24,4 @@ bool checkAllowedString(char *str);
 
 Mix_Music *playMusic(char *path);
 void playSoundEffect(char *path);
+SDL_TimerCallback printTime(Uint32 interval, void *param);
