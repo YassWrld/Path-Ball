@@ -32,6 +32,7 @@ typedef struct path
 {
     int x; // point i
     int y; // point j
+    direction dir;
     struct path *next;
 
 } path;
@@ -71,6 +72,18 @@ typedef struct Button
     char label[20];
     char iconPath[50];
 } button;
+typedef struct display
+{
+    int centerX, centerY;
+    int width, height;
+    SDL_Color color;
+    SDL_Color outlineColor;
+    SDL_Color lableColor;
+    SDL_Color displayColor;
+    char label[20];
+    char display[30];
+} display;
+
 
 typedef enum game_state
 {

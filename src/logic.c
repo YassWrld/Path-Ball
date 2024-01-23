@@ -169,6 +169,7 @@ solution *solveMatrix(int start, int obs, int n, int matrix[n][n])
     path *T = (path *)malloc(sizeof(path));
     T->x = i;
     T->y = j;
+    T->dir = d;
     T->next = NULL;
     s->path = T;
     s->hit = 0;
@@ -200,6 +201,7 @@ solution *solveMatrix(int start, int obs, int n, int matrix[n][n])
         path *new = (path *)malloc(sizeof(path));
         new->x = b.x;
         new->y = b.y;
+        new->dir = b.dir;
         new->next = NULL;
         temp->next = new;
         temp = new;

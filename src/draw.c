@@ -57,6 +57,67 @@ void drawHexagon(SDL_Renderer *renderer, int x, int y, int r)
     }
 }
 
+void drawArrow(SDL_Renderer *renderer, int x, int y, int l, direction d)
+{
+
+    int x2 = 0, y2 = 0;
+    int x3 = 0, y3 = 0;
+
+    if (d == Up)
+    {
+
+        y = y - l / 2;
+        x2 = x - l;
+        y2 = y + l;
+        x3 = x + l;
+        y3 = y + l;
+    }
+    else if (d == Down)
+    {
+        y = y + l / 2;
+        x2 = x - l;
+        y2 = y - l;
+        x3 = x + l;
+        y3 = y - l;
+    }
+    else if (d == Left)
+    {
+        x = x - l / 2;
+        x2 = x + l;
+        y2 = y - l;
+        x3 = x + l;
+        y3 = y + l;
+    }
+    else if (d == Right)
+    {
+        x = x + l / 2;
+        x2 = x - l;
+        y2 = y - l;
+        x3 = x - l;
+        y3 = y + l;
+    }
+
+    int bold = 8;
+
+    for (int i = 0; i < bold / 2; i++)
+    {
+        if (d == Up || d == Down)
+        {
+            SDL_RenderDrawLine(renderer, x, y + i, x2, y2 + i);
+            SDL_RenderDrawLine(renderer, x, y + i, x3, y3 + i);
+            SDL_RenderDrawLine(renderer, x, y - i, x2, y2 - i);
+            SDL_RenderDrawLine(renderer, x, y - i, x3, y3 - i);
+        }
+        else if (d == Left || d == Right)
+        {
+            SDL_RenderDrawLine(renderer, x + i, y, x2 + i, y2);
+            SDL_RenderDrawLine(renderer, x + i, y, x3 + i, y3);
+            SDL_RenderDrawLine(renderer, x - i, y, x2 - i, y2);
+            SDL_RenderDrawLine(renderer, x - i, y, x3 - i, y3);
+        }
+    }
+}
+
 void drawBlurredBackground(SDL_Renderer *renderer)
 {
     SDL_SetRenderDrawColor(renderer, 180, 134, 88, 30);
@@ -68,11 +129,14 @@ void drawBlurredBackground(SDL_Renderer *renderer)
     // x = radius / 2;
     // y = radius / 2;
 
-    while (x < WIDTH + radius)
+    while (x < WIDTH / 2 + radius / 2)
     {
-        while (y < HEIGHT + radius)
+        while (y < HEIGHT / 2 + radius / 2)
         {
             drawHexagon(renderer, x, y, radius);
+            drawHexagon(renderer, x, HEIGHT - y, radius);
+            drawHexagon(renderer, WIDTH - x, y, radius);
+            drawHexagon(renderer, WIDTH - x, HEIGHT - y, radius);
             y += radius;
         }
         x += radius;
@@ -98,7 +162,7 @@ void drawButton(SDL_Renderer *renderer, button *Button)
         rect.h -= 2;
     }
     SDL_Color color = Button->color;
-    if (Button->hoverColor.r != -1)
+    if (Button->hoverColor.r + Button->hoverColor.g + Button->hoverColor.b + Button->hoverColor.a != 0)
     {
         int mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
@@ -135,7 +199,46 @@ void drawButton(SDL_Renderer *renderer, button *Button)
 
     writeText(renderer, GAMEPAUSED_FONT, Button->label, fontStartX, y - fontSize / 2, fontSize, color.r, color.g, color.b, color.a);
 }
+void drawRect(SDL_Renderer *renderer, int centerX, int centerY, int width, int height)
+{
+    SDL_Rect rect = {centerX - width / 2, centerY - height / 2, width, height};
+    SDL_RenderDrawRect(renderer, &rect);
+}
 
+void drawDisplay(SDL_Renderer *renderer, display *Display)
+{
+    int x = Display->centerX;
+    int y = Display->centerY;
+     int w = Display->width;
+    int h = Display->height;
+
+    // show the label
+    SDL_Color color = Display->lableColor;
+    int fontSize = 45;
+    int textWidth = mesureTextWidth(GAMEPAUSED_FONT, Display->label, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, Display->label, x - textWidth / 2, y - 0.25 * h - 0.5 * fontSize, fontSize, color.r, color.g, color.b, color.a);
+
+    // show the value
+
+    fontSize = 24;
+    textWidth = mesureTextWidth(GAMEPAUSED_FONT, Display->display, fontSize);
+    int textX = x - textWidth / 2;
+    int textY = y + 0.1 * (0.5 * h);
+    writeText(renderer, GAMEPAUSED_FONT, Display->display, textX, textY, fontSize, color.r, color.g, color.b, color.a);
+
+    // show the display
+    //SDL_Rect outRect = {textX - 5, textY, textWidth + 10, 0.8 * (0.5 * h) + 10};
+
+    // SDL_Rect innerRect = {x - 0.4 * w + 5, y + 0.1 * (0.5 * h) + 5, 0.8 * w - 10, 0.8 * (0.5 * h) - 10};
+
+    // SDL_SetRenderDrawColor(renderer, Display->outlineColor.r, Display->outlineColor.g, Display->outlineColor.b, Display->outlineColor.a);
+    SDL_SetRenderDrawColor(renderer,255, 0, 0, 255);
+    //SDL_RenderFillRect(renderer, &outRect);
+    drawRect(renderer, x, y, w, h);
+
+    /*SDL_SetRenderDrawColor(renderer, Display->color.r, Display->color.g, Display->color.b, Display->color.a);
+    SDL_RenderFillRect(renderer, &innerRect);*/
+}
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius)
 {
     int x = radius - 1;
@@ -176,7 +279,6 @@ void drawTextInput(SDL_Renderer *renderer, game *Game)
     writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
     fontSize = 45;
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
     sprintf(text, "%s", Game->player.name);
 
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
@@ -372,7 +474,7 @@ bool drawPath(SDL_Renderer *renderer, game *Game)
         Game->helpers.pathDrawStartTime = SDL_GetTicks();
 
     if (Game->helpers.currentPath == NULL && Game->helpers.pathEndCircleTime == 0)
-        Game->helpers.currentPath = Game->solution->path;
+        Game->helpers.currentPath = Game->solution->path->next;
 
     if (SDL_GetTicks() - Game->helpers.pathDrawStartTime > 500 && Game->helpers.currentPath != NULL)
     {
@@ -407,6 +509,10 @@ bool drawPath(SDL_Renderer *renderer, game *Game)
         }
 
         drawFilledCircle(renderer, x, y, w);
+        SDL_SetRenderDrawColor(renderer, WRONG_CIRCLE_COLOR);
+
+        if (start->next != NULL)
+            drawArrow(renderer, x, y, w / 3, start->next->dir);
 
         start = start->next;
     }
@@ -441,88 +547,150 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     SDL_SetRenderDrawColor(renderer, SIDE_BAR_COLOR);
     SDL_RenderFillRect(renderer, &innerSideBar);
 
-    int centerX = outline + GRID_SIZE + OFFSET * 2 + sideBarWidth / 2;
+    // Player name
+    int nameStart = outline;
+    int nameEnd = nameStart + 0.1 * (HEIGHT - 2 * outline);
 
-    int centerY = outline + HEIGHT / 2;
+    // Level display
+    int display1Start = nameEnd + 1;
+    int display1End = display1Start + 0.2 * (HEIGHT - 2 * outline);
+
+    // Score display
+    int display2Start = display1End + 1;
+    int display2End = display2Start + 0.2 * (HEIGHT - 2 * outline);
+
+    // Time display
+    int display3Start = display2End + 1;
+    int display3End = display3Start + 0.2 * (HEIGHT - 2 * outline);
+    /*
+        // Pause button
+        int button1Start = display3End + 1;
+        int button1End = button1Start + 0.15 * (HEIGHT - 2 * outline);
+
+        // Save & Quit button
+        int button2Start = display1End + 1;
+        int button2End = button2Start + 0.15 * (HEIGHT - 2 * outline);
+    */
     char text[100];
-    int fontSize = 24;
+    int fontSize = 34;
+    int gap;
 
-    sprintf(text, "Score:%d", Game->player.score);
-    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 100, fontSize, FONT_COLOR);
-
-    // write player name at the top of the side bar
+    // Drwaing the player name
     sprintf(text, "%s", Game->player.name);
-    // set it in the top center of the side bar
-    fontSize = 34;
-    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, outline + 10, fontSize, 255, 0, 0, 255);
-    // line under the name
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderDrawLine(renderer, centerX - w / 2, outline + 10 + fontSize, centerX + w / 2, outline + 10 + fontSize);
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    gap = (nameEnd - nameStart) - fontSize - fontSize / 2;
 
-    // write time
-    sprintf(text, "Time:%s", formatTime(SDL_GetTicks() - Game->helpers.gameStartTime));
-    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 50, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, outerSideBar.h + outline + ((outerSideBar.w - outline) / 2) - w / 2, nameStart + gap / 2, fontSize, FONT_COLOR);
 
-    // write level
-    sprintf(text, "Level:%d", Game->level);
-    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY, fontSize, FONT_COLOR);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderDrawLine(renderer, outerSideBar.h + outline + ((outerSideBar.w - outline) / 2) - w / 2, gap + 10 + fontSize, outerSideBar.h + outline + ((outerSideBar.w - outline) / 2) + w / 2, gap + 10 + fontSize);
 
-    // 3 displays
-    // Name
-    // Level
-    // Score
-
-    // 2 buttons
-    // Pause
-    // Save & Quit
-
-    // pause and save & quit buttons are in the bottom of the side bar one under the other
-    // pause button
-    button pauseButton = {
-        centerX, // center of the side bar
-        centerY + 100,
+    display display1 = {
+        outerSideBar.h + outline + ((outerSideBar.w - outline) / 2),
+        display1Start + (display1End - display1Start) / 2,
+        display1Start - display1Start,
         200,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
         {255, 255, 255, 255},
         {0, 0, 0, 255},
-        4,
-        "Pause Game",
-        PAUSE_ICON_PATH
+        {0, 0, 0, 255},
+        {0, 0, 0, 255},
+        "Level :",
+        "1920"};
 
-    };
-    Game->buttons.pause = pauseButton;
-    drawButton(renderer, &pauseButton);
-
-    // save & quit button
-
-    button saveAndQuitButton = {
-        centerX,
-        centerY + 200,
+    display display2 = {
+        outerSideBar.h + outline + ((outerSideBar.w - outline) / 2),
+        display2Start + (display2End - display2Start) / 2,
+        display2Start - display2Start,
         200,
-        50,
-        {255, 0, 0, 255},
-        {255, 255, 0, 255},
         {255, 255, 255, 255},
         {0, 0, 0, 255},
-        4,
-        "Save & Quit",
-        SAVE_ICON_PATH};
-    Game->buttons.MainMenu = saveAndQuitButton;
-    drawButton(renderer, &saveAndQuitButton);
+        {0, 0, 0, 255},
+        {0, 0, 0, 255},
+        "Score :",
+        "1920"};
 
-    // hearts display
-    int heartsN = 3 - Game->loseStreak;
-    int heartSize = 20;
-    for (int i = 0; i < heartsN; i++)
-    {
-        drawImage(renderer, HEART_ICON_PATH, centerX - 50 * 2 + 100 * i, centerY + 300, heartSize, heartSize);
-    }
+    display display3 = {
+        outerSideBar.h + outline + ((outerSideBar.w - outline) / 2),
+        display3Start + (display3End - display3Start) / 2,
+        display3Start - display3Start,
+        200,
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        {0, 0, 0, 255},
+        {0, 0, 0, 255},
+        "Time :",
+        "1920"};
+
+    drawDisplay(renderer, &display1);
+    drawDisplay(renderer, &display2);
+    drawDisplay(renderer, &display3);
+    // sprintf(text, "Score:%d", Game->player.score);
+    // int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    // writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 100, fontSize, FONT_COLOR);
+
+    // sprintf(text, "%s", Game->player.name);
+    // // set it in the top center of the side bar
+    // fontSize = 34;
+    // w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    // writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, outline + 10, fontSize, 255, 0, 0, 255);
+    // // write time
+    // sprintf(text, "Time:%s", formatTime(SDL_GetTicks() - Game->helpers.gameStartTime));
+    // w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    // writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY - 50, fontSize, FONT_COLOR);
+
+    // // write level
+    // sprintf(text, "Level:%d", Game->level);
+    // w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    // writeText(renderer, GAMEPAUSED_FONT, text, centerX - w / 2, centerY, fontSize, FONT_COLOR);
+
+    // // 3 displays
+    // // Name
+    // // Level
+    // // Score
+
+    // // 2 buttons
+    // // Pause
+    // // Save & Quit
+
+    // // pause and save & quit buttons are in the bottom of the side bar one under the other
+    // // pause button
+    // button pauseButton = {
+    //     centerX, // center of the side bar
+    //     centerY + 100,
+    //     200,
+    //     50,
+    //     {0, 169, 157, 255},
+    //     {255, 255, 0, 255},
+    //     {255, 255, 255, 255},
+    //     {0, 0, 0, 255},
+    //     4,
+    //     "Pause"};
+    // Game->buttons.pause = pauseButton;
+    // drawButton(renderer, &pauseButton);
+
+    // // save & quit button
+
+    // button saveAndQuitButton = {
+    //     centerX,
+    //     centerY + 200,
+    //     200,
+    //     50,
+    //     {255, 0, 0, 255},
+    //     {255, 255, 0, 255},
+    //     {255, 255, 255, 255},
+    //     {0, 0, 0, 255},
+    //     4,
+    //     "Save & Quit"};
+    // Game->buttons.MainMenu = saveAndQuitButton;
+    // drawButton(renderer, &saveAndQuitButton);
+
+    // // hearts display
+    // int heartsN = 3 - Game->loseStreak;
+    // int heartSize = 20;
+    // for (int i = 0; i < heartsN; i++)
+    // {
+    //     drawImage(renderer, "assets/images/heart.png", centerX - 50 * 2 + 100 * i, centerY + 300, heartSize, heartSize);
+    // }
 }
 
 void drawPause(SDL_Renderer *renderer, game *Game)
@@ -576,25 +744,32 @@ void drawPause(SDL_Renderer *renderer, game *Game)
 void drawGameOver(SDL_Renderer *renderer, game *Game)
 {
     char text[100];
-    int fontSize = 24;
+    int fontSize = 90;
     sprintf(text, "Game Over");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 10, fontSize, FONT_COLOR);
+
     // you won if game->level = maxLevel or you lost if game->level = 0
-    sprintf(text, "You %s", Game->level == 0 ? "Lost" : "Won");
+    fontSize = 45;
+
+    sprintf(text, "You %s The Game", Game->level == 0 ? "Lost" : "Won");
+
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
     SDL_Color color = Game->level == 0 ? (SDL_Color){255, 0, 0, 255} : (SDL_Color){0, 255, 0, 255};
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, color.r, color.g, color.b, color.a);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2, fontSize, color.r, color.g, color.b, color.a);
 
     sprintf(text, "Your Score:%d", Game->player.score);
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
 
     // play again button
 
     button playAgainButton = {
         WIDTH / 2,
-        HEIGHT / 2,
+        HEIGHT / 2 + 100,
         200,
         50,
         {0, 169, 157, 255},
@@ -606,13 +781,14 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
         AGAIN_ICON_PATH};
 
     Game->buttons.playAgain = playAgainButton;
+
     drawButton(renderer, &playAgainButton);
 
     // save and exit button
 
     button saveAndExitButton = {
         WIDTH / 2,
-        HEIGHT / 2 + 100,
+        HEIGHT / 2 + 200,
         200,
         50,
         {255, 0, 0, 255},
@@ -626,6 +802,7 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
     };
 
     Game->buttons.MainMenu = saveAndExitButton;
+    drawButton(renderer, &saveAndExitButton);
 }
 
 void drawMainMenu(SDL_Renderer *renderer, game *Game)

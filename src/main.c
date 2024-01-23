@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
         }
         renderScreens(renderer, Screen, &Game);
 
-        graycefulDelay(10);
+        graycefulDelay(fps / 1000);
     }
 
     return Quit();
