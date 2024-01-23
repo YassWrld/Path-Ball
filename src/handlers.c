@@ -17,9 +17,6 @@ void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game 
     case TopPlayers:
         handleTopPlayers(event, renderer, Screen, Game);
         break;
-    case Credits:
-        // handleCredits(event, renderer, Game);
-        break;
     }
 }
 
@@ -71,7 +68,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if ((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p && SDL_GetModState() & KMOD_CTRL) || isClickInButton(event, &Game->buttons.pause)) // pause
     {
-        if (Game->state == TextInput || Game->state == Result || Game->state == GameOver)
+        if (Game->state == TextInput || Game->state == 0 || Game->state == GameOver)
             return;
 
         if (Game->state != Pause)
@@ -81,8 +78,18 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
         }
         else
         {
-            Game->helpers.memorizingStartTime += SDL_GetTicks() - Game->helpers.pauseTime;
-            Game->helpers.gameStartTime += SDL_GetTicks() - Game->helpers.pauseTime;
+            int addTime = SDL_GetTicks() - Game->helpers.pauseTime;
+
+            Game->helpers.memorizingStartTime += addTime;
+            Game->helpers.gameStartTime += addTime;
+            if (Game->helpers.pathDrawStartTime != 0)
+                Game->helpers.pathDrawStartTime += addTime;
+
+            if (Game->helpers.pathEndCircleTime != 0)
+                Game->helpers.pathEndCircleTime += addTime;
+
+            if (Game->helpers.selectedMachineStart != 0)
+                Game->helpers.machineModeSelectingTime += addTime;
 
             Game->helpers.pauseTime = 0;
         }
@@ -228,6 +235,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
                 else
                     Game->helpers.win = -1;
 
+                Game->helpers.win == -1 ? playSoundEffect(WRONG_SOUND_PATH) : playSoundEffect(RIGHT_SOUND_PATH);
                 Game->state = Result;
                 return;
             }
@@ -281,10 +289,12 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             {
 
                 Game->helpers.win = 1;
+                playSoundEffect(RIGHT_SOUND_PATH);
             }
             else
             {
                 Game->helpers.win = -1;
+                playSoundEffect(WRONG_SOUND_PATH);
             }
             Game->helpers.selectedI = i;
             Game->helpers.selectedJ = j;

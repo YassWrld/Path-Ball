@@ -127,6 +127,16 @@ int graycefulDelay(Uint32 ms)
     return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
 Mix_Music *
 playMusic(char *path)
 {
@@ -136,7 +146,7 @@ playMusic(char *path)
         printf("Mix_LoadMUS Error: %s\n", Mix_GetError());
         return NULL;
     }
-    Mix_PlayMusic(music, 0); // returns int
+    Mix_PlayMusic(music, -1); // returns int
 
     return music;
 }

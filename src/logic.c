@@ -54,7 +54,6 @@ int setObstacles(int n, int matrix[n][n])
     int numObstacles = randomInt(minObstacles, maxObstacles);
     int k = numObstacles;
     // Print the total number of obstacles
-    // printf("Obstacles: %d\n", numObstacles);
 
     // Place random obstacles (either 1 or -1) at random positions in the interior
 
@@ -268,7 +267,7 @@ void sortTopPlayers(player arr[])
 
 void insertScore(player current)
 {
-    FILE *file = fopen("scores.txt", "a");
+    FILE *file = fopen(SCORES_FILE_PATH, "a");
 
     // Check if the file was opened successfully
     if (file == NULL)
@@ -286,7 +285,7 @@ void insertScore(player current)
 
 void getTopPlayers(player players[])
 {
-    FILE *file = fopen("scores.txt", "r");
+    FILE *file = fopen(SCORES_FILE_PATH, "r");
     for (int i = 0; i < 5; i++)
     {
         players[i].score = 0;
@@ -362,7 +361,11 @@ void initGame(game *Game, bool machineMode, bool manualFill)
     Game->helpers.savedScore = false;
     Game->helpers.filledMachineMatrix = false;
     Game->helpers.updatedTopPlayers = false;
-    //Game->clickSound = Mix_LoadWAV("assets/sounds/click.wav");
+    Game->helpers.currentPath = NULL;
+    Game->helpers.pathDrawStartTime = 0;
+    Game->helpers.pathEndCircleTime = 0;
+    Game->helpers.machineModeSelectingTime = 0;
+    Game->helpers.selectedMachineStart = false;
 
     if (!Game->manualFill)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
@@ -414,8 +417,14 @@ void updateLevelAndScore(game *Game)
     Game->helpers.selectedJ = -1;
     Game->helpers.selected = -1;
     Game->helpers.filledObstacles = 0;
+    Game->helpers.memorizingStartTime = 0;
+    Game->helpers.pathDrawStartTime = 0;
+    Game->helpers.pathEndCircleTime = 0;
+    Game->helpers.machineModeSelectingTime = 0;
+    Game->helpers.currentPath = NULL;
+    Game->helpers.selectedMachineStart = false;
 
-        freePath(Game->solution->path);
+    freePath(Game->solution->path);
     if (Game->level != 0 && Game->level != MAX_LEVEL)
     {
         if (!Game->manualFill)

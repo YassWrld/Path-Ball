@@ -16,7 +16,6 @@ void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y,
     SDL_Color color = {r, g, b, a};
 
     SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
-
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_Rect rect = {x, y, surface->w, surface->h};
     SDL_RenderCopy(renderer, texture, NULL, &rect);
@@ -25,6 +24,7 @@ void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y,
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
 }
+
 void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
 {
     SDL_Surface *surface = IMG_Load(path);
@@ -39,6 +39,45 @@ void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
     SDL_RenderCopy(renderer, texture, NULL, &rect);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
+}
+
+void drawHexagon(SDL_Renderer *renderer, int x, int y, int r)
+{
+    int n = 6;
+    int angle = 360 / n;
+    int x1 = x + r * cos(0);
+    int y1 = y + r * sin(0);
+    for (int i = 1; i <= n; i++)
+    {
+        int x2 = x + r * cos(i * angle * M_PI / 180);
+        int y2 = y + r * sin(i * angle * M_PI / 180);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+        x1 = x2;
+        y1 = y2;
+    }
+}
+
+void drawBlurredBackground(SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 180, 134, 88, 30);
+
+    int x = 0, y = 0;
+
+    // int number = 100;
+    int radius = 50;
+    // x = radius / 2;
+    // y = radius / 2;
+
+    while (x < WIDTH + radius)
+    {
+        while (y < HEIGHT + radius)
+        {
+            drawHexagon(renderer, x, y, radius);
+            y += radius;
+        }
+        x += radius;
+        y = 0;
+    }
 }
 
 void drawButton(SDL_Renderer *renderer, button *Button)
@@ -69,18 +108,32 @@ void drawButton(SDL_Renderer *renderer, button *Button)
         }
     }
 
+    bool hasIcon = Button->iconPath[0] != '\0';
+
+    int iconSize = hasIcon ? h / 1.8 : 0;
+
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderFillRect(renderer, &rect);
+
+    int len = strlen(Button->label);
+    int fontSize = h / 2;
+    int textWidth = mesureTextWidth(GAMEPAUSED_FONT, Button->label, fontSize);
+    int fontStartX = x - textWidth / 2 + iconSize / 2;
+    int buttonStartX = x - w / 2 + Button->outlineThickness;
+    int blankMiddle = buttonStartX + (fontStartX - buttonStartX) / 2;
+
+    if (hasIcon)
+    {
+        drawImage(renderer, Button->iconPath, blankMiddle - iconSize / 2, y - iconSize / 2, iconSize, iconSize);
+    }
     // rounded corners
-    if (Button->label[0] == '\0')
+    if (len == 0)
         return;
     color = Button->textColor;
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-    int fontSize = 24;
-    int textWidth = mesureTextWidth(GAMEPAUSED_FONT, Button->label, fontSize);
+    // calculate font size based on the button size and if the button has an icon or not
 
-    writeText(renderer, GAMEPAUSED_FONT, Button->label, x - textWidth / 2, y - fontSize / 2, fontSize, color.r, color.g, color.b, color.a);
+    writeText(renderer, GAMEPAUSED_FONT, Button->label, fontStartX, y - fontSize / 2, fontSize, color.r, color.g, color.b, color.a);
 }
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius)
@@ -116,14 +169,16 @@ void drawTextInput(SDL_Renderer *renderer, game *Game)
 {
 
     char text[100];
-    int fontSize = 24;
+    int fontSize = 90;
     sprintf(text, "Enter Your Name:");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
-
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    fontSize = 45;
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
     sprintf(text, "%s", Game->player.name);
+
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, 255, 0, 0, 255);
 
@@ -133,13 +188,14 @@ void drawTextInput(SDL_Renderer *renderer, game *Game)
     if (strlen(text))
         SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 2 - 50 + fontSize, WIDTH / 2 + w / 2, HEIGHT / 2 - 50 + fontSize);
 
+    fontSize = 24;
     // draw cursor to blink
 
     sprintf(text, "Press Enter to Start");
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 50, fontSize, FONT_COLOR);
-
-    drawImage(renderer, "assets/images/enter.png", WIDTH / 2 - 50, HEIGHT / 2 + 100, 100, 100);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 150, fontSize, FONT_COLOR);
+    int iconSize = 100;
+    drawImage(renderer, ENTER_ICON_PATH, WIDTH / 2 - iconSize / 2, HEIGHT / 2 + 200, iconSize, iconSize);
 }
 
 void drawGrid(SDL_Renderer *renderer, game *Game)
@@ -205,7 +261,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             int hoverI, hoverJ;
             bool isOutside = false;
             getMatrixClick(renderer, hoverX, hoverY, n, &hoverI, &hoverJ, &isOutside);
-            if (!isOutside)
+            if (!isOutside || (Game->machineMode && Game->state != Filling))
             {
                 hoverI = -1;
                 hoverJ = -1;
@@ -309,75 +365,65 @@ void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int
         SDL_RenderDrawLine(renderer, Sx, Sy - s, Ex, Ey - s);
     }
 }
-
-void drawPath(SDL_Renderer *renderer, game *Game)
+bool drawPath(SDL_Renderer *renderer, game *Game)
 {
+
+    if (Game->helpers.pathDrawStartTime == 0)
+        Game->helpers.pathDrawStartTime = SDL_GetTicks();
+
+    if (Game->helpers.currentPath == NULL && Game->helpers.pathEndCircleTime == 0)
+        Game->helpers.currentPath = Game->solution->path;
+
+    if (SDL_GetTicks() - Game->helpers.pathDrawStartTime > 500 && Game->helpers.currentPath != NULL)
+    {
+
+        Game->helpers.pathDrawStartTime = 0;
+        Game->helpers.currentPath = Game->helpers.currentPath->next;
+    }
+
+    path *start = Game->solution->path;
+    path *end = Game->helpers.currentPath;
     int n = Game->level + 5;
     int cellSize = GRID_SIZE / n;
-    path *sPath = Game->solution->path;
-
-    while (sPath->next != NULL && sPath != NULL)
+    while (start != end)
     {
-        path *start = sPath;
-        path *end = sPath->next;
+        int x = OFFSET + start->y * cellSize + cellSize / 2 + THICKNESS / 2;
+        int y = OFFSET + start->x * cellSize + cellSize / 2 + THICKNESS / 2;
+        int w = cellSize / 6;
 
-        int startX = OFFSET + start->y * cellSize + cellSize / 2 + THICKNESS / 2;
-        int startY = OFFSET + start->x * cellSize + cellSize / 2 + THICKNESS / 2;
-        int endX = OFFSET + end->y * cellSize + cellSize / 2 + THICKNESS / 2;
-        int endY = OFFSET + end->x * cellSize + cellSize / 2 + THICKNESS / 2;
-
-        int circlesNumber = 2;
-        int circleRadius = cellSize / 8;
-        for (int i = 0; i < circlesNumber; i++)
+        if (start == Game->solution->path)
         {
-
-            if (i != circlesNumber && i != 0)
-            {
-                circleRadius = cellSize / 12;
-            }
-            else
-            {
-                circleRadius = cellSize / 8;
-            }
-
-            int c1 = startX + (endX - startX) * i / circlesNumber;
-            int c2 = startY + (endY - startY) * i / circlesNumber;
-
-            SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-            SDL_RenderClear(renderer);
-            drawGrid(renderer, Game);
-            drawSideBar(renderer, Game);
-
+            SDL_SetRenderDrawColor(renderer, START_CIRCLE_COLOR);
+            w = cellSize / 4;
+        }
+        else if (start->next == NULL)
+        {
+            SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
+            w = cellSize / 4;
+        }
+        else
+        {
             SDL_SetRenderDrawColor(renderer, PATH_COLOR);
-
-            drawFilledCircle(renderer, c1, c2, circleRadius);
-            drawSideBar(renderer, Game);
-            SDL_RenderPresent(renderer);
-
-            playSoundEffect(STEPS_SOUND_PATH);
-            graycefulDelay(250);
         }
 
-        // SDL_Delay(100);
-        sPath = sPath->next;
+        drawFilledCircle(renderer, x, y, w);
+
+        start = start->next;
     }
-    if (sPath->next == NULL)
+    bool isTheEnd = end == NULL;
+    if (!isTheEnd)
+        return false;
+
+    if (Game->helpers.pathEndCircleTime == 0)
+        Game->helpers.pathEndCircleTime = SDL_GetTicks();
+
+    if (SDL_GetTicks() - Game->helpers.pathEndCircleTime < 1000)
     {
-        int endx = sPath->y * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
-        int endy = sPath->x * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
-        SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-        SDL_RenderClear(renderer);
-        drawGrid(renderer, Game);
-        drawSideBar(renderer, Game);
 
-        SDL_SetRenderDrawColor(renderer, END_CIRCLE_COLOR);
-        drawFilledCircle(renderer, endx, endy, cellSize / 4);
-        // copy the screen
-
-        SDL_RenderPresent(renderer);
+        return false;
     }
 
-    graycefulDelay(1000);
+    return true;
 }
 
 void drawSideBar(SDL_Renderer *renderer, game *Game)
@@ -446,7 +492,10 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Pause"};
+        "Pause Game",
+        PAUSE_ICON_PATH
+
+    };
     Game->buttons.pause = pauseButton;
     drawButton(renderer, &pauseButton);
 
@@ -462,7 +511,8 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Save & Quit"};
+        "Save & Quit",
+        SAVE_ICON_PATH};
     Game->buttons.MainMenu = saveAndQuitButton;
     drawButton(renderer, &saveAndQuitButton);
 
@@ -471,18 +521,18 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     int heartSize = 20;
     for (int i = 0; i < heartsN; i++)
     {
-        drawImage(renderer, "assets/images/heart.png", centerX - 50 * 2 + 100 * i, centerY + 300, heartSize, heartSize);
+        drawImage(renderer, HEART_ICON_PATH, centerX - 50 * 2 + 100 * i, centerY + 300, heartSize, heartSize);
     }
 }
 
 void drawPause(SDL_Renderer *renderer, game *Game)
 {
     char text[100];
-    int fontSize = 24;
+    int fontSize = 90;
     sprintf(text, "Game Paused");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 100, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
 
     // resume button
     button resumeButton = {
@@ -495,9 +545,32 @@ void drawPause(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Resume"};
+        "Resume",
+        RESUME_ICON_PATH
+
+    };
     Game->buttons.pause = resumeButton;
     drawButton(renderer, &resumeButton);
+
+    // save and exit button
+
+    button saveAndExitButton = {
+        WIDTH / 2,
+        HEIGHT / 2 + 100,
+        200,
+        50,
+        {255, 0, 0, 255},
+        {255, 255, 0, 255},
+        {255, 255, 255, 255},
+        {0, 0, 0, 255},
+        4,
+        "Save & Exit",
+        SAVE_ICON_PATH
+
+    };
+    Game->buttons.MainMenu = saveAndExitButton;
+
+    drawButton(renderer, &saveAndExitButton);
 }
 
 void drawGameOver(SDL_Renderer *renderer, game *Game)
@@ -529,7 +602,8 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Play Again"};
+        "Play Again",
+        AGAIN_ICON_PATH};
 
     Game->buttons.playAgain = playAgainButton;
     drawButton(renderer, &playAgainButton);
@@ -546,7 +620,10 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Exit"};
+        "Exit",
+        EXIT_ICON_PATH
+
+    };
 
     Game->buttons.MainMenu = saveAndExitButton;
 }
@@ -561,9 +638,10 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
     // draw the title and the logo of the game the logo is next to the title
     sprintf(text, "PinBall recall");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - 100, HEIGHT / 8, fontSize, FONT_COLOR);
-    int logoSize = 200;
-    drawImage(renderer, "assets/images/icon-removebg-preview.png", WIDTH / 2 + w / 2 - logoSize / 2, HEIGHT / 8 - logoSize / 2, logoSize, logoSize);
+    int logoSize = fontSize * 1.5;
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - logoSize / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    drawImage(renderer, NOBG_ICON_PATH, WIDTH / 2 + w / 2 - logoSize / 2, HEIGHT / 8 - logoSize / 3, logoSize, logoSize);
 
     // play button
     button playerGameModeButton = {
@@ -576,7 +654,10 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Play"};
+        "Player Mode",
+        HUMAN_ICON_PATH
+
+    };
     Game->buttons.PlayerGameMode = playerGameModeButton;
     drawButton(renderer, &playerGameModeButton);
 
@@ -591,7 +672,10 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Machine"};
+        "Machine Mode",
+        ROBOT_ICON_PATH
+
+    };
     Game->buttons.MachineGameMode = machineGameModeButton;
 
     drawButton(renderer, &machineGameModeButton);
@@ -607,7 +691,10 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Top Players"};
+        "Top Players",
+        CROWN_ICON_PATH
+
+    };
     Game->buttons.TopPlayers = topPlayersButton;
 
     drawButton(renderer, &topPlayersButton);
@@ -635,7 +722,10 @@ void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Auto"};
+        "Auto",
+        AUTO_ICON_PATH
+
+    };
     Game->buttons.MachineGameAutoMode = machineGameAutoModeButton;
     drawButton(renderer, &machineGameAutoModeButton);
 
@@ -651,73 +741,95 @@ void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game)
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        "Manual"};
+        "Manual",
+        MANUAL_ICON_PATH
+
+    };
     Game->buttons.MachineGameManualMode = machineGameManualModeButton;
     drawButton(renderer, &machineGameManualModeButton);
 
     button backButton = {
-        50,
-        50,
         60,
         60,
+        100,
+        50,
         {0, 169, 157, 255},
         {255, 255, 0, 255},
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        ""};
+        "back",
+        BACK_ICON_PATH};
     Game->buttons.MainMenu = backButton;
     drawButton(renderer, &backButton);
-    drawImage(renderer, "assets/images/arrow.png", 27, 27, 45, 45);
 }
 void drawTopPlayers(SDL_Renderer *renderer, game *Game)
 {
-    // background
-    SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
-    SDL_RenderClear(renderer);
 
     // title
     char text[100];
-    int fontSize = 30;
+    int fontSize = 90;
     sprintf(text, "Top Players");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 12, fontSize, FONT_COLOR);
+    SDL_SetRenderDrawColor(renderer, FONT_COLOR);
 
+    for (int i = 0; i < 4; i++)
+    {
+        SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 12 + fontSize + i, WIDTH / 2 + w / 2, HEIGHT / 12 + fontSize + i);
+    }
+
+    fontSize = 30;
     // top players
     static bool loaded = false;
     if (!loaded || Game->helpers.updatedTopPlayers)
     {
-        printf("Hello here");
         getTopPlayers(Game->helpers.topPlayers);
         loaded = true;
         Game->helpers.updatedTopPlayers = false;
     }
-
+    // icons ,first.png , second.png , third.png
+    int iconSize = fontSize * 1.5;
     player *players = Game->helpers.topPlayers;
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 3; i++)
     {
         if (players[i].score == 0)
             break;
-        sprintf(text, "%d. %s %d %d-%d-%d", i + 1, players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
+
+        sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
         int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 4 + 60 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        char *iconPath = i == 0 ? FIRST_ICON_PATH : i == 1 ? SECOND_ICON_PATH
+                                                           : THIRD_ICON_PATH;
+
+        drawImage(renderer, iconPath, WIDTH / 2 - w / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.5);
+    }
+
+    for (int i = 3; i < 5; i++)
+    {
+        if (players[i].score == 0)
+            break;
+
+        sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
+        int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
     }
 
     // back button in the top left corner
     button backButton = {
-        50,
-        50,
         60,
         60,
+        100,
+        50,
         {0, 169, 157, 255},
         {255, 255, 0, 255},
         {255, 255, 255, 255},
         {0, 0, 0, 255},
         4,
-        ""};
+        "back",
+        BACK_ICON_PATH};
     Game->buttons.MainMenu = backButton;
     drawButton(renderer, &backButton);
-    drawImage(renderer, "assets/images/arrow.png", 27, 27, 45, 45);
 }
 
 int mesureTextWidth(char *fontPath, char *text, int size)
@@ -813,7 +925,7 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
     }
 }
 
-void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n])
+void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n], int *selectI, int *selectJ)
 {
     int cellSize = GRID_SIZE / n;
     int startI = 0, startJ = 0;
@@ -835,37 +947,42 @@ void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n])
             {
                 startI = isStart1 ? i : j;
                 startJ = isStart1 ? j : i;
-                goto afterloop;
+                i = n;
+                break;
             }
         }
     }
-afterloop:;
 
     solution *s = solveMatrix(matrix[startI][startJ], 0, n, matrix); // obs = 0
     // free Game->
     freePath(s->path);
-
-    int endX = s->endJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
-    int endY = s->endI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+    *selectI = s->endI;
+    *selectJ = s->endJ;
     free(s);
+    return;
+}
 
-    graycefulDelay(1000);
-    SDL_SetRenderDrawColor(renderer, SELECTED_CIRCLE_COLOR);
-    drawFilledCircle(renderer, endX, endY, cellSize / 4);
-    SDL_RenderPresent(renderer);
-    graycefulDelay(1000);
+void machineModeChoosing(SDL_Renderer *renderer, game *Game)
+{
+    if (Game->helpers.machineModeSelectingTime == 0)
+        Game->helpers.machineModeSelectingTime = SDL_GetTicks();
 
+    if ((SDL_GetTicks() - Game->helpers.machineModeSelectingTime) < 2000)
+        return;
+
+    int n = Game->level + 5;
+    int cellSize = GRID_SIZE / n;
     // custom event
     SDL_Event e;
     e.type = SDL_USEREVENT;
     e.user.code = 139;
+    int endX = Game->helpers.selectedJ * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
+    int endY = Game->helpers.selectedI * cellSize + OFFSET + cellSize / 2 + THICKNESS / 2;
     // set x and y coordinates
     e.user.data1 = NULL;
     e.user.data2 = NULL;
-
     e.button.x = endX;
     e.button.y = endY;
-
     SDL_PushEvent(&e);
 }
 
@@ -907,10 +1024,6 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
         return;
     }
 }
-
-
-
-
 
 bool compareColor(SDL_Color color, int r, int g, int b, int a)
 {

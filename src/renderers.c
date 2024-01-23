@@ -6,6 +6,7 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
     SDL_SetRenderDrawColor(renderer, BACKGROUND_COLOR);
     SDL_RenderClear(renderer);
 
+    drawBlurredBackground(renderer);
     switch (Screen)
     {
     case MainMenu:
@@ -21,9 +22,6 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
         break;
     case TopPlayers:
         renderTopPlayersScreen(renderer, Game);
-        break;
-    case Credits:
-        // renderCreditsScreen(renderer, Game);
         break;
     }
     SDL_RenderPresent(renderer);
@@ -65,13 +63,28 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawGrid(renderer, Game);
         drawSideBar(renderer, Game);
         if (Game->machineMode && Game->helpers.filledMachineMatrix)
-            machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix);
+        {
+            if (!Game->helpers.selectedMachineStart)
+            {
+                machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix, &Game->helpers.selectedI, &Game->helpers.selectedJ);
+                Game->helpers.selectedMachineStart = true;
+            }
+            else
+            {
+                machineModeChoosing(renderer, Game);
+            }
+        }
+
         break;
 
     case Result:
         drawGrid(renderer, Game);
         drawSideBar(renderer, Game);
-        drawPath(renderer, Game);
+
+        bool isLast = drawPath(renderer, Game);
+        if (!isLast)
+            break;
+
         updateLevelAndScore(Game);
 
         Game->state = (Game->level == 0 || Game->level == MAX_LEVEL)

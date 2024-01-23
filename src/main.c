@@ -28,10 +28,10 @@ int main(int argc, char *argv[])
     initializeSDL();
     int quit = 0;
     SDL_Event e;
-    //initGame(&Game, true, true);
-    //printMatrix(Game.level + 5, Game.matrix);
-
-
+    // initGame(&Game, true, true);
+    // printMatrix(Game.level + 5, Game.matrix);
+	playMusic(MUSIC_PATH);
+    Mix_VolumeMusic(20);
     while (!quit)
     {
 
@@ -83,7 +83,7 @@ void initializeSDL()
     SDL_SetWindowIcon(window, icon);                                    // Set the icon
     SDL_FreeSurface(icon);                                              // Free the icon surface
 
-    // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_RegisterEvents(1); // Register a user event (for machine mode)
     SDL_RenderSetVSync(renderer, true);
 }
