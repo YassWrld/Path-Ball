@@ -368,6 +368,7 @@ void initGame(game *Game, bool machineMode, bool manualFill)
     Game->helpers.pathEndCircleTime = 0;
     Game->helpers.machineModeSelectingTime = 0;
     Game->helpers.selectedMachineStart = false;
+    Game->helpers.skipPath = false;
 
     if (!Game->manualFill)
         Game->solution = setupMatrix(Game->level + 5, Game->matrix);
@@ -425,6 +426,7 @@ void updateLevelAndScore(game *Game)
     Game->helpers.machineModeSelectingTime = 0;
     Game->helpers.currentPath = NULL;
     Game->helpers.selectedMachineStart = false;
+    Game->helpers.skipPath = false;
 
     freePath(Game->solution->path);
     if (Game->level != 0 && Game->level != MAX_LEVEL)

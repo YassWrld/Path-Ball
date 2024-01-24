@@ -68,7 +68,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if ((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p && SDL_GetModState() & KMOD_CTRL) || isClickInButton(event, &Game->buttons.pause)) // pause
     {
-        if (Game->state == TextInput || Game->state == 0 || Game->state == GameOver)
+        if (Game->state == TextInput || Game->state == GameOver)
             return;
 
         if (Game->state != Pause)
@@ -97,13 +97,6 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
         return;
     }
-    if (isClickInButton(event, &Game->buttons.playAgain))
-    {
-
-        initGame(Game, Game->machineMode, Game->manualFill);
-
-        return;
-    }
 
     if (isClickInButton(event, &Game->buttons.MainMenu))
     {
@@ -116,6 +109,26 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
         *Secreen = MainMenu;
         return;
     }
+    if (Game->state == GameOver)
+    {
+        if (isClickInButton(event, &Game->buttons.playAgain))
+        {
+
+            initGame(Game, Game->machineMode, Game->manualFill);
+
+            return;
+        }
+    }
+
+    if (Game->state == Result)
+    {
+        if (isClickInButton(event, &Game->buttons.skip) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s && SDL_GetModState() & KMOD_CTRL)) // skip
+        {
+            Game->helpers.skipPath = true;
+            return;
+        }
+    }
+
     if (Game->state == Filling)
     {
 

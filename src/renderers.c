@@ -66,8 +66,9 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         {
             if (!Game->helpers.selectedMachineStart)
             {
-                machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix, &Game->helpers.selectedI, &Game->helpers.selectedJ);
+                machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix, & Game->helpers.selectedI, &Game->helpers.selectedJ);
                 Game->helpers.selectedMachineStart = true;
+                
             }
             else
             {
@@ -82,7 +83,7 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         drawSideBar(renderer, Game);
 
         bool isLast = drawPath(renderer, Game);
-        if (!isLast)
+        if (!isLast && !Game->helpers.skipPath)
             break;
 
         updateLevelAndScore(Game);

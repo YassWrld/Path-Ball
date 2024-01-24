@@ -1,3 +1,4 @@
+ifeq ($(OS),Windows_NT) 
 all: clean build run
 
 current_date := $(shell powershell Get-Date -Format "-dd-MM-HH-mm-ss")
@@ -5,10 +6,10 @@ current_date := $(shell powershell Get-Date -Format "-dd-MM-HH-mm-ss")
  
 sdlPath := C:\SDL2
 src := src/*.c
-linkers= -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer #-mwindows 
+linkers= -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer  
 includes= -I include -I $(sdlPath)\include -I $(sdlPath)\include\SDL2
 libs= -L $(sdlPath)\lib
-flags:=-Wall  -std=c17  -g  -Wall   -Werror  -pedantic 
+flags:=-Wall  -std=c17 -Wall   -Werror  -pedantic #-mwindows
 resources:= assets\windows\resources.res 
 
 
@@ -47,3 +48,45 @@ commands:
 	@echo "make build - compiles the game"
 	@echo "make run - runs the game"
 	@echo "make clean - removes the executable"
+
+else 
+# Compiler
+CC = gcc
+
+# Directories
+SRC_DIR = src
+INCLUDE_DIR = include
+BIN_DIR = bin
+
+# Source files
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC_FILES))
+
+# Compiler flags
+CFLAGS = -I$(INCLUDE_DIR) -g -Wall `sdl2-config --cflags` -lSDL2_mixer -lSDL2_ttf -lSDL2_image  -lSDL2_gfx
+LDFLAGS = `sdl2-config --libs`
+
+# Target binary
+TARGET = $(BIN_DIR)/game
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ_FILES)
+	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run: $(TARGET)
+	./$(TARGET)
+
+clean:
+	rm -rf $(BIN_DIR)/*.o $(TARGET)
+
+.PHONY: all run clean
+
+endif
+
+
+
+

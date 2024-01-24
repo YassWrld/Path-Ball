@@ -5,10 +5,14 @@
 #include <string.h>
 #include "util.h"
 
-#define MAX_NAME_LENGTH 20       // max length of player name
-#define MAX_MATRIX_SIZE 20       // max size of matrix
-#define MAX_LEVEL 11             // the real max level is MAX_LEVEL - 1
-#define MEMORIZING_TIME 3 * 1000 // memorizing time in milliseconds
+#define MAX_NAME_LENGTH 20            // max length of player name
+#define MAX_MATRIX_SIZE 20            // max size of matrix
+#define MAX_LEVEL 11                  // the real max level is MAX_LEVEL - 1
+#define MEMORIZING_TIME 3 * 1000      // memorizing time in milliseconds
+#define CIRCLE_DRAW_TIME 500          // circle draw time in milliseconds
+#define FULL_PATH_SHOW_TIME 1500      // full path draw time in milliseconds
+#define MACHINE_SELECTING_TIME 2500   // machine selecting time in milliseconds
+#define MACHINE_SHOW_SELECT_TIME 1500 // result time in milliseconds
 
 #define SCORES_FILE_PATH "assets/data/scores.txt" // scores file path
 
@@ -72,17 +76,6 @@ typedef struct Button
     char label[20];
     char iconPath[50];
 } button;
-typedef struct display
-{
-    int centerX, centerY;
-    int width, height;
-    SDL_Color color;
-    SDL_Color outlineColor;
-    SDL_Color lableColor;
-    SDL_Color displayColor;
-    char label[20];
-    char display[30];
-} display;
 
 
 typedef enum game_state
@@ -98,24 +91,25 @@ typedef enum game_state
 
 typedef struct helpers
 {
-    int selected;             // selected circle (keyboard)
-    int selectedI;            // selected i
-    int selectedJ;            // selected j
-    int memorizingStartTime;  // time when the memorizing state started
-    int gameStartTime;        // time when the game started
-    int pathDrawStartTime;    // time when the path started to be drawn
-    int pathEndCircleTime;    // time when the path ended to be drawn
-    int resultTime;           // time when the result state started
-    int pauseTime;            // time when the pause state started
+    int selected;                 // selected circle (keyboard)
+    int selectedI;                // selected i
+    int selectedJ;                // selected j
+    int memorizingStartTime;      // time when the memorizing state started
+    int gameStartTime;            // time when the game started
+    int pathDrawStartTime;        // time when the path started to be drawn
+    int pathEndCircleTime;        // time when the path ended to be drawn
+    int resultTime;               // time when the result state started
+    int pauseTime;                // time when the pause state started
     int machineModeSelectingTime; // time when the machine mode selecting state started
-    int filledObstacles;      // number of filled obstacles
-    int win;                  // 1 if win, -1 if lose, 0 if not finished
-    bool savedScore;          // true if the score is saved in the file
-    bool filledMachineMatrix; // true if the machine matrix is filled
-    bool selectedMachineStart; // true if the start circle is selected
-    bool updatedTopPlayers;   // true if the top players are updated
-    player topPlayers[5];     // top players
-    path *currentPath;        // current path of the ball
+    int filledObstacles;          // number of filled obstacles
+    int win;                      // 1 if win, -1 if lose, 0 if not finished
+    bool savedScore;              // true if the score is saved in the file
+    bool filledMachineMatrix;     // true if the machine matrix is filled
+    bool selectedMachineStart;    // true if the start circle is selected
+    bool updatedTopPlayers;       // true if the top players are updated
+    bool skipPath;                // true if the path is skipped
+    player topPlayers[5];         // top players
+    path *currentPath;            // current path of the ball
 
     // path *currentPath;       // current path of the ball
     // int currentPathLength;   // current path length
@@ -128,6 +122,7 @@ typedef struct buttonsHandle
 
     button pause;
     button playAgain;
+    button skip;
 
     button MainMenu;
     button PlayerGameMode;

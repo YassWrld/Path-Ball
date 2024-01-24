@@ -127,16 +127,6 @@ int graycefulDelay(Uint32 ms)
     return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
 Mix_Music *
 playMusic(char *path)
 {

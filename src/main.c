@@ -30,8 +30,7 @@ int main(int argc, char *argv[])
     SDL_Event e;
     // initGame(&Game, true, true);
     // printMatrix(Game.level + 5, Game.matrix);
-	playMusic(MUSIC_PATH);
-    Mix_VolumeMusic(20);
+	playMusic("assets/sounds/music.mp3");
     while (!quit)
     {
 
@@ -41,7 +40,7 @@ int main(int argc, char *argv[])
         }
         renderScreens(renderer, Screen, &Game);
 
-        graycefulDelay(fps / 1000);
+        graycefulDelay(10);
     }
 
     return Quit();

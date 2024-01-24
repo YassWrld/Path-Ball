@@ -20,11 +20,10 @@ if it didn't work, try to run `mingw32-make` instead.
 - `include/` : Contains all the header files.
 - `Makefile` : Makefile for the project (compile, clean, etc...).
 
-
 ## Authors
--`Yahiaoui Abderrahmane` : [GitHub](https://github.com/Abdo30004)
--`Obyi Yacine` : [GitHub](https://github.com/YassWrld)
+
+-`Yahiaoui Abderrahmane` : [GitHub](https://github.com/Abdo30004) -`Obyi Yacine` : [GitHub](https://github.com/YassWrld)
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
 
+[MIT](https://choosealicense.com/licenses/mit/)

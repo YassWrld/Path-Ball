@@ -13,17 +13,23 @@
 #include "util.h"
 #include "logic.h"
 
+#define GAME_TITLE "Pinball Recall"
+
+
 #define HEIGHT 700    // window height
 #define WIDTH 1100    // window width
 #define GRID_SIZE 580 // grid size (square)
 #define OFFSET 60     // offset from the top left corner of the window
 #define THICKNESS 4   // thickness of the lines
 
-#define BACKGROUND_COLOR 112, 66, 20, 255      // wood brown
-#define DIAGONAL_COLOR 241, 237, 232, 255      // white
-#define BORDER_COLOR 180, 134, 88, 255         // beige
-#define SMALL_CIRCLE_COLOR 128, 80, 40, 255    // light brown
-#define HOVER_CIRCLE_COLOR 150, 100, 60, 255   // red
+#define BACKGROUND_COLOR 94, 26, 32, 255  // wood brown
+#define BLUR_BACKGROUND_COLOR 180, 134, 88, 30 // wood brown
+#define DIAGONAL_COLOR 227, 180, 122, 255 // white
+#define BORDER_COLOR 190, 121, 79, 255    // beige
+
+#define SMALL_CIRCLE_COLOR 141, 64, 47, 255  // light brown
+#define HOVER_CIRCLE_COLOR 227 , 180, 122, 255 // red
+
 #define SELECTED_CIRCLE_COLOR 40, 80, 128, 255 // yellow
 #define PATH_COLOR 0, 169, 157, 255            // blue
 
@@ -32,8 +38,10 @@
 #define START_CIRCLE_COLOR PATH_COLOR
 #define END_CIRCLE_COLOR 0, 255, 0, 255 // green
 
-#define SIDE_BAR_COLOR 139, 161, 175, 255       // 192, 192, 192, 255 // beige
-#define SIDE_BAR_OUTLINE_COLOR 81, 96, 124, 255 // 112, 128, 144, 255 // black
+#define SIDE_BAR_COLOR 227, 180, 122, 255          // 192, 192, 192, 255 // beige
+#define SIDE_BAR_OUTLINE_COLOR 141, 64, 47, 255   // 112, 128, 144, 255 // black
+
+#define DISPLAY_BOX_COLOR 190, 121, 79, 255 // white
 
 #define FONT_COLOR 0, 0, 0, 255 // black
 #define FONT_SIZE 30
@@ -87,7 +95,7 @@ void drawPause(SDL_Renderer *renderer, game *Game);    // Pause
 void drawMainMenu(SDL_Renderer *renderer, game *Game);
 void drawTopPlayers(SDL_Renderer *renderer, game *Game);
 void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n]);
-void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n], int *i, int *j);
+void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n], int *selectI, int *selectJ);
 void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game);
 void machineModeChoosing(SDL_Renderer *renderer, game *Game);
 
