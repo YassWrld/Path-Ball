@@ -5,7 +5,7 @@
 #include <string.h>
 #include "util.h"
 
-#define MAX_NAME_LENGTH 20            // max length of player name
+#define MAX_NAME_LENGTH 21            // max length of player name
 #define MAX_MATRIX_SIZE 20            // max size of matrix
 #define MAX_LEVEL 11                  // the real max level is MAX_LEVEL - 1
 #define MEMORIZING_TIME 3 * 1000      // memorizing time in milliseconds
@@ -76,7 +76,6 @@ typedef struct Button
     char label[20];
     char iconPath[50];
 } button;
-
 
 typedef enum game_state
 {

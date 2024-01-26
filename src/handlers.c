@@ -57,7 +57,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             // check if the name is too long
             if (!checkAllowedString(event.text.text))
                 return;
-            if (strlen(Game->player.name) >= 20)
+            if (strlen(Game->player.name) >= MAX_NAME_LENGTH - 1)
                 return;
 
             strcat(Game->player.name, event.text.text); // add the character to the name
@@ -67,7 +67,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     // Pause mode
 
-    if ((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p && SDL_GetModState() & KMOD_CTRL) || isClickInButton(event, &Game->buttons.pause)) // pause
+    if ((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) || isClickInButton(event, &Game->buttons.pause)) // pause
     {
         if (Game->state == TextInput || Game->state == GameOver)
             return;
@@ -123,7 +123,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (Game->state == Result)
     {
-        if (isClickInButton(event, &Game->buttons.skip) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s && SDL_GetModState() & KMOD_CTRL)) // skip
+        if (isClickInButton(event, &Game->buttons.skip) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s)) // skip
         {
             Game->helpers.skipPath = true;
             return;

@@ -28,6 +28,7 @@ void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y,
 
 void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
 {
+
     SDL_Surface *surface = IMG_Load(path);
     if (!surface)
     {
@@ -201,11 +202,6 @@ void drawButton(SDL_Renderer *renderer, button *Button)
     // calculate font size based on the button size and if the button has an icon or not
 
     writeText(renderer, GAMEPAUSED_FONT, Button->label, fontStartX, y - fontSize / 2, fontSize, color.r, color.g, color.b, color.a);
-}
-void drawRect(SDL_Renderer *renderer, int centerX, int centerY, int width, int height)
-{
-    SDL_Rect rect = {centerX - width / 2, centerY - height / 2, width, height};
-    SDL_RenderDrawRect(renderer, &rect);
 }
 
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius)
@@ -436,6 +432,14 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
 
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     writeText(renderer, GAMEPAUSED_FONT, text, OFFSET + GRID_SIZE / 2 - w / 2, OFFSET / 2 - fontSize / 2, fontSize, 255, 255, 255, 255);
+    int lifes = 3 - Game->loseStreak;
+    int iconSize = 30;
+    int gap = 20;
+
+    for (int i = 0; i < lifes; i++)
+    {
+        drawImage(renderer, HEART_ICON_PATH, OFFSET + GRID_SIZE / 2 + (i - 1) * (iconSize + gap) - iconSize / 2, OFFSET + GRID_SIZE + iconSize / 2, iconSize, iconSize);
+    }
 
     if (strcmp(Game->player.name, "root") || Game->state != Selecting)
         return;
@@ -699,7 +703,16 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
         {0, 0, 0, 255},
         4,
         "Save & Quit",
-        SAVE_ICON_PATH};
+        SAVE_ICON_PATH
+
+    };
+
+    if (Game->machineMode)
+    {
+        strcpy(saveAndQuitButton.label, "Quit");
+        strcpy(saveAndQuitButton.iconPath, EXIT_ICON_PATH);
+    }
+
     Game->buttons.MainMenu = saveAndQuitButton;
     drawButton(renderer, &saveAndQuitButton);
 }

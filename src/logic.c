@@ -231,7 +231,6 @@ solution *setupMatrix(int n, int matrix[n][n])
             s = tmp;
         }
     }
-
     return s;
 }
 
@@ -378,6 +377,8 @@ void initGame(game *Game, bool machineMode, bool manualFill)
         Game->solution = NULL;
     }
     Game->helpers.gameStartTime = SDL_GetTicks();
+
+    printMatrix(Game->level + 5, Game->matrix);
 }
 
 void updateLevelAndScore(game *Game)
@@ -440,4 +441,5 @@ void updateLevelAndScore(game *Game)
             Game->helpers.filledObstacles = 0;
         }
     }
+    printMatrix(Game->level + 5, Game->matrix);
 }
