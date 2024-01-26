@@ -41,13 +41,13 @@ void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
 }
-
 void drawHexagon(SDL_Renderer *renderer, int x, int y, int r)
 {
     int n = 6;
     int angle = 360 / n;
     int x1 = x + r * SDL_cos(0);
     int y1 = y + r * SDL_sin(0);
+
     for (int i = 1; i <= n; i++)
     {
         int x2 = x + r * SDL_cos(i * angle * M_PI / 180);
@@ -124,17 +124,22 @@ void drawBlurredBackground(SDL_Renderer *renderer)
     SDL_SetRenderDrawColor(renderer, BLUR_BACKGROUND_COLOR);
 
     int x = 0, y = 0;
+    int radius = 50;
 
-    int radius = 45;
-
-    while (x < WIDTH / 2 + radius / 2)
+    while (x <= WIDTH / 2)
     {
-        while (y < HEIGHT / 2 + radius / 2)
+        while (y <= HEIGHT / 2)
         {
             drawHexagon(renderer, x, y, radius);
-            drawHexagon(renderer, x, HEIGHT - y, radius);
-            drawHexagon(renderer, WIDTH - x, y, radius);
             drawHexagon(renderer, WIDTH - x, HEIGHT - y, radius);
+
+            if (y != HEIGHT - y && x != WIDTH - x)
+            {
+
+                drawHexagon(renderer, x, HEIGHT - y, radius);
+                drawHexagon(renderer, WIDTH - x, y, radius);
+            }
+
             y += radius;
         }
         x += radius;
