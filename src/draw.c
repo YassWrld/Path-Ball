@@ -965,66 +965,62 @@ void drawTopPlayers(SDL_Renderer *renderer, game *Game)
     fontSize = 30;
     // top players
     static bool loaded = false;
+    static int maxNameW = 0;
+    static int maxScoreW = 0;
+    static int maxTextW = 0;
+    int iconSize = fontSize * 1.5;
+    int gap = 50;
+    player *players = Game->helpers.topPlayers;
     if (!loaded || Game->helpers.updatedTopPlayers)
     {
         getTopPlayers(Game->helpers.topPlayers);
+
         loaded = true;
         Game->helpers.updatedTopPlayers = false;
+        for (int i = 0; i < 5; i++)
+        {
+            sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
+            int nameW = mesureTextWidth(GAMEPAUSED_FONT, players[i].name, fontSize);
+            sprintf(text, "%d", players[i].score);
+            int scoreW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+            sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
+            int dateW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+            int fullW = nameW + scoreW + dateW + 2 * gap + iconSize;
+
+            if (fullW > w)
+                maxTextW = fullW;
+            if (nameW > maxNameW)
+                maxNameW = nameW;
+            if (scoreW > maxScoreW)
+                maxScoreW = scoreW;
+        }
     }
     // icons ,first.png , second.png , third.png
-    int iconSize = fontSize * 1.5;
-    player *players = Game->helpers.topPlayers;
-
-    w = 0;
-    int maxNameW = 0;
-    int maxScoreW = 0;
-    const int gap = 50;
-    for (int i = 0; i < 5; i++)
-    {
-        sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
-        int nameW = mesureTextWidth(GAMEPAUSED_FONT, players[i].name, fontSize);
-        sprintf(text, "%d", players[i].score);
-        int scoreW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-        sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
-        int dateW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-
-        int w1 = nameW + scoreW + dateW + 2 * gap + iconSize;
-
-        if (w1 > w)
-            w = w1;
-        if (nameW > maxNameW)
-            maxNameW = nameW;
-        if (scoreW > maxScoreW)
-            maxScoreW = scoreW;
-    }
 
     for (int i = 0; i < 5; i++)
     {
         if (players[i].score == 0)
             break;
 
-        // sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
-
         sprintf(text, players[i].name);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
         sprintf(text, "%d", players[i].score);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 + iconSize + maxNameW + gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
 
         sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
-        // int dateW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 + iconSize + maxNameW + maxScoreW + 2 * gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + maxScoreW + 2 * gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
 
         if (i < 3)
         {
             char *iconPath = i == 0 ? FIRST_ICON_PATH : i == 1 ? SECOND_ICON_PATH
                                                                : THIRD_ICON_PATH;
-
-            drawImage(renderer, iconPath, WIDTH / 2 - w / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.4);
+            drawImage(renderer, iconPath, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.4);
         }
         else
         {
             sprintf(text, "%d", i + 1);
-            writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize * 1.5, FONT_COLOR);
+            writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize * 1.5, FONT_COLOR);
         }
     }
     // back button in the top left corner

@@ -28,9 +28,8 @@ int main(int argc, char *argv[])
     initializeSDL();
     int quit = 0;
     SDL_Event e;
-    // initGame(&Game, true, true);
-    // printMatrix(Game.level + 5, Game.matrix);
-	playMusic("assets/sounds/music.mp3");
+
+    playMusic(MUSIC_PATH);
     while (!quit)
     {
 

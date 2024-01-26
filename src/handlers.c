@@ -45,8 +45,9 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
             if (event.key.keysym.sym == SDLK_RETURN)
             {
-                SDL_StopTextInput();      // stop text input mode
-                Game->state = Memorizing; // change the state to memorizing
+                SDL_StopTextInput();                          // stop text input mode
+                Game->helpers.gameStartTime = SDL_GetTicks(); // start the game
+                Game->state = Memorizing;                     // change the state to memorizing
             }
             return;
         }

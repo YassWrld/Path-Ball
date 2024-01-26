@@ -15,20 +15,19 @@
 
 #define GAME_TITLE "Pinball Recall"
 
-
 #define HEIGHT 700    // window height
 #define WIDTH 1100    // window width
 #define GRID_SIZE 580 // grid size (square)
 #define OFFSET 60     // offset from the top left corner of the window
 #define THICKNESS 4   // thickness of the lines
 
-#define BACKGROUND_COLOR 94, 26, 32, 255  // wood brown
+#define BACKGROUND_COLOR 94, 26, 32, 255       // wood brown
 #define BLUR_BACKGROUND_COLOR 180, 134, 88, 30 // wood brown
-#define DIAGONAL_COLOR 227, 180, 122, 255 // white
-#define BORDER_COLOR 190, 121, 79, 255    // beige
+#define DIAGONAL_COLOR 227, 180, 122, 255      // white
+#define BORDER_COLOR 190, 121, 79, 255         // beige
 
-#define SMALL_CIRCLE_COLOR 141, 64, 47, 255  // light brown
-#define HOVER_CIRCLE_COLOR 227 , 180, 122, 255 // red
+#define SMALL_CIRCLE_COLOR 141, 64, 47, 255   // light brown
+#define HOVER_CIRCLE_COLOR 227, 180, 122, 255 // red
 
 #define SELECTED_CIRCLE_COLOR 40, 80, 128, 255 // yellow
 #define PATH_COLOR 0, 169, 157, 255            // blue
@@ -38,8 +37,8 @@
 #define START_CIRCLE_COLOR PATH_COLOR
 #define END_CIRCLE_COLOR 0, 255, 0, 255 // green
 
-#define SIDE_BAR_COLOR 227, 180, 122, 255          // 192, 192, 192, 255 // beige
-#define SIDE_BAR_OUTLINE_COLOR 141, 64, 47, 255   // 112, 128, 144, 255 // black
+#define SIDE_BAR_COLOR 227, 180, 122, 255       // 192, 192, 192, 255 // beige
+#define SIDE_BAR_OUTLINE_COLOR 141, 64, 47, 255 // 112, 128, 144, 255 // black
 
 #define DISPLAY_BOX_COLOR 190, 121, 79, 255 // white
 
@@ -75,10 +74,10 @@
 #define SECOND_ICON_PATH "assets/images/second.png"
 #define THIRD_ICON_PATH "assets/images/third.png"
 
-void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
-void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
-void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
-void drawButton(SDL_Renderer *renderer, button *Button);
+void drawBlurredBackground(SDL_Renderer *renderer);
+void drawMainMenu(SDL_Renderer *renderer, game *Game);
+void drawTopPlayers(SDL_Renderer *renderer, game *Game);
+void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game);
 
 // Text input
 void drawTextInput(SDL_Renderer *renderer, game *Game);
@@ -92,12 +91,17 @@ void drawSideBar(SDL_Renderer *renderer, game *Game);  // Side bar
 void drawGameOver(SDL_Renderer *renderer, game *Game); // Game over
 void drawPause(SDL_Renderer *renderer, game *Game);    // Pause
 
-void drawMainMenu(SDL_Renderer *renderer, game *Game);
-void drawTopPlayers(SDL_Renderer *renderer, game *Game);
+
+
+
 void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n]);
 void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n], int *selectI, int *selectJ);
-void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game);
 void machineModeChoosing(SDL_Renderer *renderer, game *Game);
+
+void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
+void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
+void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
+void drawButton(SDL_Renderer *renderer, button *Button);
 
 void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside); // Get matrix click
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
@@ -105,4 +109,3 @@ bool compareColor(SDL_Color color, int r, int g, int b, int a);
 int mesureTextWidth(char *fontPath, char *text, int size);
 bool isClickInButton(SDL_Event event, button *Button);
 
-void drawBlurredBackground(SDL_Renderer *renderer);
