@@ -30,7 +30,7 @@ if it didn't work, try to run `mingw32-make` instead.
 - `draw.c` : Contains the drawing functions (draw Grid, draw main menu, etc...).
 - `util.c` : Contains the utility functions (formatting, etc...).
 
-#### each file has a corresponding header file in the `include/` folder except for `main.c`.
+#### each file has a corresponding header file in the `include/` folder except for `main.c`,
 
 ## Authors
 

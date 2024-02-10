@@ -89,7 +89,23 @@ void playMusic(Mix_Music *music);
  * @return void
  */
 void playSoundEffect(Mix_Chunk *sound);
-
-
-int QuitSDL(SDL_Window **window, SDL_Renderer **renderer);
+/**
+ * @brief Initializes SDL Library (with TTF, Image and Mixer) and creates a window and a renderer
+ *
+ * @param window Pointer to a pointer to SDL_Window
+ * @param renderer Pointer to a pointer to SDL_Renderer
+ * @param TITLE Title of the window
+ * @param WIDTH Width of the window
+ * @param HEIGHT Height of the window
+ * @param ICON_PATH Path to the window icon
+ */
 void InitializeSDL(SDL_Window **window, SDL_Renderer **renderer, char *TITLE, int WIDTH, int HEIGHT, char *ICON_PATH);
+
+/**
+ * @brief Quits SDL Library (with TTF, Image and Mixer) and destroys the window and the renderer
+ *
+ * @param window Pointer to a pointer to SDL_Window
+ * @param renderer Pointer to a pointer to SDL_Renderer
+ * @return int Returns 0 on success, -1 on failure
+ */
+int QuitSDL(SDL_Window **window, SDL_Renderer **renderer);

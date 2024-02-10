@@ -213,18 +213,18 @@ void drawBlurredBackground(SDL_Renderer *renderer)
     int x = 0, y = 0;
     int radius = 50;
 
-    while (x <= WIDTH / 2)
+    while (x <= WINDOW_WIDTH / 2)
     {
-        while (y <= HEIGHT / 2)
+        while (y <= WINDOW_HEIGHT / 2)
         {
             drawHexagon(renderer, x, y, radius);
-            drawHexagon(renderer, WIDTH - x, HEIGHT - y, radius);
+            drawHexagon(renderer, WINDOW_WIDTH - x, WINDOW_HEIGHT - y, radius);
 
-            if (y != HEIGHT - y && x != WIDTH - x)
+            if (y != WINDOW_HEIGHT - y && x != WINDOW_WIDTH - x)
             {
 
-                drawHexagon(renderer, x, HEIGHT - y, radius);
-                drawHexagon(renderer, WIDTH - x, y, radius);
+                drawHexagon(renderer, x, WINDOW_HEIGHT - y, radius);
+                drawHexagon(renderer, WINDOW_WIDTH - x, y, radius);
             }
 
             y += radius;
@@ -244,13 +244,13 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     int logoSize = fontSize * 1.5;
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - logoSize / 2, HEIGHT / 8, fontSize, FONT_COLOR);
-    drawImage(renderer, NOBG_ICON_PATH, WIDTH / 2 + w / 2 - logoSize / 2, HEIGHT / 8 - logoSize / 3, logoSize, logoSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2 - logoSize / 2, WINDOW_HEIGHT / 8, fontSize, FONT_COLOR);
+    drawImage(renderer, NOBG_ICON_PATH, WINDOW_WIDTH / 2 + w / 2 - logoSize / 2, WINDOW_HEIGHT / 8 - logoSize / 3, logoSize, logoSize);
 
     // play button
     button playerGameModeButton = {
-        WIDTH / 2,
-        HEIGHT / 2,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -267,8 +267,8 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
 
     // machine button
     button machineGameModeButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 100,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2 + 100,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -286,8 +286,8 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
 
     // top players button
     button topPlayersButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 200,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2 + 200,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -312,9 +312,8 @@ void drawTopPlayers(SDL_Renderer *renderer, game *Game)
     int fontSize = 90;
     sprintf(text, "Top Players");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 12, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 12, fontSize, FONT_COLOR);
     SDL_SetRenderDrawColor(renderer, FONT_COLOR);
-
 
     fontSize = 30;
     // top players
@@ -358,23 +357,23 @@ void drawTopPlayers(SDL_Renderer *renderer, game *Game)
             break;
 
         sprintf(text, players[i].name);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - maxTextW / 2 + iconSize, WINDOW_HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
         sprintf(text, "%d", players[i].score);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + gap, WINDOW_HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
 
         sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + maxScoreW + 2 * gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + maxScoreW + 2 * gap, WINDOW_HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
 
         if (i < 3)
         {
             char *iconPath = i == 0 ? FIRST_ICON_PATH : i == 1 ? SECOND_ICON_PATH
                                                                : THIRD_ICON_PATH;
-            drawImage(renderer, iconPath, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.4);
+            drawImage(renderer, iconPath, WINDOW_WIDTH / 2 - maxTextW / 2 - iconSize / 2, WINDOW_HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.4);
         }
         else
         {
             sprintf(text, "%d", i + 1);
-            writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize * 1.5, FONT_COLOR);
+            writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - maxTextW / 2 - iconSize / 2, WINDOW_HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize * 1.5, FONT_COLOR);
         }
     }
     // back button in the top left corner
@@ -402,14 +401,14 @@ void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game)
     int fontSize = 64;
     sprintf(text, "Choose Machine Game Mode");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 8, fontSize, FONT_COLOR);
 
     // 2 play buttons one for auto and one for manual both are in the middle of the screen
 
     // auto button
     button machineGameAutoModeButton = {
-        WIDTH / 2 - 100 - 5,
-        HEIGHT / 2,
+        WINDOW_WIDTH / 2 - 100 - 5,
+        WINDOW_HEIGHT / 2,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -427,8 +426,8 @@ void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game)
     // manual button
 
     button machineGameManualModeButton = {
-        WIDTH / 2 + 100 + 5,
-        HEIGHT / 2,
+        WINDOW_WIDTH / 2 + 100 + 5,
+        WINDOW_HEIGHT / 2,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -467,28 +466,28 @@ void drawTextInput(SDL_Renderer *renderer, game *Game)
     sprintf(text, "Enter Your Name:");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 8, fontSize, FONT_COLOR);
     fontSize = 45;
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     sprintf(text, "%s", Game->player.name);
 
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 - 50, fontSize, 255, 0, 0, 255);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 2 - 50, fontSize, 255, 0, 0, 255);
 
     // draw wrting line
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
     if (strlen(text))
-        SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 2 - 50 + fontSize, WIDTH / 2 + w / 2, HEIGHT / 2 - 50 + fontSize);
+        SDL_RenderDrawLine(renderer, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 2 - 50 + fontSize, WINDOW_WIDTH / 2 + w / 2, WINDOW_HEIGHT / 2 - 50 + fontSize);
 
     fontSize = 24;
     // draw cursor to blink
 
     sprintf(text, "Press Enter to Start");
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2 + 150, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 2 + 150, fontSize, FONT_COLOR);
     int iconSize = 100;
-    drawImage(renderer, ENTER_ICON_PATH, WIDTH / 2 - iconSize / 2, HEIGHT / 2 + 200, iconSize, iconSize);
+    drawImage(renderer, ENTER_ICON_PATH, WINDOW_WIDTH / 2 - iconSize / 2, WINDOW_HEIGHT / 2 + 200, iconSize, iconSize);
 }
 
 void drawGrid(SDL_Renderer *renderer, game *Game)
@@ -775,10 +774,10 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
 {
     // side bar
     int outline = 10;
-    int sideBarWidth = WIDTH - GRID_SIZE - OFFSET * 2;
+    int sideBarWidth = WINDOW_WIDTH - GRID_SIZE - OFFSET * 2;
 
-    SDL_Rect outerSideBar = {GRID_SIZE + OFFSET * 2, 0, sideBarWidth, HEIGHT};
-    SDL_Rect innerSideBar = {GRID_SIZE + OFFSET * 2 + outline, outline, sideBarWidth - 2 * outline, HEIGHT - 2 * outline};
+    SDL_Rect outerSideBar = {GRID_SIZE + OFFSET * 2, 0, sideBarWidth, WINDOW_HEIGHT};
+    SDL_Rect innerSideBar = {GRID_SIZE + OFFSET * 2 + outline, outline, sideBarWidth - 2 * outline, WINDOW_HEIGHT - 2 * outline};
 
     SDL_SetRenderDrawColor(renderer, SIDE_BAR_OUTLINE_COLOR);
     SDL_RenderFillRect(renderer, &outerSideBar);
@@ -788,19 +787,19 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
 
     // Player name
     int nameStart = outline;
-    int nameEnd = nameStart + 0.1 * (HEIGHT - 2 * outline);
+    int nameEnd = nameStart + 0.1 * (WINDOW_HEIGHT - 2 * outline);
 
     // Level display
     int levelStart = nameEnd + 1;
-    int levelEnd = levelStart + 0.2 * (HEIGHT - 2 * outline);
+    int levelEnd = levelStart + 0.2 * (WINDOW_HEIGHT - 2 * outline);
 
     // Score display
     int scoreStart = levelEnd + 1;
-    int scoreEnd = scoreStart + 0.2 * (HEIGHT - 2 * outline);
+    int scoreEnd = scoreStart + 0.2 * (WINDOW_HEIGHT - 2 * outline);
 
     // Time display
     int timeStart = scoreEnd + 1;
-    int timeEnd = timeStart + 0.2 * (HEIGHT - 2 * outline);
+    int timeEnd = timeStart + 0.2 * (WINDOW_HEIGHT - 2 * outline);
 
     SDL_SetRenderDrawColor(renderer, FONT_COLOR);
     SDL_Rect nameRect = {GRID_SIZE + OFFSET * 2 + outline, nameStart, sideBarWidth - 2 * outline, nameEnd - nameStart};
@@ -891,7 +890,7 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
 
     int centerX = outline + GRID_SIZE + OFFSET * 2 + innerSideBar.w / 2;
 
-    int centerY = outline + HEIGHT / 2;
+    int centerY = outline + WINDOW_HEIGHT / 2;
     // draw the buttons
     button pauseButton = {
         centerX, // center of the side bar
@@ -944,12 +943,12 @@ void drawPause(SDL_Renderer *renderer, game *Game)
     sprintf(text, "Game Paused");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 8, fontSize, FONT_COLOR);
 
     // resume button
     button resumeButton = {
-        WIDTH / 2,
-        HEIGHT / 2,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -967,8 +966,8 @@ void drawPause(SDL_Renderer *renderer, game *Game)
     // save and exit button
 
     button saveAndExitButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 100,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2 + 100,
         200,
         50,
         {BUTTON_SECONDARY_COLOR},
@@ -992,7 +991,7 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
     sprintf(text, "Game Over");
     int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 10, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 10, fontSize, FONT_COLOR);
 
     // you won if game->level = maxLevel or you lost if game->level = 0
     fontSize = 45;
@@ -1003,17 +1002,17 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
 
     SDL_Color color = Game->level == 0 ? (SDL_Color){255, 0, 0, 255} : (SDL_Color){0, 255, 0, 255};
 
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 3, fontSize, color.r, color.g, color.b, color.a);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 3, fontSize, color.r, color.g, color.b, color.a);
 
     sprintf(text, "Your Score:%d", Game->player.score);
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 2.1, fontSize, FONT_COLOR);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 2.1, fontSize, FONT_COLOR);
 
     // play again button
 
     button playAgainButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 100,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2 + 100,
         200,
         50,
         {BUTTON_PRIMARY_COLOR},
@@ -1031,8 +1030,8 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
     // save and exit button
 
     button saveAndExitButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 200,
+        WINDOW_WIDTH / 2,
+        WINDOW_HEIGHT / 2 + 200,
         200,
         50,
         {BUTTON_SECONDARY_COLOR},
@@ -1067,7 +1066,7 @@ int mesureTextWidth(char *fontPath, char *text, int size)
 
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
 {
-    SDL_Surface *getPixel_Surface = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    SDL_Surface *getPixel_Surface = SDL_CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, getPixel_Surface->pixels, getPixel_Surface->pitch);
     const Uint8 getPixel_bpp = getPixel_Surface->format->BytesPerPixel;
 

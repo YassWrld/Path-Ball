@@ -15,8 +15,8 @@
 
 #define GAME_TITLE "Path Ball"
 
-#define HEIGHT 700    // window height
-#define WIDTH 1100    // window width
+#define WINDOW_HEIGHT 700    // window height
+#define WINDOW_WIDTH 1100    // window width
 #define GRID_SIZE 580 // grid size (square)
 #define OFFSET 60     // offset from the top left corner of the window
 #define THICKNESS 4   // thickness of the lines
@@ -114,7 +114,6 @@ void drawArrow(SDL_Renderer *renderer, int x, int y, int l, direction d);
  */
 void drawHexagon(SDL_Renderer *renderer, int x, int y, int r);
 
-
 /**
  * @brief Filled circle drawing
  *
@@ -182,7 +181,6 @@ void drawButton(SDL_Renderer *renderer, button *Button);
  * @return void
  */
 void drawBlurredBackground(SDL_Renderer *renderer);
-
 
 // Screens drawing functions
 
@@ -257,7 +255,6 @@ void drawGrid(SDL_Renderer *renderer, game *Game);
  */
 void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
 
-
 /**
  * @brief Side bar
  *
@@ -269,7 +266,6 @@ void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int
  */
 void drawSideBar(SDL_Renderer *renderer, game *Game);
 
-
 /**
  * @brief Path
  *
@@ -280,7 +276,6 @@ void drawSideBar(SDL_Renderer *renderer, game *Game);
  * @return bool: true if path is successfully drawn, false otherwise
  */
 bool drawPath(SDL_Renderer *renderer, game *Game);
-
 
 /**
  * @brief Game over
