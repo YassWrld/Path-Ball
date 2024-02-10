@@ -48,11 +48,7 @@
 // #define MONOCRAFT_FONT "assets/fonts/monocraft.ttf"// black
 #define GAMEPAUSED_FONT "assets/fonts/gamepaused.otf" // black
 
-#define MUSIC_PATH "assets/sounds/music.mp3"
-#define STEPS_SOUND_PATH "assets/sounds/step.wav"
-#define CLICK_SOUND_PATH "assets/sounds/click.wav"
-#define RIGHT_SOUND_PATH "assets/sounds/right.wav"
-#define WRONG_SOUND_PATH "assets/sounds/wrong.wav"
+
 
 #define ICON_PATH "assets/images/icon.png"
 #define NOBG_ICON_PATH "assets/images/nobg-icon.png"
@@ -74,38 +70,41 @@
 #define SECOND_ICON_PATH "assets/images/second.png"
 #define THIRD_ICON_PATH "assets/images/third.png"
 
+
+
+
+
+//components drawing functions
 void drawBlurredBackground(SDL_Renderer *renderer);
-void drawMainMenu(SDL_Renderer *renderer, game *Game);
-void drawTopPlayers(SDL_Renderer *renderer, game *Game);
-void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game);
-
-// Text input
-void drawTextInput(SDL_Renderer *renderer, game *Game);
-// Matrix
-void drawGrid(SDL_Renderer *renderer, game *Game);
-void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
-// void drawPath(SDL_Renderer *renderer, game *Game);
-bool drawPath(SDL_Renderer *renderer, game *Game);
-int mesurePathLength(path *path);
-void drawSideBar(SDL_Renderer *renderer, game *Game);  // Side bar
-void drawGameOver(SDL_Renderer *renderer, game *Game); // Game over
-void drawPause(SDL_Renderer *renderer, game *Game);    // Pause
-
-
-
-
-void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n]);
-void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n], int *selectI, int *selectJ);
-void machineModeChoosing(SDL_Renderer *renderer, game *Game);
-
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
 void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
 void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
 void drawButton(SDL_Renderer *renderer, button *Button);
 
+
+//screens drawing functions
+void drawMainMenu(SDL_Renderer *renderer, game *Game);
+void drawTopPlayers(SDL_Renderer *renderer, game *Game);
+void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game);
+
+
+//Game drawing functions
+void drawTextInput(SDL_Renderer *renderer, game *Game); // Text input
+void drawGrid(SDL_Renderer *renderer, game *Game);      // Grid (matrix)
+void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY); // Diagonal
+bool drawPath(SDL_Renderer *renderer, game *Game); // Path
+
+void drawSideBar(SDL_Renderer *renderer, game *Game);  // Side bar
+void drawGameOver(SDL_Renderer *renderer, game *Game); // Game over
+void drawPause(SDL_Renderer *renderer, game *Game);    // Pause
+
+void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[MAX_N][MAX_N]); // Machine Fill the matrix
+void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[MAX_N][MAX_N], int *selectI, int *selectJ); // Machine Find the start and end
+void machineModeChoosing(SDL_Renderer *renderer, game *Game); //Machine Send the virtual click
+
+
 void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *i, int *j, bool *isOutside); // Get matrix click
 SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
 bool compareColor(SDL_Color color, int r, int g, int b, int a);
 int mesureTextWidth(char *fontPath, char *text, int size);
-bool isClickInButton(SDL_Event event, button *Button);
-
+bool isClickInButton(SDL_Event event, game *Game, button Button);

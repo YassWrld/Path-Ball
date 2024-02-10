@@ -9,7 +9,7 @@ src := src/*.c
 linkers= -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer  
 includes= -I include -I $(sdlPath)\include -I $(sdlPath)\include\SDL2
 libs= -L $(sdlPath)\lib
-flags:=-Wall  -std=c17 -Wall   -Werror  -pedantic# -mwindows
+flags:=-Wall  -std=c17 -Wall   -Werror  -pedantic -mwindows
 resources:= assets\windows\resources.res 
 
 

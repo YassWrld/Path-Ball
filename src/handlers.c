@@ -22,7 +22,7 @@ void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game 
 
 void handleGlobal(SDL_Event event, int *quit)
 {
-    if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) // quit
+    if (event.type == SDL_QUIT || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE)) // quit
     {
         *quit = 1;
         return;
@@ -34,7 +34,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (Game->state == TextInput) // Text input mode
     {
-        if (event.type == SDL_KEYDOWN) // text input
+        if (event.type == SDL_KEYUP) // text input
         {
             if (strlen(Game->player.name) == 0) // if the name is empty
                 return;
@@ -67,7 +67,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     // Pause mode
 
-    if ((event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) || isClickInButton(event, &Game->buttons.pause)) // pause
+    if ((event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_p) || isClickInButton(event, Game, Game->buttons.pause)) // pause
     {
         if (Game->state == TextInput || Game->state == GameOver)
             return;
@@ -99,7 +99,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
         return;
     }
 
-    if (isClickInButton(event, &Game->buttons.MainMenu))
+    if (isClickInButton(event, Game, Game->buttons.MainMenu))
     {
         if (Game->player.score != 0 && !Game->machineMode && !Game->helpers.savedScore)
         {
@@ -112,7 +112,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     }
     if (Game->state == GameOver)
     {
-        if (isClickInButton(event, &Game->buttons.playAgain))
+        if (isClickInButton(event, Game, Game->buttons.playAgain))
         {
 
             initGame(Game, Game->machineMode, Game->manualFill);
@@ -123,7 +123,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (Game->state == Result)
     {
-        if (isClickInButton(event, &Game->buttons.skip) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s)) // skip
+        if (isClickInButton(event, Game, Game->buttons.skip) || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_s)) // skip
         {
             Game->helpers.skipPath = true;
             return;
@@ -148,31 +148,30 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             if (i == -1 && j == -1) // if the click is outside the matrix
                 return;
             int n = Game->level + 5;
-            int(*matrix)[n] = Game->matrix;
             if (isOutside)
             {
-                Game->solution = solveMatrix(matrix[i][j], Game->helpers.filledObstacles, n, Game->matrix);
+                Game->solution = solveMatrix(Game->matrix[i][j], Game->helpers.filledObstacles, n, Game->matrix);
                 Game->state = Memorizing;
                 return;
             }
 
-            if (matrix[i][j] == 0)
+            if (Game->matrix[i][j] == 0)
             {
-                matrix[i][j] = 1;
+                Game->matrix[i][j] = 1;
                 Game->helpers.filledObstacles++;
             }
-            else if (matrix[i][j] == 1)
-                matrix[i][j] = -1;
-            else if (matrix[i][j] == -1)
+            else if (Game->matrix[i][j] == 1)
+                Game->matrix[i][j] = -1;
+            else if (Game->matrix[i][j] == -1)
             {
-                matrix[i][j] = 0;
+                Game->matrix[i][j] = 0;
 
                 Game->helpers.filledObstacles--;
             }
             return;
         }
 
-        if (event.type == SDL_KEYDOWN)
+        if (event.type == SDL_KEYUP)
         {
             if (!Game->machineMode && Game->manualFill) // if machine mode is on, return (no user input)
                 return;
@@ -222,7 +221,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     if (Game->state == Selecting)
     {
 
-        if (event.type == SDL_KEYDOWN)
+        if (event.type == SDL_KEYUP)
         {
             if (Game->machineMode) // if machine mode is on, return (no user input)
                 return;
@@ -249,7 +248,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
                 else
                     Game->helpers.win = -1;
 
-                Game->helpers.win == -1 ? playSoundEffect(WRONG_SOUND_PATH) : playSoundEffect(RIGHT_SOUND_PATH);
+                Game->helpers.win == -1 ? playSoundEffect(Game->sounds.lose) : playSoundEffect(Game->sounds.win);
                 Game->state = Result;
                 return;
             }
@@ -303,12 +302,12 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             {
 
                 Game->helpers.win = 1;
-                playSoundEffect(RIGHT_SOUND_PATH);
+                playSoundEffect(Game->sounds.win);
             }
             else
             {
                 Game->helpers.win = -1;
-                playSoundEffect(WRONG_SOUND_PATH);
+                playSoundEffect(Game->sounds.lose);
             }
             Game->helpers.selectedI = i;
             Game->helpers.selectedJ = j;
@@ -354,18 +353,18 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     if (event.button.button != SDL_BUTTON_LEFT)
         return;
 
-    if (isClickInButton(event, &Game->buttons.PlayerGameMode))
+    if (isClickInButton(event, Game, Game->buttons.PlayerGameMode))
     {
         *Secreen = PlayerGameMode;
         initGame(Game, false, false);
         return;
     }
-    if (isClickInButton(event, &Game->buttons.MachineGameMode))
+    if (isClickInButton(event, Game, Game->buttons.MachineGameMode))
     {
         *Secreen = ChooseMachineGameMode;
         return;
     }
-    if (isClickInButton(event, &Game->buttons.TopPlayers))
+    if (isClickInButton(event, Game, Game->buttons.TopPlayers))
     {
 
         *Secreen = TopPlayers;
@@ -380,19 +379,19 @@ void handleChooseMachineGameMode(SDL_Event event, SDL_Renderer *renderer, screen
     if (event.button.button != SDL_BUTTON_LEFT)
         return;
 
-    if (isClickInButton(event, &Game->buttons.MachineGameAutoMode))
+    if (isClickInButton(event, Game, Game->buttons.MachineGameAutoMode))
     {
         *Secreen = MachineGameMode;
         initGame(Game, true, false);
         return;
     }
-    if (isClickInButton(event, &Game->buttons.MachineGameManualMode))
+    if (isClickInButton(event, Game, Game->buttons.MachineGameManualMode))
     {
         *Secreen = MachineGameMode;
         initGame(Game, true, true);
         return;
     }
-    if (isClickInButton(event, &Game->buttons.MainMenu))
+    if (isClickInButton(event, Game, Game->buttons.MainMenu))
     {
         *Secreen = MainMenu;
         return;
@@ -406,7 +405,7 @@ void handleTopPlayers(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, 
     if (event.button.button != SDL_BUTTON_LEFT)
         return;
 
-    if (isClickInButton(event, &Game->buttons.MainMenu))
+    if (isClickInButton(event, Game, Game->buttons.MainMenu))
     {
 
         *Secreen = MainMenu;

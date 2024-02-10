@@ -7,6 +7,7 @@
 
 #define MAX_NAME_LENGTH 21            // max length of player name
 #define MAX_MATRIX_SIZE 20            // max size of matrix
+#define MAX_N MAX_MATRIX_SIZE         // just an alias for MAX_MATRIX_SIZE
 #define MAX_LEVEL 11                  // the real max level is MAX_LEVEL - 1
 #define MEMORIZING_TIME 3 * 1000      // memorizing time in milliseconds
 #define CIRCLE_DRAW_TIME 500          // circle draw time in milliseconds
@@ -16,27 +17,33 @@
 
 #define SCORES_FILE_PATH "assets/data/scores.txt" // scores file path
 
+#define MUSIC_PATH "assets/sounds/music.mp3"
+#define STEP_SOUND_PATH "assets/sounds/step.wav"
+#define CLICK_SOUND_PATH "assets/sounds/click.wav"
+#define WIN_SOUND_PATH "assets/sounds/right.wav"
+#define LOSE_SOUND_PATH "assets/sounds/wrong.wav"
+
+
 typedef enum Directions
 {
     Up,    // 0
     Right, // 1
     Down,  // 2
     Left   // 3
-
 } direction;
 
 typedef struct ball
 {
-    direction dir;
-    int x; // current point i
-    int y; // current point j
+    direction dir; // direction of the ball
+    int x;         // current point i
+    int y;         // current point j
 } ball;
 
 typedef struct path
 {
-    int x; // point i
-    int y; // point j
-    direction dir;
+    int x;         // point i
+    int y;         // point j
+    direction dir; // direction of the ball
     struct path *next;
 
 } path;
@@ -66,15 +73,15 @@ typedef struct player
 } player;
 typedef struct Button
 {
-    int centerX, centerY;
-    int width, height;
-    SDL_Color color;
-    SDL_Color hoverColor;
-    SDL_Color textColor;
-    SDL_Color outlineColor;
-    int outlineThickness;
-    char label[20];
-    char iconPath[50];
+    int centerX, centerY;   // center of the button
+    int width, height;      // width and height of the button
+    SDL_Color color;        // color of the button
+    SDL_Color hoverColor;   // hover color of the button
+    SDL_Color textColor;    // text color
+    SDL_Color outlineColor; // outline color
+    int outlineThickness;   // outline thickness
+    char label[20];         // label of the button
+    char iconPath[50];      // icon path of the button
 } button;
 
 typedef enum game_state
@@ -110,8 +117,6 @@ typedef struct helpers
     player topPlayers[5];         // top players
     path *currentPath;            // current path of the ball
 
-    // path *currentPath;       // current path of the ball
-    // int currentPathLength;   // current path length
     game_state prevState; // previous state before pause
 
 } helpers_t;
@@ -119,17 +124,26 @@ typedef struct helpers
 typedef struct buttonsHandle
 {
 
-    button pause;
-    button playAgain;
-    button skip;
-
-    button MainMenu;
-    button PlayerGameMode;
-    button MachineGameMode;
-    button MachineGameAutoMode;
-    button MachineGameManualMode;
-    button TopPlayers;
+    button pause;                 // pause button (in game)
+    button playAgain;             // play again button (in game)
+    button skip;                  // skip button (in game)
+    button MainMenu;              // main menu button
+    button PlayerGameMode;        // player game mode button
+    button MachineGameMode;       // machine game mode button (choose mode)
+    button MachineGameAutoMode;   // machine game auto mode button
+    button MachineGameManualMode; // machine game manual mode button
+    button TopPlayers;            // top players button
 } buttonsHandle;
+
+typedef struct sounds_t
+{
+    Mix_Chunk *click; // click sound (button click)
+    Mix_Chunk *win;   // win sound (win state)
+    Mix_Chunk *lose;  // lose sound (lose state)
+    Mix_Chunk *step;  // step sound (path draw)
+    Mix_Music *music; // background music
+
+} sounds_t;
 
 typedef struct game
 {
@@ -141,20 +155,16 @@ typedef struct game
 
     int machineMatrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE]; // for machine mode
 
-    int level;      // current level
-    int maxLevel;   // max level reached
-    int winStreak;  // win streak
-    int loseStreak; // lose streak
-
-    bool machineMode; // machine mode on/off
-    bool manualFill;  // manual fill on/off
-
-    solution *solution; // solution for current level
-
-    helpers_t helpers; // control variables
-
+    int level;             // current level
+    int maxLevel;          // max level reached
+    int winStreak;         // win streak
+    int loseStreak;        // lose streak
+    bool machineMode;      // machine mode on/off
+    bool manualFill;       // manual fill on/off
+    solution *solution;    // solution for current level
+    helpers_t helpers;     // control variables
     buttonsHandle buttons; // buttons
-                           // Mix_Chunk *clickSound;
+    sounds_t sounds;       // sounds
 
 } game;
 
@@ -165,22 +175,22 @@ typedef enum Screen // screen enum
     PlayerGameMode,        // player game mode screen
     MachineGameMode,       // machine game mode screen
     TopPlayers,            // top players screen
-                           // credits screen
 } screen;
 
-solution *setupMatrix(int n, int matrix[n][n]); // setup the matrix for the current level (initialize, set obstacles,choose start, solve the matrix) and return the solution
-void initializeMatrix(int n, int matrix[n][n]); // initialize outer matrix and fill inner matrix with 0s
-int setObstacles(int n, int matrix[n][n]);      // set obstacles in the matrix
+solution *setupMatrix(int n, int matrix[MAX_N][MAX_N]); // setup the matrix for the current level (initialize, set obstacles,choose start, solve the matrix) and return the solution
+void initializeMatrix(int n, int matrix[MAX_N][MAX_N]); // initialize outer matrix and fill inner matrix with 0s
+int setObstacles(int n, int matrix[MAX_N][MAX_N]);      // set obstacles in the matrix
 
-void findStart(int n, int matrix[n][n], int start, int *x, int *y); // find the start circle i, j
-direction getNextDirection(direction d, int current);               // get the next direction of the ball
-solution *solveMatrix(int start, int obs, int n, int matrix[n][n]); // solve the matrix and return the solution
+void findStart(int n, int matrix[MAX_N][MAX_N], int start, int *x, int *y); // find the start circle i, j
+direction getNextDirection(direction d, int current);                       // get the next direction of the ball
+solution *solveMatrix(int start, int obs, int n, int matrix[MAX_N][MAX_N]); // solve the matrix and return the solution
 
-void freePath(path *p);
+void initGame(game *Game, bool machineMode, bool manualFill); // initialize the game
+void loadAllSounds(game *Game);                              // load all the sounds
+void updateLevelAndScore(game *Game);                         // update the level and score of the player and the game
+void insertScore(player current);                             // insert the score of the current player in the file
+void sortTopPlayers(player arr[]);                            // sort the top players by score
+void getTopPlayers(player players[]);                         // get the top players from the file (5 players)
 
-void initGame(game *Game, bool machineMode, bool manualFill);
-// initialize the game
-void updateLevelAndScore(game *Game); // update the level and score of the player and the game
-void insertScore(player current);     // insert the score of the current player in the file
-void sortTopPlayers(player arr[]);    // sort the top players by score
-void getTopPlayers(player players[]); // get the top players from the file (5 players)
+void freePath(path *p);                            // free the path (linked list)
+void printMatrix(int n, int matrix[MAX_N][MAX_N]); // print the matrix

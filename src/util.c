@@ -35,35 +35,6 @@ bool checkAllowedString(char *str)
     return isAllowed;
 }
 
-void printMatrix(int n, int matrix[n][n])
-{
-    printf("+---");
-    for (int j = 0; j < n; j++)
-    {
-        printf("----");
-    }
-    printf("--+\n");
-
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            if (j == 0)
-            {
-                printf("| ");
-            }
-            printf("%2d | ", matrix[i][j]);
-        }
-
-        printf("\n+---");
-        for (int j = 0; j < n; j++)
-        {
-            printf("----");
-        }
-        printf("--+\n");
-    }
-}
-
 date_t getCurrentDate()
 {
     date_t currentDate;
@@ -127,8 +98,7 @@ int graycefulDelay(Uint32 ms)
     return 0;
 }
 
-Mix_Music *
-playMusic(char *path)
+Mix_Music *loadMusic(char *path)
 {
     Mix_Music *music = Mix_LoadMUS(path);
     if (!music)
@@ -136,20 +106,35 @@ playMusic(char *path)
         printf("Mix_LoadMUS Error: %s\n", Mix_GetError());
         return NULL;
     }
-    Mix_PlayMusic(music, -1); // returns int
 
     return music;
 }
 
-void playSoundEffect(char *path)
+Mix_Chunk *loadSoundEffect(char *path)
 {
-
     Mix_Chunk *soundEffect = Mix_LoadWAV(path);
-
     if (!soundEffect)
     {
         printf("Mix_LoadWAV Error: %s\n", Mix_GetError());
-        return;
+        return NULL;
     }
-    Mix_PlayChannel(-1, soundEffect, 0);
+    return soundEffect;
+}
+
+void playSoundEffect(Mix_Chunk *soundEffect)
+{
+    int status = Mix_PlayChannel(-1, soundEffect, 0);
+    if (status == -1)
+    {
+        printf("Mix_PlayChannel Error: %s\n", Mix_GetError());
+    }
+}
+
+void playMusic(Mix_Music *music)
+{
+    int status = Mix_PlayMusic(music, -1);
+    if (status == -1)
+    {
+        printf("Mix_PlayMusic Error: %s\n", Mix_GetError());
+    }
 }

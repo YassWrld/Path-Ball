@@ -21,7 +21,7 @@ void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y,
     SDL_Rect rect = {x, y, surface->w, surface->h};
     SDL_RenderCopy(renderer, texture, NULL, &rect);
 
-    // TTF_CloseFont(font);
+    TTF_CloseFont(font);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
 }
@@ -42,6 +42,7 @@ void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
 }
+
 void drawHexagon(SDL_Renderer *renderer, int x, int y, int r)
 {
     int n = 6;
@@ -270,7 +271,6 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
     int n = Game->level + 5;
 
     int cellSize = GRID_SIZE / n;
-    int(*matrix)[n] = Game->matrix;
 
     SDL_SetRenderDrawColor(renderer, BORDER_COLOR);
 
@@ -303,7 +303,7 @@ void drawGrid(SDL_Renderer *renderer, game *Game)
             int y = OFFSET + i * cellSize + cellSize / 2 + THICKNESS / 2;
             if (j > 0 && j < n - 1)
             {
-                int current = matrix[i][j];
+                int current = Game->matrix[i][j];
 
                 if (current != 0 && Game->state != Selecting)
                 {
@@ -486,12 +486,12 @@ bool drawPath(SDL_Renderer *renderer, game *Game)
     if (Game->helpers.currentPath == NULL && Game->helpers.pathEndCircleTime == 0)
     {
         Game->helpers.currentPath = Game->solution->path->next;
-        playSoundEffect(STEPS_SOUND_PATH);
+        playSoundEffect(Game->sounds.step);
     }
 
     if (SDL_GetTicks() - Game->helpers.pathDrawStartTime > CIRCLE_DRAW_TIME && Game->helpers.currentPath != NULL)
     {
-        playSoundEffect(STEPS_SOUND_PATH);
+        playSoundEffect(Game->sounds.step);
         Game->helpers.pathDrawStartTime = 0;
         Game->helpers.currentPath = Game->helpers.currentPath->next;
     }
@@ -582,12 +582,7 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     SDL_Rect levelRect = {GRID_SIZE + OFFSET * 2 + outline, levelStart, sideBarWidth - 2 * outline, levelEnd - levelStart};
     SDL_Rect scoreRect = {GRID_SIZE + OFFSET * 2 + outline, scoreStart, sideBarWidth - 2 * outline, scoreEnd - scoreStart};
     SDL_Rect timeRect = {GRID_SIZE + OFFSET * 2 + outline, timeStart, sideBarWidth - 2 * outline, timeEnd - timeStart};
-    /*
-        SDL_RenderDrawRect(renderer, &nameRect);
-        SDL_RenderDrawRect(renderer, &levelRect);
-        SDL_RenderDrawRect(renderer, &scoreRect);
-        SDL_RenderDrawRect(renderer, &timeRect);
-        */
+
     char text[100];
 
     sprintf(text, "%s", Game->player.name);
@@ -1111,7 +1106,7 @@ SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y)
     return pixelColor;
 }
 
-void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
+void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[MAX_N][MAX_N])
 {
     int cellSize = GRID_SIZE / n;
     initializeMatrix(n, matrix);
@@ -1151,7 +1146,7 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[n][n])
     }
 }
 
-void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[n][n], int *selectI, int *selectJ)
+void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[MAX_N][MAX_N], int *selectI, int *selectJ)
 {
     int cellSize = GRID_SIZE / n;
     int startI = 0, startJ = 0;
@@ -1257,22 +1252,22 @@ bool compareColor(SDL_Color color, int r, int g, int b, int a)
     return (r == color.r) && (g == color.g) && (b == color.b) && (a = color.a);
 }
 
-bool isClickInButton(SDL_Event event, button *Button)
+bool isClickInButton(SDL_Event event,game *Game, button Button)
 {
     if (event.type != SDL_MOUSEBUTTONUP || event.button.button != SDL_BUTTON_LEFT)
         return false;
 
-    int x = Button->centerX;
-    int y = Button->centerY;
-    int w = Button->width;
-    int h = Button->height;
+    int x = Button.centerX;
+    int y = Button.centerY;
+    int w = Button.width;
+    int h = Button.height;
 
     int mouseX = event.button.x;
     int mouseY = event.button.y;
 
     if (mouseX >= x - w / 2 && mouseX <= x + w / 2 && mouseY >= y - h / 2 && mouseY <= y + h / 2)
     {
-        playSoundEffect(CLICK_SOUND_PATH);
+        playSoundEffect(Game->sounds.click);
 
         return true;
     }

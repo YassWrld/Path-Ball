@@ -3,7 +3,7 @@
 matrix logic part
 */
 
-void initializeMatrix(int n, int matrix[n][n])
+void initializeMatrix(int n, int matrix[MAX_N][MAX_N])
 {
     matrix[0][0] = matrix[0][n - 1] = matrix[n - 1][0] = matrix[n - 1][n - 1] = -9;
 
@@ -42,7 +42,7 @@ void initializeMatrix(int n, int matrix[n][n])
     }
 }
 
-int setObstacles(int n, int matrix[n][n])
+int setObstacles(int n, int matrix[MAX_N][MAX_N])
 {
     // Calculate the maximum number of obstacles in the interior
     int maxObstacles = (n - 2) * (n - 2) / 2 - 1;
@@ -76,7 +76,7 @@ int setObstacles(int n, int matrix[n][n])
     return numObstacles;
 }
 
-void findStart(int n, int matrix[n][n], int start, int *x, int *y)
+void findStart(int n, int matrix[MAX_N][MAX_N], int start, int *x, int *y)
 {
     int i = 0;
     int j = 0;
@@ -137,7 +137,7 @@ direction getNextDirection(direction d, int current)
     return d;
 }
 
-solution *solveMatrix(int start, int obs, int n, int matrix[n][n])
+solution *solveMatrix(int start, int obs, int n, int matrix[MAX_N][MAX_N])
 {
     solution *s = malloc(sizeof(solution));
     s->start = start;
@@ -215,7 +215,7 @@ solution *solveMatrix(int start, int obs, int n, int matrix[n][n])
     return s;
 }
 
-solution *setupMatrix(int n, int matrix[n][n])
+solution *setupMatrix(int n, int matrix[MAX_N][MAX_N])
 {
     initializeMatrix(n, matrix);
     int obs = setObstacles(n, matrix);
@@ -234,15 +234,7 @@ solution *setupMatrix(int n, int matrix[n][n])
     return s;
 }
 
-void freePath(path *p)
-{
-    while (p != NULL)
-    {
-        path *tmp = p;
-        p = p->next;
-        free(tmp);
-    }
-}
+
 
 /*
 Score Managment Functions
@@ -323,7 +315,13 @@ void getTopPlayers(player players[])
 /*
 game part
 */
-
+void loadAllSounds(game *Game){
+    Game->sounds.click = loadSoundEffect(CLICK_SOUND_PATH);
+    Game->sounds.win = loadSoundEffect(WIN_SOUND_PATH);
+    Game->sounds.lose = loadSoundEffect(LOSE_SOUND_PATH);
+    Game->sounds.step = loadSoundEffect(STEP_SOUND_PATH);
+    Game->sounds.music = loadMusic(MUSIC_PATH);
+}
 void initGame(game *Game, bool machineMode, bool manualFill)
 {
 
@@ -442,4 +440,52 @@ void updateLevelAndScore(game *Game)
         }
     }
     printMatrix(Game->level + 5, Game->matrix);
+}
+
+
+/*
+Utility Functions (not in util.c because of recursive includes)
+*/
+
+
+
+
+
+void freePath(path *p)
+{
+    while (p != NULL)
+    {
+        path *tmp = p;
+        p = p->next;
+        free(tmp);
+    }
+}
+
+void printMatrix(int n, int matrix[MAX_N][MAX_N])
+{
+    printf("+---");
+    for (int j = 0; j < n; j++)
+    {
+        printf("----");
+    }
+    printf("--+\n");
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (j == 0)
+            {
+                printf("| ");
+            }
+            printf("%2d | ", matrix[i][j]);
+        }
+
+        printf("\n+---");
+        for (int j = 0; j < n; j++)
+        {
+            printf("----");
+        }
+        printf("--+\n");
+    }
 }

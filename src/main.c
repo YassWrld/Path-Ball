@@ -18,6 +18,7 @@ SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 void initializeSDL();
 int Quit();
+
 game Game;
 screen Screen = MainMenu;
 int fps = 60;
@@ -29,7 +30,9 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
 
-    playMusic(MUSIC_PATH);
+    loadAllSounds(&Game);
+    playMusic(Game.sounds.music);
+
     while (!quit)
     {
 
