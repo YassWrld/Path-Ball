@@ -115,7 +115,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
         if (isClickInButton(event, Game, Game->buttons.playAgain))
         {
 
-            initGame(Game, Game->machineMode, Game->manualFill);
+            initGame(Game, Game->machineMode, Game->manualFill, true);
 
             return;
         }
@@ -356,7 +356,7 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     if (isClickInButton(event, Game, Game->buttons.PlayerGameMode))
     {
         *Secreen = PlayerGameMode;
-        initGame(Game, false, false);
+        initGame(Game, false, false, false); // player mode
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.MachineGameMode))
@@ -382,13 +382,13 @@ void handleChooseMachineGameMode(SDL_Event event, SDL_Renderer *renderer, screen
     if (isClickInButton(event, Game, Game->buttons.MachineGameAutoMode))
     {
         *Secreen = MachineGameMode;
-        initGame(Game, true, false);
+        initGame(Game, true, false, false);
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.MachineGameManualMode))
     {
         *Secreen = MachineGameMode;
-        initGame(Game, true, true);
+        initGame(Game, true, true, false);
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.MainMenu))

@@ -13,16 +13,14 @@
 #define CIRCLE_DRAW_TIME 500          // circle draw time in milliseconds
 #define FULL_PATH_SHOW_TIME 1500      // full path draw time in milliseconds
 #define MACHINE_SELECTING_TIME 2500   // machine selecting time in milliseconds
-#define MACHINE_SHOW_SELECT_TIME 1500 // result time in milliseconds
 
 #define SCORES_FILE_PATH "assets/data/scores.txt" // scores file path
 
-#define MUSIC_PATH "assets/sounds/music.mp3"
-#define STEP_SOUND_PATH "assets/sounds/step.wav"
-#define CLICK_SOUND_PATH "assets/sounds/click.wav"
-#define WIN_SOUND_PATH "assets/sounds/right.wav"
-#define LOSE_SOUND_PATH "assets/sounds/wrong.wav"
-
+#define MUSIC_PATH "assets/sounds/music.mp3"    // background music path
+#define STEP_SOUND_PATH "assets/sounds/step.wav" // step sound path
+#define CLICK_SOUND_PATH "assets/sounds/click.wav" // click sound path
+#define WIN_SOUND_PATH "assets/sounds/right.wav" // win sound path
+#define LOSE_SOUND_PATH "assets/sounds/wrong.wav" // lose sound path
 
 typedef enum Directions
 {
@@ -58,10 +56,10 @@ typedef struct solution
     int endI; // end circle i
     int endJ; // end circle j
 
-    int noHit; // obs
-    int hit;
+    int noHit; // obstacles not hit
+    int hit;    // obs
 
-    path *path;
+    path *path; // path of the ball
 
 } solution;
 typedef struct player
@@ -69,8 +67,8 @@ typedef struct player
     char name[MAX_NAME_LENGTH]; // player name
     int score;                  // player score
     date_t date;                // date of the game
-
 } player;
+
 typedef struct Button
 {
     int centerX, centerY;   // center of the button
@@ -109,21 +107,23 @@ typedef struct helpers
     int machineModeSelectingTime; // time when the machine mode selecting state started
     int filledObstacles;          // number of filled obstacles
     int win;                      // 1 if win, -1 if lose, 0 if not finished
+
     bool savedScore;              // true if the score is saved in the file
     bool filledMachineMatrix;     // true if the machine matrix is filled
     bool selectedMachineStart;    // true if the start circle is selected
     bool updatedTopPlayers;       // true if the top players are updated
     bool skipPath;                // true if the path is skipped
+
+
+
     player topPlayers[5];         // top players
     path *currentPath;            // current path of the ball
-
     game_state prevState; // previous state before pause
 
 } helpers_t;
 
 typedef struct buttonsHandle
 {
-
     button pause;                 // pause button (in game)
     button playAgain;             // play again button (in game)
     button skip;                  // skip button (in game)
@@ -185,8 +185,8 @@ void findStart(int n, int matrix[MAX_N][MAX_N], int start, int *x, int *y); // f
 direction getNextDirection(direction d, int current);                       // get the next direction of the ball
 solution *solveMatrix(int start, int obs, int n, int matrix[MAX_N][MAX_N]); // solve the matrix and return the solution
 
-void initGame(game *Game, bool machineMode, bool manualFill); // initialize the game
-void loadAllSounds(game *Game);                              // load all the sounds
+void initGame(game *Game, bool machineMode, bool manualFill, bool playAgain); // initialize the game
+void loadAllSounds(game *Game);                               // load all the sounds
 void updateLevelAndScore(game *Game);                         // update the level and score of the player and the game
 void insertScore(player current);                             // insert the score of the current player in the file
 void sortTopPlayers(player arr[]);                            // sort the top players by score

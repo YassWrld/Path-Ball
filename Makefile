@@ -1,5 +1,5 @@
 ifeq ($(OS),Windows_NT) 
-all: clean build run
+all:c build run
 
 current_date := $(shell powershell Get-Date -Format "-dd-MM-HH-mm-ss")
 
@@ -12,7 +12,8 @@ libs= -L $(sdlPath)\lib
 flags:=-Wall  -std=c17 -Wall   -Werror  -pedantic -mwindows
 resources:= assets\windows\resources.res 
 
-
+c:
+	echo  
 build:
 	gcc $(src) $(resources) $(includes) $(libs) $(linkers) $(flags) -o "bin/game.exe"
 run :

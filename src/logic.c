@@ -234,8 +234,6 @@ solution *setupMatrix(int n, int matrix[MAX_N][MAX_N])
     return s;
 }
 
-
-
 /*
 Score Managment Functions
 */
@@ -315,14 +313,15 @@ void getTopPlayers(player players[])
 /*
 game part
 */
-void loadAllSounds(game *Game){
+void loadAllSounds(game *Game)
+{
     Game->sounds.click = loadSoundEffect(CLICK_SOUND_PATH);
     Game->sounds.win = loadSoundEffect(WIN_SOUND_PATH);
     Game->sounds.lose = loadSoundEffect(LOSE_SOUND_PATH);
     Game->sounds.step = loadSoundEffect(STEP_SOUND_PATH);
     Game->sounds.music = loadMusic(MUSIC_PATH);
 }
-void initGame(game *Game, bool machineMode, bool manualFill)
+void initGame(game *Game, bool machineMode, bool manualFill, bool playAgain)
 {
 
     Game->level = 1;
@@ -337,17 +336,22 @@ void initGame(game *Game, bool machineMode, bool manualFill)
         exit(1);
 
     // random name
-    if (!machineMode)
+    if (!machineMode && !playAgain)
     {
         sprintf(Game->player.name, "Player%d", randomInt(1, 1000));
         SDL_StartTextInput();
     }
-    else
+    else if (machineMode)
         sprintf(Game->player.name, "Machine");
 
     Game->player.date = getCurrentDate();
 
-    Game->state = machineMode ? manualFill ? Filling : Memorizing : TextInput;
+    // Game->state = machineMode ? manualFill ? Filling : Memorizing : TextInput;
+
+    if (machineMode)
+        Game->state = manualFill ? Filling : Memorizing;
+    else
+        Game->state = playAgain ? Memorizing : TextInput;
 
     Game->helpers.memorizingStartTime = 0;
     Game->helpers.pauseTime = 0;
@@ -442,14 +446,9 @@ void updateLevelAndScore(game *Game)
     printMatrix(Game->level + 5, Game->matrix);
 }
 
-
 /*
 Utility Functions (not in util.c because of recursive includes)
 */
-
-
-
-
 
 void freePath(path *p)
 {
