@@ -34,7 +34,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (Game->state == TextInput) // Text input mode
     {
-        if (event.type == SDL_KEYUP) // text input
+        if (event.type == SDL_KEYDOWN) // text input
         {
             if (strlen(Game->player.name) == 0) // if the name is empty
                 return;
@@ -123,7 +123,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (Game->state == Result)
     {
-        if (isClickInButton(event, Game, Game->buttons.skip) || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_s)) // skip
+        if (isClickInButton(event, Game, Game->buttons.skip) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_s)) // skip
         {
             Game->helpers.skipPath = true;
             return;
@@ -221,7 +221,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     if (Game->state == Selecting)
     {
 
-        if (event.type == SDL_KEYUP)
+        if (event.type == SDL_KEYDOWN)
         {
             if (Game->machineMode) // if machine mode is on, return (no user input)
                 return;

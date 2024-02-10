@@ -66,9 +66,8 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         {
             if (!Game->helpers.selectedMachineStart)
             {
-                machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix, & Game->helpers.selectedI, &Game->helpers.selectedJ);
+                machineModeSelecting(renderer, Game->level + 5, Game->machineMatrix, &Game->helpers.selectedI, &Game->helpers.selectedJ);
                 Game->helpers.selectedMachineStart = true;
-                
             }
             else
             {
@@ -108,24 +107,17 @@ void renderGameModeScreen(SDL_Renderer *renderer, game *Game)
         break;
     }
 }
-/*
-void renderCreditsScreen(SDL_Renderer *renderer, game *game)
+
+void renderMainMenuScreen(SDL_Renderer *renderer, game *Game)
 {
-    drawCredits(renderer, game);
+    drawMainMenu(renderer, Game);
+}
+void renderTopPlayersScreen(SDL_Renderer *renderer, game *Game)
+{
+    drawTopPlayers(renderer, Game);
 }
 
-*/
-
-void renderMainMenuScreen(SDL_Renderer *renderer, game *game)
+void renderChooseMachineGameModeScreen(SDL_Renderer *renderer, game *Game)
 {
-    drawMainMenu(renderer, game);
-}
-void renderTopPlayersScreen(SDL_Renderer *renderer, game *game)
-{
-    drawTopPlayers(renderer, game);
-}
-
-void renderChooseMachineGameModeScreen(SDL_Renderer *renderer, game *game)
-{
-    drawChooseMachineGameMode(renderer, game);
+    drawChooseMachineGameMode(renderer, Game);
 }

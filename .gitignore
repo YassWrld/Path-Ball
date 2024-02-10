@@ -1,7 +1,4 @@
 # ignore all . files but include . folders
 
 bin
-.old/*
 .vscode/*
-
-makefile

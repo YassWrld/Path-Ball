@@ -11,6 +11,7 @@ int randomInt(int min, int max)
     }
     return rand() % (max - min + 1) + min;
 }
+
 bool checkAllowedString(char *str)
 {
 
@@ -88,7 +89,7 @@ int graycefulDelay(Uint32 ms)
 
         if (e.type == SDL_QUIT)
         {
-            exit(0);
+
             return 1;
         }
 
@@ -137,4 +138,56 @@ void playMusic(Mix_Music *music)
     {
         printf("Mix_PlayMusic Error: %s\n", Mix_GetError());
     }
+}
+
+int QuitSDL(SDL_Window **window, SDL_Renderer **renderer)
+{
+    SDL_DestroyRenderer(*renderer);
+    SDL_DestroyWindow(*window);
+    TTF_Quit();
+    IMG_Quit();
+    Mix_Quit();
+    SDL_Quit();
+    return 0;
+}
+
+void InitializeSDL(SDL_Window **window, SDL_Renderer **renderer, char *TITLE, int WIDTH, int HEIGHT, char *ICON_PATH)
+{
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        fprintf(stderr, "SDL could not be initialized! SDL Error: %s\n", SDL_GetError());
+        // Handle the SDL error and exit or return an error code.
+    }
+
+    // Initialize SDL_ttf
+    if (TTF_Init() < 0)
+    {
+        fprintf(stderr, "SDL_ttf could not be initialized! SDL_ttf Error: %s\n", TTF_GetError());
+        // Handle the SDL_ttf error and exit or return an error code.
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        Mix_AllocateChannels(16);
+        fprintf(stderr, "SDL_mixer could not be initialized! SDL_mixer Error: %s\n", Mix_GetError());
+        // Handle the SDL_mixer error and exit or return an error code.
+    }
+
+    if (IMG_Init(IMG_INIT_PNG) < 0)
+    {
+        fprintf(stderr, "SDL_image could not be initialized! SDL_image Error: %s\n", IMG_GetError());
+        // Handle the SDL_image error and exit or return an error code.
+    }
+    *window = SDL_CreateWindow("Pinball Recall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0); // Create a window
+    *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);                                          // Create a renderer
+
+    SDL_Surface *icon = IMG_Load(ICON_PATH); // Load the icon
+
+    icon = SDL_ConvertSurfaceFormat(icon, SDL_PIXELFORMAT_RGBA8888, 0); // Convert the icon to the right format
+    SDL_SetWindowIcon(*window, icon);                                   // Set the icon
+    SDL_FreeSurface(icon);                                              // Free the icon surface
+
+    SDL_SetRenderDrawBlendMode(*renderer, SDL_BLENDMODE_BLEND);
+    SDL_RegisterEvents(1); // Register a user event (for machine mode)
+    SDL_RenderSetVSync(*renderer, true);
 }

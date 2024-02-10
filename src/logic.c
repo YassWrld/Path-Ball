@@ -80,13 +80,13 @@ void findStart(int n, int matrix[MAX_N][MAX_N], int start, int *x, int *y)
 {
     int i = 0;
     int j = 0;
-    /*if (start < 11 || start > 10 + 4 * (n - 2))
+    if (start < 11 || start > 10 + 4 * (n - 2))
     {
         *x = -1;
         *y = -1;
         return;
     }
-*/
+
     while (matrix[i][j] != start)
     {
         if (i == 0 && j < n - 1)
@@ -237,6 +237,23 @@ solution *setupMatrix(int n, int matrix[MAX_N][MAX_N])
 /*
 Score Managment Functions
 */
+void insertScore(player current)
+{
+    FILE *file = fopen(SCORES_FILE_PATH, "a");
+
+    // Check if the file was opened successfully
+    if (file == NULL)
+    {
+        printf("Error opening file!\n");
+        return; // Return an error code
+    }
+
+    // Write the player's information to the file
+    fprintf(file, "%d,%d-%d-%d,%s\n", current.score, current.date.day, current.date.month, current.date.year, current.name);
+
+    // Close the file
+    fclose(file);
+}
 
 void sortTopPlayers(player arr[])
 {
@@ -254,24 +271,6 @@ void sortTopPlayers(player arr[])
             }
         }
     }
-}
-
-void insertScore(player current)
-{
-    FILE *file = fopen(SCORES_FILE_PATH, "a");
-
-    // Check if the file was opened successfully
-    if (file == NULL)
-    {
-        printf("Error opening file!\n");
-        return; // Return an error code
-    }
-
-    // Write the player's information to the file
-    fprintf(file, "%d,%d-%d-%d,%s\n", current.score, current.date.day, current.date.month, current.date.year, current.name);
-
-    // Close the file
-    fclose(file);
 }
 
 void getTopPlayers(player players[])

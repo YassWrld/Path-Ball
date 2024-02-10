@@ -1,65 +1,5 @@
 #include <draw.h>
 
-void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a)
-{
-    if (!text || text[0] == '\0')
-    {
-        return; // Don't render anything if the text is empty
-    }
-
-    TTF_Font *font = TTF_OpenFont(fontPath, size);
-    if (!font)
-    {
-        printf("TTF_OpenFont Error: %s\n", TTF_GetError());
-        return;
-    }
-
-    SDL_Color color = {r, g, b, a};
-
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect rect = {x, y, surface->w, surface->h};
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
-
-    TTF_CloseFont(font);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
-}
-
-void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
-{
-
-    SDL_Surface *surface = IMG_Load(path);
-    if (!surface)
-    {
-        printf("IMG_Load Error: %s\n", IMG_GetError());
-        return;
-    }
-
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect rect = {x, y, w, h};
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
-}
-
-void drawHexagon(SDL_Renderer *renderer, int x, int y, int r)
-{
-    int n = 6;
-    int angle = 360 / n;
-    int x1 = x + r * SDL_cos(0);
-    int y1 = y + r * SDL_sin(0);
-
-    for (int i = 1; i <= n; i++)
-    {
-        int x2 = x + r * SDL_cos(i * angle * M_PI / 180);
-        int y2 = y + r * SDL_sin(i * angle * M_PI / 180);
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-        x1 = x2;
-        y1 = y2;
-    }
-}
-
 void drawArrow(SDL_Renderer *renderer, int x, int y, int l, direction d)
 {
 
@@ -121,32 +61,93 @@ void drawArrow(SDL_Renderer *renderer, int x, int y, int l, direction d)
     }
 }
 
-void drawBlurredBackground(SDL_Renderer *renderer)
+void drawHexagon(SDL_Renderer *renderer, int x, int y, int r)
 {
-    SDL_SetRenderDrawColor(renderer, BLUR_BACKGROUND_COLOR);
+    int n = 6;
+    int angle = 360 / n;
+    int x1 = x + r * SDL_cos(0);
+    int y1 = y + r * SDL_sin(0);
 
-    int x = 0, y = 0;
-    int radius = 50;
-
-    while (x <= WIDTH / 2)
+    for (int i = 1; i <= n; i++)
     {
-        while (y <= HEIGHT / 2)
-        {
-            drawHexagon(renderer, x, y, radius);
-            drawHexagon(renderer, WIDTH - x, HEIGHT - y, radius);
-
-            if (y != HEIGHT - y && x != WIDTH - x)
-            {
-
-                drawHexagon(renderer, x, HEIGHT - y, radius);
-                drawHexagon(renderer, WIDTH - x, y, radius);
-            }
-
-            y += radius;
-        }
-        x += radius;
-        y = 0;
+        int x2 = x + r * SDL_cos(i * angle * M_PI / 180);
+        int y2 = y + r * SDL_sin(i * angle * M_PI / 180);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+        x1 = x2;
+        y1 = y2;
     }
+}
+void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius)
+{
+    int x = radius - 1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+
+    while (x >= y)
+    {
+        SDL_RenderDrawLine(renderer, centerX + x, centerY - y, centerX - x, centerY - y);
+        SDL_RenderDrawLine(renderer, centerX + x, centerY + y, centerX - x, centerY + y);
+        SDL_RenderDrawLine(renderer, centerX + y, centerY - x, centerX - y, centerY - x);
+        SDL_RenderDrawLine(renderer, centerX + y, centerY + x, centerX - y, centerY + x);
+
+        if (err <= 0)
+        {
+            y++;
+            err += dy;
+            dy += 2;
+        }
+        if (err > 0)
+        {
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
+}
+
+void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h)
+{
+
+    SDL_Surface *surface = IMG_Load(path);
+    if (!surface)
+    {
+        printf("IMG_Load Error: %s\n", IMG_GetError());
+        return;
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect = {x, y, w, h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
+void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a)
+{
+    if (!text || text[0] == '\0')
+    {
+        return; // Don't render anything if the text is empty
+    }
+
+    TTF_Font *font = TTF_OpenFont(fontPath, size);
+    if (!font)
+    {
+        printf("TTF_OpenFont Error: %s\n", TTF_GetError());
+        return;
+    }
+
+    SDL_Color color = {r, g, b, a};
+
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect = {x, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+    TTF_CloseFont(font);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 void drawButton(SDL_Renderer *renderer, button *Button)
@@ -195,7 +196,7 @@ void drawButton(SDL_Renderer *renderer, button *Button)
     {
         drawImage(renderer, Button->iconPath, blankMiddle - iconSize / 2, y - iconSize / 2, iconSize, iconSize);
     }
-    // rounded corners
+
     if (len == 0)
         return;
     color = Button->textColor;
@@ -205,35 +206,259 @@ void drawButton(SDL_Renderer *renderer, button *Button)
     writeText(renderer, GAMEPAUSED_FONT, Button->label, fontStartX, y - fontSize / 2, fontSize, color.r, color.g, color.b, color.a);
 }
 
-void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius)
+void drawBlurredBackground(SDL_Renderer *renderer)
 {
-    int x = radius - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius << 1);
+    SDL_SetRenderDrawColor(renderer, BLUR_BACKGROUND_COLOR);
 
-    while (x >= y)
+    int x = 0, y = 0;
+    int radius = 50;
+
+    while (x <= WIDTH / 2)
     {
-        SDL_RenderDrawLine(renderer, centerX + x, centerY - y, centerX - x, centerY - y);
-        SDL_RenderDrawLine(renderer, centerX + x, centerY + y, centerX - x, centerY + y);
-        SDL_RenderDrawLine(renderer, centerX + y, centerY - x, centerX - y, centerY - x);
-        SDL_RenderDrawLine(renderer, centerX + y, centerY + x, centerX - y, centerY + x);
+        while (y <= HEIGHT / 2)
+        {
+            drawHexagon(renderer, x, y, radius);
+            drawHexagon(renderer, WIDTH - x, HEIGHT - y, radius);
 
-        if (err <= 0)
-        {
-            y++;
-            err += dy;
-            dy += 2;
+            if (y != HEIGHT - y && x != WIDTH - x)
+            {
+
+                drawHexagon(renderer, x, HEIGHT - y, radius);
+                drawHexagon(renderer, WIDTH - x, y, radius);
+            }
+
+            y += radius;
         }
-        if (err > 0)
-        {
-            x--;
-            dx += 2;
-            err += dx - (radius << 1);
-        }
+        x += radius;
+        y = 0;
     }
 }
+void drawMainMenu(SDL_Renderer *renderer, game *Game)
+{
+    // background
+    // title
+    char text[100];
+    int fontSize = 90;
+    // draw the title and the logo of the game the logo is next to the title
+    sprintf(text, GAME_TITLE);
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    int logoSize = fontSize * 1.5;
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - logoSize / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+    drawImage(renderer, NOBG_ICON_PATH, WIDTH / 2 + w / 2 - logoSize / 2, HEIGHT / 8 - logoSize / 3, logoSize, logoSize);
+
+    // play button
+    button playerGameModeButton = {
+        WIDTH / 2,
+        HEIGHT / 2,
+        200,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "Player Mode",
+        HUMAN_ICON_PATH
+
+    };
+    Game->buttons.PlayerGameMode = playerGameModeButton;
+    drawButton(renderer, &playerGameModeButton);
+
+    // machine button
+    button machineGameModeButton = {
+        WIDTH / 2,
+        HEIGHT / 2 + 100,
+        200,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "Machine Mode",
+        ROBOT_ICON_PATH
+
+    };
+    Game->buttons.MachineGameMode = machineGameModeButton;
+
+    drawButton(renderer, &machineGameModeButton);
+
+    // top players button
+    button topPlayersButton = {
+        WIDTH / 2,
+        HEIGHT / 2 + 200,
+        200,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "Top Players",
+        CROWN_ICON_PATH
+
+    };
+    Game->buttons.TopPlayers = topPlayersButton;
+
+    drawButton(renderer, &topPlayersButton);
+}
+
+void drawTopPlayers(SDL_Renderer *renderer, game *Game)
+{
+
+    // title
+    char text[100];
+    int fontSize = 90;
+    sprintf(text, "Top Players");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 12, fontSize, FONT_COLOR);
+    SDL_SetRenderDrawColor(renderer, FONT_COLOR);
+
+
+    fontSize = 30;
+    // top players
+    static bool loaded = false;
+    static int maxNameW = 0;
+    static int maxScoreW = 0;
+    static int maxTextW = 0;
+    int iconSize = fontSize * 1.5;
+    int gap = 50;
+    player *players = Game->helpers.topPlayers;
+    if (!loaded || Game->helpers.updatedTopPlayers)
+    {
+        getTopPlayers(Game->helpers.topPlayers);
+
+        loaded = true;
+        Game->helpers.updatedTopPlayers = false;
+        for (int i = 0; i < 5; i++)
+        {
+            sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
+            int nameW = mesureTextWidth(GAMEPAUSED_FONT, players[i].name, fontSize);
+            sprintf(text, "%d", players[i].score);
+            int scoreW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+            sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
+            int dateW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+            int fullW = nameW + scoreW + dateW + 2 * gap + iconSize;
+
+            if (fullW > w)
+                maxTextW = fullW;
+            if (nameW > maxNameW)
+                maxNameW = nameW;
+            if (scoreW > maxScoreW)
+                maxScoreW = scoreW;
+        }
+    }
+    // icons ,first.png , second.png , third.png
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (players[i].score == 0)
+            break;
+
+        sprintf(text, players[i].name);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+        sprintf(text, "%d", players[i].score);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+
+        sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
+        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + maxScoreW + 2 * gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
+
+        if (i < 3)
+        {
+            char *iconPath = i == 0 ? FIRST_ICON_PATH : i == 1 ? SECOND_ICON_PATH
+                                                               : THIRD_ICON_PATH;
+            drawImage(renderer, iconPath, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.4);
+        }
+        else
+        {
+            sprintf(text, "%d", i + 1);
+            writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize * 1.5, FONT_COLOR);
+        }
+    }
+    // back button in the top left corner
+    button backButton = {
+        60,
+        60,
+        100,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "back",
+        BACK_ICON_PATH};
+    Game->buttons.MainMenu = backButton;
+    drawButton(renderer, &backButton);
+}
+
+void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game)
+{
+
+    // title
+    char text[100];
+    int fontSize = 64;
+    sprintf(text, "Choose Machine Game Mode");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
+
+    // 2 play buttons one for auto and one for manual both are in the middle of the screen
+
+    // auto button
+    button machineGameAutoModeButton = {
+        WIDTH / 2 - 100 - 5,
+        HEIGHT / 2,
+        200,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "Auto",
+        AUTO_ICON_PATH
+
+    };
+    Game->buttons.MachineGameAutoMode = machineGameAutoModeButton;
+    drawButton(renderer, &machineGameAutoModeButton);
+
+    // manual button
+
+    button machineGameManualModeButton = {
+        WIDTH / 2 + 100 + 5,
+        HEIGHT / 2,
+        200,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "Manual",
+        MANUAL_ICON_PATH
+
+    };
+    Game->buttons.MachineGameManualMode = machineGameManualModeButton;
+    drawButton(renderer, &machineGameManualModeButton);
+
+    button backButton = {
+        60,
+        60,
+        100,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "back",
+        BACK_ICON_PATH};
+    Game->buttons.MainMenu = backButton;
+    drawButton(renderer, &backButton);
+}
+
 void drawTextInput(SDL_Renderer *renderer, game *Game)
 {
 
@@ -673,11 +898,11 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
         centerY + 170,
         200,
         50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
         "Pause Game",
         PAUSE_ICON_PATH
 
@@ -692,11 +917,11 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
         pauseButton.centerY + 100,
         200,
         50,
-        {255, 0, 0, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
+        {BUTTON_SECONDARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
         "Save & Quit",
         SAVE_ICON_PATH
 
@@ -727,11 +952,11 @@ void drawPause(SDL_Renderer *renderer, game *Game)
         HEIGHT / 2,
         200,
         50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
         "Resume",
         RESUME_ICON_PATH
 
@@ -746,11 +971,11 @@ void drawPause(SDL_Renderer *renderer, game *Game)
         HEIGHT / 2 + 100,
         200,
         50,
-        {255, 0, 0, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
+        {BUTTON_SECONDARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
         "Save & Exit",
         SAVE_ICON_PATH
 
@@ -791,11 +1016,11 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
         HEIGHT / 2 + 100,
         200,
         50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
         "Play Again",
         AGAIN_ICON_PATH};
 
@@ -810,11 +1035,11 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
         HEIGHT / 2 + 200,
         200,
         50,
-        {255, 0, 0, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
+        {BUTTON_SECONDARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
         "Exit",
         EXIT_ICON_PATH
 
@@ -822,235 +1047,6 @@ void drawGameOver(SDL_Renderer *renderer, game *Game)
 
     Game->buttons.MainMenu = saveAndExitButton;
     drawButton(renderer, &saveAndExitButton);
-}
-
-void drawMainMenu(SDL_Renderer *renderer, game *Game)
-{
-    // background
-    // title
-    char text[100];
-    int fontSize = 90;
-    // draw the title and the logo of the game the logo is next to the title
-    sprintf(text, GAME_TITLE);
-    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    int logoSize = fontSize * 1.5;
-
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2 - logoSize / 2, HEIGHT / 8, fontSize, FONT_COLOR);
-    drawImage(renderer, NOBG_ICON_PATH, WIDTH / 2 + w / 2 - logoSize / 2, HEIGHT / 8 - logoSize / 3, logoSize, logoSize);
-
-    // play button
-    button playerGameModeButton = {
-        WIDTH / 2,
-        HEIGHT / 2,
-        200,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "Player Mode",
-        HUMAN_ICON_PATH
-
-    };
-    Game->buttons.PlayerGameMode = playerGameModeButton;
-    drawButton(renderer, &playerGameModeButton);
-
-    // machine button
-    button machineGameModeButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 100,
-        200,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "Machine Mode",
-        ROBOT_ICON_PATH
-
-    };
-    Game->buttons.MachineGameMode = machineGameModeButton;
-
-    drawButton(renderer, &machineGameModeButton);
-
-    // top players button
-    button topPlayersButton = {
-        WIDTH / 2,
-        HEIGHT / 2 + 200,
-        200,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "Top Players",
-        CROWN_ICON_PATH
-
-    };
-    Game->buttons.TopPlayers = topPlayersButton;
-
-    drawButton(renderer, &topPlayersButton);
-}
-void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game)
-{
-
-    // title
-    char text[100];
-    int fontSize = 64;
-    sprintf(text, "Choose Machine Game Mode");
-    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 8, fontSize, FONT_COLOR);
-
-    // 2 play buttons one for auto and one for manual both are in the middle of the screen
-
-    // auto button
-    button machineGameAutoModeButton = {
-        WIDTH / 2 - 100 - 5,
-        HEIGHT / 2,
-        200,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "Auto",
-        AUTO_ICON_PATH
-
-    };
-    Game->buttons.MachineGameAutoMode = machineGameAutoModeButton;
-    drawButton(renderer, &machineGameAutoModeButton);
-
-    // manual button
-
-    button machineGameManualModeButton = {
-        WIDTH / 2 + 100 + 5,
-        HEIGHT / 2,
-        200,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "Manual",
-        MANUAL_ICON_PATH
-
-    };
-    Game->buttons.MachineGameManualMode = machineGameManualModeButton;
-    drawButton(renderer, &machineGameManualModeButton);
-
-    button backButton = {
-        60,
-        60,
-        100,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "back",
-        BACK_ICON_PATH};
-    Game->buttons.MainMenu = backButton;
-    drawButton(renderer, &backButton);
-}
-void drawTopPlayers(SDL_Renderer *renderer, game *Game)
-{
-
-    // title
-    char text[100];
-    int fontSize = 90;
-    sprintf(text, "Top Players");
-    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-    writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - w / 2, HEIGHT / 12, fontSize, FONT_COLOR);
-    SDL_SetRenderDrawColor(renderer, FONT_COLOR);
-    /*
-        for (int i = 0; i < 4; i++)
-        {
-            SDL_RenderDrawLine(renderer, WIDTH / 2 - w / 2, HEIGHT / 12 + fontSize + i, WIDTH / 2 + w / 2, HEIGHT / 12 + fontSize + i);
-        }
-    */
-
-    fontSize = 30;
-    // top players
-    static bool loaded = false;
-    static int maxNameW = 0;
-    static int maxScoreW = 0;
-    static int maxTextW = 0;
-    int iconSize = fontSize * 1.5;
-    int gap = 50;
-    player *players = Game->helpers.topPlayers;
-    if (!loaded || Game->helpers.updatedTopPlayers)
-    {
-        getTopPlayers(Game->helpers.topPlayers);
-
-        loaded = true;
-        Game->helpers.updatedTopPlayers = false;
-        for (int i = 0; i < 5; i++)
-        {
-            sprintf(text, "%s %d %d-%d-%d", players[i].name, players[i].score, players[i].date.day, players[i].date.month + 1, players[i].date.year);
-            int nameW = mesureTextWidth(GAMEPAUSED_FONT, players[i].name, fontSize);
-            sprintf(text, "%d", players[i].score);
-            int scoreW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-            sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
-            int dateW = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
-
-            int fullW = nameW + scoreW + dateW + 2 * gap + iconSize;
-
-            if (fullW > w)
-                maxTextW = fullW;
-            if (nameW > maxNameW)
-                maxNameW = nameW;
-            if (scoreW > maxScoreW)
-                maxScoreW = scoreW;
-        }
-    }
-    // icons ,first.png , second.png , third.png
-
-    for (int i = 0; i < 5; i++)
-    {
-        if (players[i].score == 0)
-            break;
-
-        sprintf(text, players[i].name);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
-        sprintf(text, "%d", players[i].score);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
-
-        sprintf(text, "%d-%d-%d", players[i].date.day, players[i].date.month + 1, players[i].date.year);
-        writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 + iconSize + maxNameW + maxScoreW + 2 * gap, HEIGHT / 5 + 100 * (i + 1), fontSize, FONT_COLOR);
-
-        if (i < 3)
-        {
-            char *iconPath = i == 0 ? FIRST_ICON_PATH : i == 1 ? SECOND_ICON_PATH
-                                                               : THIRD_ICON_PATH;
-            drawImage(renderer, iconPath, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize, iconSize * 1.4);
-        }
-        else
-        {
-            sprintf(text, "%d", i + 1);
-            writeText(renderer, GAMEPAUSED_FONT, text, WIDTH / 2 - maxTextW / 2 - iconSize / 2, HEIGHT / 5 + 100 * (i + 1) - iconSize / 2, iconSize * 1.5, FONT_COLOR);
-        }
-    }
-    // back button in the top left corner
-    button backButton = {
-        60,
-        60,
-        100,
-        50,
-        {0, 169, 157, 255},
-        {255, 255, 0, 255},
-        {255, 255, 255, 255},
-        {0, 0, 0, 255},
-        4,
-        "back",
-        BACK_ICON_PATH};
-    Game->buttons.MainMenu = backButton;
-    drawButton(renderer, &backButton);
 }
 
 int mesureTextWidth(char *fontPath, char *text, int size)
@@ -1252,7 +1248,7 @@ bool compareColor(SDL_Color color, int r, int g, int b, int a)
     return (r == color.r) && (g == color.g) && (b == color.b) && (a = color.a);
 }
 
-bool isClickInButton(SDL_Event event,game *Game, button Button)
+bool isClickInButton(SDL_Event event, game *Game, button Button)
 {
     if (event.type != SDL_MOUSEBUTTONUP || event.button.button != SDL_BUTTON_LEFT)
         return false;

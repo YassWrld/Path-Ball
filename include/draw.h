@@ -22,41 +22,46 @@
 #define THICKNESS 4   // thickness of the lines
 
 // Color Palette
-#define TAN 227, 180, 122, 255       // Tan
-#define DARK_ORANGE 141, 64, 47, 255 // Dark Orange
+#define TAN 227, 180, 122, 255       // Color Tan
+#define DARK_ORANGE 141, 64, 47, 255 // Color Dark Orange
 
+#define BACKGROUND_COLOR 94, 26, 32, 255 // Background Color (Dark Red)
 
+#define BLUR_BACKGROUND_COLOR 180, 134, 88, 30 // Blurred Background Color (Light Brown)
 
-#define BACKGROUND_COLOR 94, 26, 32, 255 // Dark Red
+#define DIAGONAL_COLOR TAN // Diagonal Color (Tan)
 
-#define BLUR_BACKGROUND_COLOR 180, 134, 88, 30 // Light Brown
+#define BORDER_COLOR 190, 121, 79, 255 // Border Color (Brown)
 
-#define DIAGONAL_COLOR TAN // Tan
+#define SMALL_CIRCLE_COLOR DARK_ORANGE // Small Circle Color (Dark Orange)
 
-#define BORDER_COLOR 190, 121, 79, 255 // Brown
+#define HOVER_CIRCLE_COLOR TAN // Hover Circle Color (Tan)
 
-#define SMALL_CIRCLE_COLOR DARK_ORANGE // Dark Orange
+#define SELECTED_CIRCLE_COLOR 40, 80, 128, 255 // Selected Circle Color (Dark Blue)
 
-#define HOVER_CIRCLE_COLOR TAN // Tan
+#define PATH_COLOR 0, 169, 157, 255 // Path Color (Turquoise)
 
-#define SELECTED_CIRCLE_COLOR 40, 80, 128, 255 // Dark Blue
+#define CIRCLE_OUTLINE_COLOR 241, 237, 232, 255 // Circle Outline Color (Light Grey)
 
-#define PATH_COLOR 0, 169, 157, 255 // Turquoise
+#define WRONG_CIRCLE_COLOR 255, 0, 0, 255 // Wrong Circle Color (Red)
+#define START_CIRCLE_COLOR PATH_COLOR     // Start Circle Color (Turquoise)
 
-#define CIRCLE_OUTLINE_COLOR 241, 237, 232, 255 // Light Gray
+#define END_CIRCLE_COLOR 0, 255, 0, 255 // End Circle Color (Green)
 
-#define WRONG_CIRCLE_COLOR 255, 0, 0, 255 // Red
-#define START_CIRCLE_COLOR PATH_COLOR     // like the path color (Turquoise)
+#define SIDE_BAR_COLOR TAN // Inner Side Bar Color (Tan)
 
-#define END_CIRCLE_COLOR 0, 255, 0, 255 // Green
+#define SIDE_BAR_OUTLINE_COLOR DARK_ORANGE // Outer Side Bar Color (Dark Orange)
 
-#define SIDE_BAR_COLOR TAN // Tan
+#define DISPLAY_BOX_COLOR 190, 121, 79, 255 // Display Box Color (Brown)
 
-#define SIDE_BAR_OUTLINE_COLOR DARK_ORANGE // Dark Orange
+#define FONT_COLOR 0, 0, 0, 255 // Default Font Color (Black)
 
-#define DISPLAY_BOX_COLOR 190, 121, 79, 255 // Brown
-
-#define FONT_COLOR 0, 0, 0, 255 // black
+#define BUTTON_PRIMARY_COLOR PATH_COLOR       // Button Primary Color (Turquoise)
+#define BUTTON_SECONDARY_COLOR 255, 0, 0, 255 // Button Secondary Color (Red)
+#define BUTTON_HOVER_COLOR 255, 255, 0, 255   // Button Hover Color (Yellow)
+#define BUTTON_LABEL_COLOR 255, 255, 255, 255 // Button Label Color (White)
+#define BUTTON_OUTLINE_COLOR 0, 0, 0, 255     // Button Outline Color (Black)
+#define BUTTON_OUTLINE_THICKNESS 4            // Button Outline Thickness
 
 #define GAMEPAUSED_FONT "assets/fonts/gamepaused.otf" // game paused font path
 
@@ -83,24 +88,51 @@
 // components drawing functions
 
 /**
- * @brief Blurred background drawing (Hexagons pattern) 
+ * @brief Draws an arrow
+ *
+ * (Draws an arrow at the specified position with the specified length and direction)
+ *
  * @param renderer: SDL_Renderer pointer
+ * @param x: x coordinate of the arrow's starting point
+ * @param y: y coordinate of the arrow's starting point
+ * @param l: length of the arrow
+ * @param d: direction of the arrow (up, down, left, right)
  * @return void
-*/
-void drawBlurredBackground(SDL_Renderer *renderer);       
+ */
+void drawArrow(SDL_Renderer *renderer, int x, int y, int l, direction d);
+
+/**
+ * @brief Draws a hexagon
+ *
+ * (Draws a hexagon at the specified position with the specified radius)
+ *
+ * @param renderer: SDL_Renderer pointer
+ * @param x: x coordinate of the hexagon's center
+ * @param y: y coordinate of the hexagon's center
+ * @param r: radius of the hexagon
+ * @return void
+ */
+void drawHexagon(SDL_Renderer *renderer, int x, int y, int r);
+
 
 /**
  * @brief Filled circle drawing
+ *
+ * (Draws a filled circle on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
- * @param centerX: center x
- * @param centerY: center y
- * @param radius: radius
+ * @param centerX: x coordinate of the circle center
+ * @param centerY: y coordinate of the circle center
+ * @param radius: radius of the circle
  * @return void
-*/                       
+ */
 void drawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius);
 
 /**
  * @brief Image drawing
+ *
+ * (Draws an image on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param path: path to the image file
  * @param x: x coordinate of the top-left corner of the image
@@ -113,6 +145,9 @@ void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
 
 /**
  * @brief Text writing
+ *
+ * (Writes text on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param fontPath: path to the font file
  * @param text: text to be written
@@ -125,19 +160,37 @@ void drawImage(SDL_Renderer *renderer, char *path, int x, int y, int w, int h);
  * @param a: alpha (transparency) component of the font color
  * @return void
  */
-void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a); 
+void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y, int size, int r, int g, int b, int a);
 
 /**
  * @brief Button Drawing
+ *
+ * (Draws a button on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Button: pointer to a button structure
  * @return void
  */
-void drawButton(SDL_Renderer *renderer, button *Button);                                          
+void drawButton(SDL_Renderer *renderer, button *Button);
 
-// screens drawing functions
+/**
+ * @brief Blurred background drawing (Hexagons pattern)
+ *
+ * (Draws a blurred background with a hexagons pattern)
+ *
+ * @param renderer: SDL_Renderer pointer
+ * @return void
+ */
+void drawBlurredBackground(SDL_Renderer *renderer);
+
+
+// Screens drawing functions
+
 /**
  * @brief Main menu drawing
+ *
+ * (Draws the main menu screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -146,6 +199,9 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Top players drawing
+ *
+ * (Draws the top players screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -154,20 +210,22 @@ void drawTopPlayers(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Choose machine game mode drawing
+ *
+ * (Draws the choose machine game mode screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
  */
 void drawChooseMachineGameMode(SDL_Renderer *renderer, game *Game);
 
-
-
-
 // Game drawing functions
-
 
 /**
  * @brief Text input
+ *
+ * (Draws text input on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -176,6 +234,9 @@ void drawTextInput(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Grid (matrix)
+ *
+ * (Draws the grid (matrix) on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -184,6 +245,9 @@ void drawGrid(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Diagonal
+ *
+ * (Draws a diagonal line on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param n: size of the diagonal
  * @param direction: direction of the diagonal (0 for left, 1 for right)
@@ -193,24 +257,36 @@ void drawGrid(SDL_Renderer *renderer, game *Game);
  */
 void drawDiagonal(SDL_Renderer *renderer, int n, int direction, int centerX, int centerY);
 
-/**
- * @brief Path
- * @param renderer: SDL_Renderer pointer
- * @param Game: pointer to the game structure
- * @return bool: true if path is successfully drawn, false otherwise
- */
-bool drawPath(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Side bar
+ *
+ * (Draws the side bar on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
  */
 void drawSideBar(SDL_Renderer *renderer, game *Game);
 
+
+/**
+ * @brief Path
+ *
+ * (Draws the path on the screen)
+ *
+ * @param renderer: SDL_Renderer pointer
+ * @param Game: pointer to the game structure
+ * @return bool: true if path is successfully drawn, false otherwise
+ */
+bool drawPath(SDL_Renderer *renderer, game *Game);
+
+
 /**
  * @brief Game over
+ *
+ * (Draws the game over screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -219,6 +295,9 @@ void drawGameOver(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Pause
+ *
+ * (Draws the pause screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -227,6 +306,9 @@ void drawPause(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Machine Fill the matrix
+ *
+ * (Fills the matrix for the machine mode)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param n: size of the matrix
  * @param matrix: the matrix to be filled
@@ -236,6 +318,9 @@ void machineModeMemorize(SDL_Renderer *renderer, int n, int matrix[MAX_N][MAX_N]
 
 /**
  * @brief Machine Find the start and end
+ *
+ * (Finds the start and end points for the machine mode)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param n: size of the matrix
  * @param matrix: the matrix
@@ -247,6 +332,9 @@ void machineModeSelecting(SDL_Renderer *renderer, int n, int matrix[MAX_N][MAX_N
 
 /**
  * @brief Machine Send the virtual click
+ *
+ * (Sends the virtual click for the machine mode)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param Game: pointer to the game structure
  * @return void
@@ -255,6 +343,9 @@ void machineModeChoosing(SDL_Renderer *renderer, game *Game);
 
 /**
  * @brief Get matrix logic click (i, j) from screen click (x, y)
+ *
+ * (Converts screen click coordinates to matrix logic coordinates)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param clickX: x coordinate of the screen click
  * @param clickY: y coordinate of the screen click
@@ -268,6 +359,9 @@ void getMatrixClick(SDL_Renderer *renderer, int clickX, int clickY, int n, int *
 
 /**
  * @brief Get pixel color from the screen
+ *
+ * (Retrieves the color of a pixel on the screen)
+ *
  * @param renderer: SDL_Renderer pointer
  * @param pixel_X: x coordinate of the pixel
  * @param pixel_Y: y coordinate of the pixel
@@ -277,6 +371,9 @@ SDL_Color getPixelColor(SDL_Renderer *renderer, int pixel_X, int pixel_Y);
 
 /**
  * @brief Compare color struct with a given color
+ *
+ * (Compares a color struct with a given color)
+ *
  * @param color: SDL_Color struct representing the color
  * @param r: red component of the color
  * @param g: green component of the color
@@ -288,6 +385,9 @@ bool compareColor(SDL_Color color, int r, int g, int b, int a);
 
 /**
  * @brief Measure text width (for centering)
+ *
+ * (Measures the width of a text for centering purposes)
+ *
  * @param fontPath: path to the font file
  * @param text: text whose width needs to be measured
  * @param size: size of the font
@@ -297,6 +397,9 @@ int mesureTextWidth(char *fontPath, char *text, int size);
 
 /**
  * @brief Check if a click event occurs inside a button
+ *
+ * (Checks if a click event occurs inside a button)
+ *
  * @param event: SDL_Event containing the click event
  * @param Game: pointer to the game structure
  * @param Button: button structure to check against
