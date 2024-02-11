@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a game project for University of Tecknology and Sciences Houari Boumediene (USTHB) in Algiers, Algeria. It's a 2D p puzzle game made with SDL2 and C.
+This is a game project for the University of Technology and Sciences Houari Boumediene (USTHB) in Algiers, Algeria. It's a 2D puzzle game made with SDL2 and C.
 
 ## Game Description
 
@@ -10,13 +10,15 @@ In Path Ball, your objective is to remember the positions of various bumpers bef
 
 ## How to play
 
-The game is played with the mouse/keyboard. The player has to remember the position of the bumpers for a few seconds (3s default), then the bumpers disappear and the ball start position is shown, the player has to predict the path and the final position of the ball and click on it. The player has 3 lives, if he misses 3 times, he loses a level, if he wins 3 times in a row, he goes to the next level, losing in the first level means game over, winning the last level (10) means winning the game.
+The game is played with the mouse or keyboard. The player has to remember the position of the bumpers for a few seconds (3s default), then the bumpers disappear and the ball start position is shown. The player has to predict the path and the final position of the ball and click on it. The player has 3 lives; if he misses 3 times, he loses a level; if he wins 3 times in a row, he goes to the next level; losing in the first level means game over; winning the last level (10) means winning the game.
 
 ## Game Modes
 
 - `Player Mode` : **The normal mode of the game , the player has to predict the path of the ball.**
 - `Machine Auto Mode` : **The machine sets the bumpers and predicts the path of the ball and selects the final position.**
 - `Machine Manual Mode` : **The Player sets the bumpers and chooses the start position of the ball and the machine predicts the path and selects the final position.**
+
+**Note :** _In the machine modes,the machine never misses. Besides, the machine doesn't have access to the logic of the game (the game matrix), it only has access to the screen. It reads the pixels of the screen to get the positions of the bumpers and the start position of the ball and builds a different matrix to simulate the game._
 
 ## Folder Structure
 
@@ -60,6 +62,27 @@ are named the same as the source file but with a</u> `.h` <u>extension and conta
 -`Yahiaoui Abderrahmane` : **[GitHub](https://github.com/Abdo30004) / [Discord](https://discordapp.com/users/760952710383665192)**
 
 -`Oubyi Mohamed Yacine` : **[GitHub](https://github.com/YassWrld) / [Discord](https://discordapp.com/users/989586655612645467)**
+
+
+## Screenshots
+
+#### Main Menu
+![MainMenu](https://i.imgur.com/30131QL.png "MainMenu")
+
+
+#### Main Game
+
+![MainGame](https://i.imgur.com/lFCimpK.png "MainGame")
+
+#### Game Over
+
+![GameOver](https://i.imgur.com/NiVoFQy.png "GameOver")
+
+#### Top Players
+![TopPlayers](https://i.imgur.com/sTy9Fyk.png "TopPlayers")
+
+
+
 
 ## License
 

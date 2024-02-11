@@ -15,11 +15,11 @@
 
 #define GAME_TITLE "Path Ball"
 
-#define WINDOW_HEIGHT 700    // window height
-#define WINDOW_WIDTH 1100    // window width
-#define GRID_SIZE 580 // grid size (square)
-#define OFFSET 60     // offset from the top left corner of the window
-#define THICKNESS 4   // thickness of the lines
+#define WINDOW_HEIGHT 700 // window height
+#define WINDOW_WIDTH 1100 // window width
+#define GRID_SIZE 580     // grid size (square)
+#define OFFSET 60         // offset from the top left corner of the window
+#define THICKNESS 4       // thickness of the lines
 
 // Color Palette
 #define TAN 227, 180, 122, 255       // Color Tan

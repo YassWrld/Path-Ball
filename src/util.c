@@ -191,5 +191,5 @@ void InitializeSDL(SDL_Window **window, SDL_Renderer **renderer, char *TITLE, in
 
     SDL_SetRenderDrawBlendMode(*renderer, SDL_BLENDMODE_BLEND);
     SDL_RegisterEvents(1);               // Register a user event (for machine mode virtual clicks)
-   // SDL_RenderSetVSync(*renderer, true); // Enable VSync (to cap the frame rate)
+    SDL_RenderSetVSync(*renderer, true); // Enable VSync (to cap the frame rate)
 }
