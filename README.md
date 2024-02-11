@@ -2,15 +2,15 @@
 
 ## Description
 
-**This is a game project for University of Tecknology and Sciences Houari Boumediene (USTHB) in Algiers, Algeria. It's a 2D p puzzle game made with SDL2 and C.**
+This is a game project for University of Tecknology and Sciences Houari Boumediene (USTHB) in Algiers, Algeria. It's a 2D p puzzle game made with SDL2 and C.
 
 ## Game Description
 
-**In Path Ball, your objective is to remember the positions of various bumpers before they disappear. This task extends beyond simple memorization, requiring players to mentally simulate how the ball will rebound off these bumpers and predict its subsequent trajectory. This challenge not only tests your ability to retain information but also demands the analytical skill to interpret and anticipate the ball's movements, making it a cognitive exercise that involves both memory and strategic reasoning.**
+In Path Ball, your objective is to remember the positions of various bumpers before they disappear. This task extends beyond simple memorization, requiring players to mentally simulate how the ball will rebound off these bumpers and predict its subsequent trajectory. This challenge not only tests your ability to retain information but also demands the analytical skill to interpret and anticipate the ball's movements, making it a cognitive exercise that involves both memory and strategic reasoning.
 
 ## How to play
 
-**The game is played with the mouse/keyboard. The player has to remember the position of the bumpers for a few seconds (3s default), then the bumpers disappear and the ball start position is shown, the player has to predict the path and the final position of the ball and click on it. The player has 3 lives, if he misses 3 times, he loses a level, if he wins 3 times in a row, he goes to the next level, losing in the first level means game over, winning the last level (10) means winning the game.**
+The game is played with the mouse/keyboard. The player has to remember the position of the bumpers for a few seconds (3s default), then the bumpers disappear and the ball start position is shown, the player has to predict the path and the final position of the ball and click on it. The player has 3 lives, if he misses 3 times, he loses a level, if he wins 3 times in a row, he goes to the next level, losing in the first level means game over, winning the last level (10) means winning the game.
 
 ## Game Modes
 
