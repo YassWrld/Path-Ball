@@ -1,4 +1,4 @@
-# ignore all . files but include . folders
-
-bin
+# Ignore compiled files / vscode config files
+bin/*.dll
+bin/*.exe
 .vscode/*
