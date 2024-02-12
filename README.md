@@ -63,12 +63,11 @@ are named the same as the source file but with a</u> `.h` <u>extension and conta
 
 -`Oubyi Mohamed Yacine` : **[GitHub](https://github.com/YassWrld) / [Discord](https://discordapp.com/users/989586655612645467)**
 
-
 ## Screenshots
 
 #### Main Menu
-![MainMenu](https://i.imgur.com/30131QL.png "MainMenu")
 
+![MainMenu](https://i.imgur.com/30131QL.png "MainMenu")
 
 #### Main Game
 
@@ -79,10 +78,8 @@ are named the same as the source file but with a</u> `.h` <u>extension and conta
 ![GameOver](https://i.imgur.com/NiVoFQy.png "GameOver")
 
 #### Top Players
-![TopPlayers](https://i.imgur.com/sTy9Fyk.png "TopPlayers")
 
-
-
+![TopPlayers](https://i.imgur.com/en10ABv.png "TopPlayers")
 
 ## License
 
