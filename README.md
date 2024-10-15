@@ -58,10 +58,9 @@ are named the same as the source file but with a</u> `.h` <u>extension and conta
 - **For windows, don't forget to add the dlls to the `bin/` folder (not included in the repository).**
 
 ## Authors
+-`Yahiaoui Abderrahmane` : **[GitHub](https://github.com/Abdo30004) / [Discord](https://discordapp.com/users/760952710383665192)**
 
 -`Oubyi Mohamed Yacine` : **[GitHub](https://github.com/YassWrld) / [Discord](https://discordapp.com/users/989586655612645467)**
-
--`Yahiaoui Abderrahmane` : **[GitHub](https://github.com/Abdo30004) / [Discord](https://discordapp.com/users/760952710383665192)**
 
 
 ## Screenshots
