@@ -67,19 +67,19 @@ are named the same as the source file but with a</u> `.h` <u>extension and conta
 
 #### Main Menu
 
-![MainMenu](https://i.imgur.com/30131QL.png "MainMenu")
+![MainMenu](./assets/github/main-menu.png "MainMenu")
 
 #### Main Game
 
-![MainGame](https://i.imgur.com/lFCimpK.png "MainGame")
+![MainGame](./assets/github/main-game.png "MainGame")
 
 #### Game Over
 
-![GameOver](https://i.imgur.com/NiVoFQy.png "GameOver")
+![GameOver](./assets/github/game-over.png "GameOver")
 
 #### Top Players
 
-![TopPlayers](https://i.imgur.com/en10ABv.png "TopPlayers")
+![TopPlayers](./assets/github/top-players-latest.png "TopPlayers")
 
 ## License
 

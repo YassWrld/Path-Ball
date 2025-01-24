@@ -3,7 +3,7 @@ all: clean build run
 
 current_date := $(shell powershell Get-Date -Format "-dd-MM-HH-mm-ss")
 
-sdlPath := C:\SDL2
+sdlPath := C:\dev\SDL2
 src := src/*.c
 linkers = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer  
 includes = -I include -I $(sdlPath)\include -I $(sdlPath)\include\SDL2
