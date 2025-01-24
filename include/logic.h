@@ -69,7 +69,7 @@ typedef struct player // player struct
     date_t date;                // date of the game
 } player;
 
-typedef struct Button // button struct
+typedef struct button // button struct
 {
     int centerX, centerY;   // center of the button
     int width, height;      // width and height of the button
