@@ -20,6 +20,29 @@ The game is played with the mouse or keyboard. The player has to remember the po
 
 **Note :** _In the machine modes,the machine never misses. Besides, the machine doesn't have access to the logic of the game (the game matrix), it only has access to the screen. It reads the pixels of the screen to get the positions of the bumpers and the start position of the ball and builds a different matrix to simulate the game._
 
+## Controls
+
+- `Player Mode` :
+  - **Mouse**
+    - **Select the final position of the ball :** Click on the final position of the ball.
+  - **Keyboard**
+    - **Select the final position of the ball :** Use the arrow keys to move the ball and press `Enter` to select the final position.
+- `Machine Manual Mode` :
+  - **Mouse**
+    - **Set the bumpers :** Click on the grid to set the bumpers, 1 click to set a bumper, 2 clicks to switch its direction, 3 clicks to remove it.
+    - **Set the start position of the ball :** Click on the circle to set the start position of the ball.
+  - **Keyboard**
+    - **Set the start position of the ball :** Use the arrow keys to move the ball and press `Enter` to set the start position of the ball.
+- `Pause` :
+  - **Keyboard**
+    - **Pause the game :** Press `P` to pause the game.
+- `Skip Ball Path Display` :
+  - **Keyboard**
+    - **Skip the ball path display :** Press `S` to skip the ball path display.
+- `Exit` :
+  - **Keyboard**
+    - **Exit the game :** Press `F10` to exit the game.
+
 ## Folder Structure
 
 - `src/` : Contains all the source files.
@@ -58,10 +81,10 @@ are named the same as the source file but with a</u> `.h` <u>extension and conta
 - **For windows, don't forget to add the dlls to the `bin/` folder (not included in the repository).**
 
 ## Authors
+
 -`Yahiaoui Abderrahmane` : **[GitHub](https://github.com/Abdo30004) / [Discord](https://discordapp.com/users/760952710383665192)**
 
 -`Oubyi Mohamed Yacine` : **[GitHub](https://github.com/YassWrld) / [Discord](https://discordapp.com/users/989586655612645467)**
-
 
 ## Screenshots
 
