@@ -488,6 +488,22 @@ void drawTextInput(SDL_Renderer *renderer, game *Game)
     writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, WINDOW_HEIGHT / 2 + 150, fontSize, FONT_COLOR);
     int iconSize = 100;
     drawImage(renderer, ENTER_ICON_PATH, WINDOW_WIDTH / 2 - iconSize / 2, WINDOW_HEIGHT / 2 + 200, iconSize, iconSize);
+
+    // back button in the top left corner
+    button backButton = {
+        60,
+        60,
+        100,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "back",
+        BACK_ICON_PATH};
+    Game->buttons.MainMenu = backButton;
+    drawButton(renderer, &backButton);
 }
 
 void drawGrid(SDL_Renderer *renderer, game *Game)

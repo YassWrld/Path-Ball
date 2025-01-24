@@ -22,14 +22,15 @@ void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game 
 
 void handleGlobal(SDL_Event event, int *quit)
 {
-    if (event.type == SDL_QUIT || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE)) // quit
+
+    if (event.type == SDL_QUIT || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_F10)) // quit
     {
         *quit = 1;
         return;
     }
 }
 
-void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game)
+void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game)
 {
 
     if (Game->state == TextInput) // Text input mode
@@ -106,8 +107,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
             insertScore(Game->player);
             Game->helpers.updatedTopPlayers = true;
         }
-
-        *Secreen = MainMenu;
+        *Screen = MainMenu;
         return;
     }
     if (Game->state == GameOver)
@@ -346,7 +346,7 @@ void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
     }
 }
 
-void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game)
+void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game)
 {
     if (event.type != SDL_MOUSEBUTTONUP)
         return;
@@ -355,24 +355,24 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, ga
 
     if (isClickInButton(event, Game, Game->buttons.PlayerGameMode))
     {
-        *Secreen = PlayerGameMode;
+        *Screen = PlayerGameMode;
         initGame(Game, false, false, false); // player mode
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.MachineGameMode))
     {
-        *Secreen = ChooseMachineGameMode;
+        *Screen = ChooseMachineGameMode;
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.TopPlayers))
     {
 
-        *Secreen = TopPlayers;
+        *Screen = TopPlayers;
         return;
     }
 }
 
-void handleChooseMachineGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game)
+void handleChooseMachineGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game)
 {
     if (event.type != SDL_MOUSEBUTTONUP)
         return;
@@ -381,24 +381,24 @@ void handleChooseMachineGameMode(SDL_Event event, SDL_Renderer *renderer, screen
 
     if (isClickInButton(event, Game, Game->buttons.MachineGameAutoMode))
     {
-        *Secreen = MachineGameMode;
+        *Screen = MachineGameMode;
         initGame(Game, true, false, false);
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.MachineGameManualMode))
     {
-        *Secreen = MachineGameMode;
+        *Screen = MachineGameMode;
         initGame(Game, true, true, false);
         return;
     }
     if (isClickInButton(event, Game, Game->buttons.MainMenu))
     {
-        *Secreen = MainMenu;
+        *Screen = MainMenu;
         return;
     }
 }
 
-void handleTopPlayers(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, game *Game)
+void handleTopPlayers(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game)
 {
     if (event.type != SDL_MOUSEBUTTONUP)
         return;
@@ -408,7 +408,7 @@ void handleTopPlayers(SDL_Event event, SDL_Renderer *renderer, screen *Secreen, 
     if (isClickInButton(event, Game, Game->buttons.MainMenu))
     {
 
-        *Secreen = MainMenu;
+        *Screen = MainMenu;
         return;
     }
 }
