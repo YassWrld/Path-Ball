@@ -17,6 +17,9 @@ void handleEvents(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game 
     case TopPlayers:
         handleTopPlayers(event, renderer, Screen, Game);
         break;
+    case Credits:
+        handleCredits(event, renderer, Screen, Game);
+        break;
     }
 }
 
@@ -26,6 +29,15 @@ void handleGlobal(SDL_Event event, int *quit)
     if (event.type == SDL_QUIT || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_F10)) // quit
     {
         *quit = 1;
+        return;
+    }
+}
+
+void handleCredits(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game)
+{
+    if (isClickInButton(event, Game, Game->buttons.MainMenu))
+    {
+        *Screen = MainMenu;
         return;
     }
 }
@@ -368,6 +380,12 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Screen, gam
     {
 
         *Screen = TopPlayers;
+        return;
+    }
+    if (isClickInButton(event, Game, Game->buttons.Credits))
+    {
+        Game->helpers.creditsAnimationStartTime = 0;
+        *Screen = Credits;
         return;
     }
 }

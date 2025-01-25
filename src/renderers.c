@@ -23,6 +23,10 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game)
     case TopPlayers:
         renderTopPlayersScreen(renderer, Game);
         break;
+
+    case Credits:
+        renderCreditsScreen(renderer, Game);
+        break;
     }
     SDL_RenderPresent(renderer);
 }
@@ -120,4 +124,10 @@ void renderTopPlayersScreen(SDL_Renderer *renderer, game *Game)
 void renderChooseMachineGameModeScreen(SDL_Renderer *renderer, game *Game)
 {
     drawChooseMachineGameMode(renderer, Game);
+}
+
+void renderCreditsScreen(SDL_Renderer *renderer, game *Game)
+{
+   
+    drawCredits(renderer, Game);
 }

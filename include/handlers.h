@@ -62,6 +62,18 @@ void handleMainMenu(SDL_Event event, SDL_Renderer *renderer, screen *Screen, gam
 void handleGameMode(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game);
 
 /**
+ * @brief Handle Credits Screen Events
+ *
+ * (Handles events specific to the credits screen)
+ *
+ * @param event: SDL_Event containing the event data
+ * @param renderer: SDL_Renderer pointer
+ * @param Screen: pointer to the screen structure
+ * @param Game: pointer to the game structure
+ * @return void
+ */
+void handleCredits(SDL_Event event, SDL_Renderer *renderer, screen *Screen, game *Game);
+/**
  * @brief Handle Choose Machine Screen Game Mode Events
  *
  * (Handles events specific to the choose machine screen game mode)

@@ -95,18 +95,20 @@ typedef enum game_state // game state enum
 
 typedef struct helpers // control variables
 {
-    int selected;                 // selected circle (keyboard)
-    int selectedI;                // selected i
-    int selectedJ;                // selected j
-    int memorizingStartTime;      // time when the memorizing state started
-    int gameStartTime;            // time when the game started
-    int pathDrawStartTime;        // time when the path started to be drawn
-    int pathEndCircleTime;        // time when the path ended to be drawn
-    int resultTime;               // time when the result state started
-    int pauseTime;                // time when the pause state started
-    int machineModeSelectingTime; // time when the machine mode selecting state started
-    int filledObstacles;          // number of filled obstacles
-    int win;                      // 1 if win, -1 if lose, 0 if not finished
+    int selected;                  // selected circle (keyboard)
+    int selectedI;                 // selected i
+    int selectedJ;                 // selected j
+    int memorizingStartTime;       // time when the memorizing state started
+    int creditsAnimationStartTime; // time when the credits animation started
+    int creditsAnimationIndex;     // index of the credits animation
+    int gameStartTime;             // time when the game started
+    int pathDrawStartTime;         // time when the path started to be drawn
+    int pathEndCircleTime;         // time when the path ended to be drawn
+    int resultTime;                // time when the result state started
+    int pauseTime;                 // time when the pause state started
+    int machineModeSelectingTime;  // time when the machine mode selecting state started
+    int filledObstacles;           // number of filled obstacles
+    int win;                       // 1 if win, -1 if lose, 0 if not finished
 
     bool savedScore;           // true if the score is saved in the file
     bool filledMachineMatrix;  // true if the machine matrix is filled
@@ -131,6 +133,7 @@ typedef struct buttonsHandle
     button MachineGameAutoMode;   // machine game auto mode button
     button MachineGameManualMode; // machine game manual mode button
     button TopPlayers;            // top players button
+    button Credits;               // credits button
 } buttonsHandle;
 
 typedef struct sounds_t // sounds struct (sound effects and background music)
@@ -173,6 +176,7 @@ typedef enum Screen // screen enum
     PlayerGameMode,        // player game mode screen
     MachineGameMode,       // machine game mode screen
     TopPlayers,            // top players screen
+    Credits,               // credits screen
 } screen;
 
 /**

@@ -302,6 +302,149 @@ void drawMainMenu(SDL_Renderer *renderer, game *Game)
     Game->buttons.TopPlayers = topPlayersButton;
 
     drawButton(renderer, &topPlayersButton);
+
+    int wb = 75, hb = 20;
+
+    button creditsButton = {
+        wb / 2 + 5,
+        WINDOW_HEIGHT - hb / 2 - 5,
+        wb,
+        hb,
+        {255, 255, 255, 255},
+        {255, 0, 0, 255},
+        {0, 0, 0, 255},
+        {BUTTON_OUTLINE_COLOR},
+        2,
+        "Credits",
+        CREDITS_ICON_PATH
+
+    };
+
+    Game->buttons.Credits = creditsButton;
+
+    drawButton(renderer, &creditsButton);
+}
+
+void drawCredits(SDL_Renderer *renderer, game *Game)
+{
+
+    // title
+    char text[100];
+
+
+    if (Game->helpers.creditsAnimationStartTime == 0)
+    {
+        printf("credits animation start\n");
+        Game->helpers.creditsAnimationStartTime = SDL_GetTicks();
+    }
+
+    double elapsed = (SDL_GetTicks() - Game->helpers.creditsAnimationStartTime) / 1000.0;
+    int fontSize = 30;
+    int y = WINDOW_HEIGHT;
+    int speed = 80; // speed of the text movement (pixels per second)
+    y -= (int)(speed * elapsed);
+
+    /*Developed By*/
+    sprintf(text, "Developed by:");
+    int w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    for (int k = 0; k < 3; k++)
+        SDL_RenderDrawLine(renderer, WINDOW_WIDTH / 2 - w / 2, y + fontSize + k, WINDOW_WIDTH / 2 + w / 2, y + fontSize + k);
+
+    y += 50;
+    sprintf(text, DEV_1_NAME);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, FONT_COLOR);
+    y += 50;
+    sprintf(text, DEV_2_NAME);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, FONT_COLOR);
+
+    /*Responsable Teacher*/
+    y += 100;
+
+    sprintf(text, "Responsable Teacher:");
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, 255, 0, 0, 255);
+
+    for (int k = 0; k < 3; k++)
+        SDL_RenderDrawLine(renderer, WINDOW_WIDTH / 2 - w / 2, y + fontSize + k, WINDOW_WIDTH / 2 + w / 2, y + fontSize + k);
+    y += 50;
+    sprintf(text, RESPONSABLE_TEACHER_NAME);
+
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, FONT_COLOR);
+
+    /*Special Thanks*/
+
+    y += 100;
+
+    sprintf(text, "Special Thanks to:");
+
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, 255, 0, 0, 255);
+
+    for (int k = 0; k < 3; k++)
+        SDL_RenderDrawLine(renderer, WINDOW_WIDTH / 2 - w / 2, y + fontSize + k, WINDOW_WIDTH / 2 + w / 2, y + fontSize + k);
+
+    y += 50;
+
+    sprintf(text, SPECIAL_THANKS_1_Name);
+
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, FONT_COLOR);
+
+    y += 50;
+
+    sprintf(text, SPECIAL_THANKS_2_Name);
+
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, FONT_COLOR);
+
+    y += 250;
+    fontSize = 60;
+
+    sprintf(text, GAME_TITLE);
+
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, FONT_COLOR);
+
+    y += 50;
+    drawImage(renderer, NOBG_ICON_PATH, WINDOW_WIDTH / 2 - 100, y, 200, 200);
+    y += 210;
+    fontSize = 20;
+    sprintf(text, GAME_VERSION);
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, 255, 255, 255, 255);
+
+    if (y + 100 < 0)
+    {
+        Game->helpers.creditsAnimationStartTime = 0;
+        y = WINDOW_HEIGHT;
+    }
+
+    // back button in the top left corner
+    button backButton = {
+        60,
+        60,
+        100,
+        50,
+        {BUTTON_PRIMARY_COLOR},
+        {BUTTON_HOVER_COLOR},
+        {BUTTON_LABEL_COLOR},
+        {BUTTON_OUTLINE_COLOR},
+        BUTTON_OUTLINE_THICKNESS,
+        "back",
+        BACK_ICON_PATH};
+    Game->buttons.MainMenu = backButton;
+    drawButton(renderer, &backButton);
 }
 
 void drawTopPlayers(SDL_Renderer *renderer, game *Game)

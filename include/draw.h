@@ -14,6 +14,15 @@
 #include "logic.h"
 
 #define GAME_TITLE "Path Ball"
+#define GAME_VERSION "Version 1.0.0"
+
+#define DEV_1_NAME "Yahiaoui Abderrahmane"
+#define DEV_2_NAME "Oubyi Mohamed Yacine"
+
+#define RESPONSABLE_TEACHER_NAME "Mr. Cherif Smaili"
+
+#define SPECIAL_THANKS_1_Name "Oukili Mohamed Djazil"
+#define SPECIAL_THANKS_2_Name "Meddad Zakarya"
 
 #define WINDOW_HEIGHT 700 // window height
 #define WINDOW_WIDTH 1100 // window width
@@ -65,21 +74,22 @@
 
 #define GAMEPAUSED_FONT "assets/fonts/gamepaused.otf" // game paused font path
 
-#define ICON_PATH "assets/images/icon.png"           // window icon path
-#define NOBG_ICON_PATH "assets/images/nobg-icon.png" // window icon without background  path
-#define ENTER_ICON_PATH "assets/images/enter.png"    // enter button icon path
-#define BACK_ICON_PATH "assets/images/back.png"      // back button icon path
-#define PAUSE_ICON_PATH "assets/images/pause.png"    // pause button icon path
-#define RESUME_ICON_PATH "assets/images/resume.png"  // resume button icon path
-#define ROBOT_ICON_PATH "assets/images/robot.png"    // robot icon path
-#define HUMAN_ICON_PATH "assets/images/human.png"    // human icon path
-#define CROWN_ICON_PATH "assets/images/crown.png"    // crown icon path
-#define SAVE_ICON_PATH "assets/images/save.png"      // save icon path
-#define AUTO_ICON_PATH "assets/images/auto.png"      // auto icon path
-#define MANUAL_ICON_PATH "assets/images/manual.png"  // manual icon path
-#define HEART_ICON_PATH "assets/images/heart.png"    // heart icon path
-#define EXIT_ICON_PATH "assets/images/exit.png"      // exit button icon path
-#define AGAIN_ICON_PATH "assets/images/again.png"    // again button icon path
+#define ICON_PATH "assets/images/icon.png"            // window icon path
+#define NOBG_ICON_PATH "assets/images/nobg-icon.png"  // window icon without background  path
+#define ENTER_ICON_PATH "assets/images/enter.png"     // enter button icon path
+#define BACK_ICON_PATH "assets/images/back.png"       // back button icon path
+#define PAUSE_ICON_PATH "assets/images/pause.png"     // pause button icon path
+#define RESUME_ICON_PATH "assets/images/resume.png"   // resume button icon path
+#define ROBOT_ICON_PATH "assets/images/robot.png"     // robot icon path
+#define HUMAN_ICON_PATH "assets/images/human.png"     // human icon path
+#define CROWN_ICON_PATH "assets/images/crown.png"     // crown icon path
+#define SAVE_ICON_PATH "assets/images/save.png"       // save icon path
+#define AUTO_ICON_PATH "assets/images/auto.png"       // auto icon path
+#define MANUAL_ICON_PATH "assets/images/manual.png"   // manual icon path
+#define HEART_ICON_PATH "assets/images/heart.png"     // heart icon path
+#define EXIT_ICON_PATH "assets/images/exit.png"       // exit button icon path
+#define AGAIN_ICON_PATH "assets/images/again.png"     // again button icon path
+#define CREDITS_ICON_PATH "assets/images/credits.png" // credits button icon path
 
 #define FIRST_ICON_PATH "assets/images/first.png"   // first icon path
 #define SECOND_ICON_PATH "assets/images/second.png" // second icon path
@@ -195,6 +205,16 @@ void drawBlurredBackground(SDL_Renderer *renderer);
  */
 void drawMainMenu(SDL_Renderer *renderer, game *Game);
 
+/**
+ * @brief Credits drawing
+ *
+ * (Draws the credits screen)
+ *
+ * @param renderer: SDL_Renderer pointer
+ * @param Game: pointer to the game structure
+ * @return void
+ */
+void drawCredits(SDL_Renderer *renderer, game *Game);
 /**
  * @brief Top players drawing
  *

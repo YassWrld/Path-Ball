@@ -27,6 +27,16 @@ void renderScreens(SDL_Renderer *renderer, screen Screen, game *Game);
 void renderMainMenuScreen(SDL_Renderer *renderer, game *Game);
 
 /**
+ * @brief Renders the credits screen
+ *
+ * (Renders the credits screen with appropriate graphics and text)
+ *
+ * @param renderer: SDL_Renderer pointer
+ * @param Game: pointer to the game structure
+ * @return void
+ */
+void renderCreditsScreen(SDL_Renderer *renderer, game *Game);
+/**
  * @brief Renders the game mode screen
  *
  * (Renders the game mode screen with appropriate graphics and text)
