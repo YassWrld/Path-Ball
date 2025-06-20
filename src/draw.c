@@ -1034,8 +1034,9 @@ void drawSideBar(SDL_Renderer *renderer, game *Game)
     writeText(renderer, GAMEPAUSED_FONT, text, timeRect.x + timeRect.w / 2 - w / 2, timeRect.y + fontSize / 2, fontSize, FONT_COLOR);
 
     SDL_Rect timeDisplay = {timeRect.x + timeRect.w / 2 - displayBoxWidth / 2, timeRect.y + 2 * fontSize, displayBoxWidth, fontSize};
-
-    sprintf(text, "%s", formatTime(SDL_GetTicks() - Game->helpers.gameStartTime));
+    char *timeStr = formatTime(SDL_GetTicks() - Game->helpers.gameStartTime);
+    sprintf(text, "%s", timeStr);
+    free(timeStr); 
 
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
     SDL_SetRenderDrawColor(renderer, DISPLAY_BOX_COLOR);
