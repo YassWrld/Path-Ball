@@ -140,7 +140,7 @@ void writeText(SDL_Renderer *renderer, char *fontPath, char *text, int x, int y,
 
     SDL_Color color = {r, g, b, a};
 
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+    SDL_Surface *surface = TTF_RenderUTF8_Solid(font, text, color);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_Rect rect = {x, y, surface->w, surface->h};
     SDL_RenderCopy(renderer, texture, NULL, &rect);
@@ -331,7 +331,6 @@ void drawCredits(SDL_Renderer *renderer, game *Game)
     // title
     char text[100];
 
-
     if (Game->helpers.creditsAnimationStartTime == 0)
     {
         printf("credits animation start\n");
@@ -423,6 +422,12 @@ void drawCredits(SDL_Renderer *renderer, game *Game)
     w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
 
     writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y, fontSize, 255, 255, 255, 255);
+    y += 200;
+    fontSize = 50;
+    sprintf(text, "All Rights Reserved © 2025");
+    w = mesureTextWidth(GAMEPAUSED_FONT, text, fontSize);
+
+    writeText(renderer, GAMEPAUSED_FONT, text, WINDOW_WIDTH / 2 - w / 2, y + 50, fontSize, 255, 0, 0, 255);
 
     if (y + 100 < 0)
     {
