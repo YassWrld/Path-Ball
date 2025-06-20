@@ -307,6 +307,8 @@ void getTopPlayers(player players[])
             // Do nothing, just advance the file position
         }
     }
+
+    fclose(file);
 }
 
 /*

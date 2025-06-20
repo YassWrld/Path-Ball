@@ -1,4 +1,7 @@
 #include "util.h"
+#include <logic.h>
+
+extern game Game;
 
 int randomInt(int min, int max)
 {
@@ -141,6 +144,13 @@ void playMusic(Mix_Music *music)
 
 int QuitSDL(SDL_Window **window, SDL_Renderer **renderer)
 {
+
+    Mix_FreeMusic(Game.sounds.music); // Free the music
+    Mix_FreeChunk(Game.sounds.click); // Free the click sound effect
+    Mix_FreeChunk(Game.sounds.win);   // Free the win sound effect
+    Mix_FreeChunk(Game.sounds.lose);  // Free the lose sound effect
+    Mix_FreeChunk(Game.sounds.step);  // Free the step sound effect
+    Mix_CloseAudio();                 // Close the audio subsystem
 
     SDL_DestroyRenderer(*renderer); // Destroy the renderer
     SDL_DestroyWindow(*window);     // Destroy the window
